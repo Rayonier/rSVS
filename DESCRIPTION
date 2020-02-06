@@ -1,0 +1,14 @@
+Package: rSVS
+Type: Package
+Title: R Package for Stand Visualization using SVS
+Version: 0.1.0.9000
+Author: James McCarter
+Maintainer: James McCarter <jim.mccarter@rayonier.com>
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.0.2
+Suggests: 
+    testthat

@@ -1,0 +1,7 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+rSVS.vpj
+rSVS.vpw
+rSVS.vpwhist
+rSVS.vtg
+__pycache__
