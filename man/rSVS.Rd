@@ -3,7 +3,7 @@
 \docType{package}
 \name{rSVS}
 \alias{rSVS}
-\title{A pacakge for stand level visualization using the Stand Visualization System (SVS).}
+\title{A packge for stand level visualization using the Stand Visualization System (SVS).}
 \description{
 The rSVS package provides and interface to perform SVS visualiations from R.
 }
