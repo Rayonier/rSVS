@@ -48,7 +48,10 @@ SVS <- function( data, output='svs', clumped=false, random=false, row=true, unif
     if( ! "reticulate" %in% .packages() ) print( paste0( "reticulate package NOT loaded" ) )
     if( ! "reticulate" %in% rownames(installed.packages()) ) print( paste0( "reticulate package NOT installed" ) )
     svsexe <- system.file( "bin/svs", "winsvs.exe", package="rSVS" )
-    cmdline <- paste0( svsexe, " c:/Users/mccarterj/McCarter/Projects/rSVS/inst/bin/SouthernPine.svs" )
+    demosvsfile <- system.file( "bin", "SouthernPine.svs", package="rSVS" )
+    print( demosvsfile )
+    cmdline <- paste0( svsexe, " ", demosvsfile )
+    print( cmdline )
     system( cmdline, invisible=FALSE )
 }
 
