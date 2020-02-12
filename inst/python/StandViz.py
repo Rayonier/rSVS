@@ -1,8 +1,29 @@
+#!/usr/bin/python
+#
+# Filename:...: StandViz.py
+# Description.: Stand level visualzation package using the Stand Visualization System (SVS)
+# Author......: James B. McCarter
+# Copyright...: 2020, Rayonier, Inc
+# Requirements:
+#
+
+import argparse             # ArgumentParser()
+import math
+import os                   # os.path.split(), os.path.splitext()
+import platform             # platform.system()
+import re                   # re.search()
+import sys
+import time
+
+(__file_version__, __file_date__) = ( '$Revision: 1.0.1 $', '$Date: 2020/02/12 07:19:00 $' )
+(_MyPath, _MyFile, _MyOS) = (os.path.split(sys.argv[0])[0], os.path.split(sys.argv[0])[1], platform.system())
+(_MyVersion, _MyDate) = ( __file_version__.split()[1], '{} - {}'.format(__file_date__.split()[1], __file_date__.split()[2]) )
+
 #
 # PySvsAddin.py - stand visualization adding implementation in Python
 #
 
-import ConfigParser, math, os, random, re, sys, time, win32com.client, pythoncom, _winreg
+#import ConfigParser, math, os, random, re, sys, time, win32com.client, pythoncom, _winreg
 
 ##################################
 # Begin Global Data Declarations #
@@ -13,109 +34,186 @@ import ConfigParser, math, os, random, re, sys, time, win32com.client, pythoncom
 #global OWNPATH
 VERBOSE = 0
 
-####################################
-# Begin Local Function Definitions #
-####################################
+########################################################
+# Begin Main Program - implement command line inferface
+########################################################
+def main():     # implement main scope for handling of command line execution of script
+    global DEBUG, NOTIFY, VERBOSE
+    try:
+        (DEBUG, NOTIFY, VERBOSE) = (False, False, False)
+        # ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789
+        SARG = argparse.ArgumentParser( add_help=False, usage=" %(prog)s [-B|-W|-S|-X] [-c|-f|-r|-u] [dDhnv] [-a #] [-l #] [-p #] [-w worksheet] file [file [...]]\n" +
+                                                              "\t%(prog)s [-v] [-A [FIA|NRCS]] [-F]" )
 
-def PrintUsage():
-    """Usage help if no command line arguments provided"""
-    print( '' )
-    print( 'PyStandViz.py - Python implementation of Stand Visualization Addin for Excel' )
-    print( '' )
-    print( 'PyStandViz.py [-b|-h|-s|-x] [-c|-f|-r|-u] =? -d -v -z -w worksheet file [file...]' )
-    print( '' )
-    print( 'Options:' )
-    print( '    -?      : display help' )
-    print( '    -d      : scale diameter: dbh > 10 * 1.25; dbh > 15 * 1.50' )
-    print( '    -g      : debuG output' )
-    print( '    -m      : implement thinnings a row (Mechanical) thinnings (only for Fixed coordinates)' )
-    print( '    -n      : Notify progress in DOS window' )
-    print( '    -t      : TIR format input files' )
-    print( '    -v      : verbose' )
-    print( '    -w name : worksheet name for Excel input files (not implemented yet)' )
-    print( '    -z      : zip files for transfer' )
-    print( 'Output Options:' )
-    print( '    -b      : output to BITMAP (capture .bmp and convert to .png' )
-    print( '    -h      : output to HTML (create .png and generate .html page' )
-    print( '    -s      : output to SVS (default)' )
-    print( '    -x      : output to Excel .csv file' )
-    print( 'Coordinate Options:' )
-    print( '    -c      : generate clumped coordinates' )
-    print( '    -f      : generate fixed coordinates' )
-    print( '    -r      : generate random coordinates (default)' )
-    print( '    -u      : generate uniform coordinates' )
-    print( '    -a #    : rAndomness factor (0=perfect rows, 0.4-0.8=plantations, >.8=clumps)' )
-    print( '    -l #    : cLumpiness factor (default 0.75)' )
-    print( '    -p #    : clumP ratio (n clumps = (0.01-0.5)*TPA)' )
-    print( '' )
-    print( 'Examples:' )
-    print( '  PyStandViz.py -v MyFile.csv' )
-    print( '  PyStandViz.py -c -w Stand1 MyExcelFile.xls' )
+        SARGO = SARG.add_argument_group( "Output arguments" )
+        SARGO.add_argument( "-B", action="store_true", help="output to Bitmap (capture .bmp, convert to .png)" )
+        SARGO.add_argument( "-W", action="store_true", help="output to HTML (create .png, generate .html page)" )
+        SARGO.add_argument( "-S", action="store_true", help="output to SVS (default)" )
+        SARGO.add_argument( "-X", action="store_true", help="output to eXcel (.csv file)" )
+
+        SARGC = SARG.add_argument_group( "Coordiante arguments" )
+        SARGC.add_argument( "-c", action="store_true", help="generate clumped coordinates" )
+        SARGC.add_argument( "-f", action="store_true", help="generate fixed coordinates" )
+        SARGC.add_argument( "-r", action="store_true", help="generate random coordinates" )
+        SARGC.add_argument( "-u", action="store_true", help="generate Uniform coordinates" )
+        SARGC.add_argument( "-a", action="store", nargs=1, metavar="#", help="rAndomness factor (0=perf rows, 0.4-0.8=plantation, <.8=clumps)" )
+        SARGC.add_argument( "-l", action="store", nargs=1, metavar="#", help="cLumpiness factor (default 0.75)" )
+        #SARGC.add_argument( "-w", action="store", nargs=1, metavar="name", help="worksheet name for Excel input" )
+        SARGC.add_argument( "-p", action="store", nargs=1, metavar="#", help="clumP ratio (n clumps = (0.01-0.5)*TPA)" )
+
+        SARGG = SARG.add_argument_group( "General arguments" )
+        SARGG.add_argument( "-d", action="store_true", help="scale Diameter: dbh>10*1.25; dbh>15*1.50" )
+        SARGG.add_argument( "-D", action="store_true", help="Debug output" )
+        SARGG.add_argument( "-h", action="store_true", help="display help" )
+        SARGG.add_argument( "-n", action="store_true", help="Notify progress in DOS window" )
+        SARGG.add_argument( "-v", action="store_true", help="Verbose output" )
+        #SARGG.add_argument( "-z", action="store_true", help="zip file for transfer" )
+        #SARGG.add_argument( "-m", action="store_true", help="Mechanical (row) thinning (only for Fixed coordinates)" )
+        #SARGG.add_argument( "-t", action="store_true", help="TIR format files" )
+
+        SARGT = SARG.add_argument_group( "Treeform arguments" )
+        SARGT.add_argument( "-A", action="store", nargs=1, metavar="TRFile", help="Audit treeform file versions rSVS_Species.csv" )
+        SARGT.add_argument( "-F", action="store_true", help="create FIA.TRF from NRCS.trf" )
+
+
+        SARG.add_argument( "FILELIST", nargs="*", help="Files [File [...]]")
+        SOPT = SARG.parse_args()
+        nFile = len( SOPT.FILELIST )
+
+        if( SOPT.D ): DEBUG = 1
+        if( SOPT.v ): VERBOSE = 1
+        if( SOPT.n ): NOTIFY = 1
+
+        #nfiles = len(cmdline)
+        if( (nFile==0) | SOPT.h ):
+            SARG.print_help()
+            sys.exit( "help printed" )
+
+        if( (SOPT.c==0) & (SOPT.f==0) & (SOPT.r==0) & (SOPT.u==0) ): SOPT.r = True   # random is default coordinate generation
+        if( (SOPT.B==0) & (SOPT.W==0) & (SOPT.S==0) & (SOPT.X==0) ): SOPT.S = 1   # SVS is default output
+
+        if( NOTIFY ): print( 'StandViz.py - Python implementation of Stand Visualization Addin for Excel' )
+        if( DEBUG ): print( 'len(cmdline)=%d, cmdline="%s", OPT=%s' % (nfiles, cmdline, OPT) )
+
+
+        for f in cmdline:
+            D = {}              # create data dictionary
+            if( DEBUG ): print( 'File: %s' % (f) )
+            (dirname, filename) = os.path.split( f )
+            if( DEBUG ): print( 'dirname=%s, filename=%s' % (dirname, filename) )
+            (basename, ext) = os.path.splitext( filename )
+            if( DEBUG ): print( 'dirname=%s, filename=%s, basename=%s, ext=%s' % (dirname, filename, basename, ext) )
+            DataSet = 'None'
+            if( re.search( '.csv', filename ) != None ):        # create DataSet name from filename
+                DataSet = re.sub( '.csv', '', filename )
+            elif( re.search( '.xlsx', filename ) != None ):
+                DataSet = re.sub( '.xlsx', '', filename )
+            elif( re.search( '.xls', filename ) != None ):
+                DataSet = re.sub( '.xls', '', filename )
+
+            #print 'DataSet = %s' % (DataSet)
+            SVS = StandViz( DataSet )                 # create class/dataset for input file
+
+            # if extension is .xls or xlsx file then need to determine if we are a SvsAddin format or TIR format file
+            if( ext in ['.xls', '.xlsx' ] ):            # test eXcel file for type
+                FileFormat = 'Excel'
+                FileFormat = Test_Excel_Format( f )
+                #raw_input( "Paused: After Test_Excel_Format(): %s is %s" % (f, FileFormat) )
+                if( FileFormat == 'TIR' ):      # TIR format excel files, run PyTIRData.py to extract
+                    BAT = open( '%s\\RunPyTIRData.bat' % (OWNPATH), 'w' )
+                    cmd = '"%s\\python.exe" "%s\\PyTIRData.py" "%s"\n' % (OWNPATH, OWNPATH, f)
+                    BAT.write( cmd )
+                    BAT.close()
+                    cmd = '%s\\RunPyTIRData.bat' % (OWNPATH)
+                    #raw_input( 'Running: %s' % (cmd) )
+                    os.system( cmd )
+                    #os.unlink( cmd )
+                    (standname, treatment, age) = filename.split('_')
+                    #dirname = '%s\\%s_%s' % (dirname, standname, treatment)
+                    csvfilename = '%s\\%s_%s.csv' % (dirname, standname, treatment)
+                    SVS.CSV_Load_File( csvfilename )
+                else:       # unknown excel file format
+                    sys.exit()
+            elif( ext in [ '.csv' ] ):
+                #SVS.CSV_Load_File( f )                      # load the data from .cvs file
+                if( OPT['t'] ):
+                    D = TIR_Load_Data( DataSet, f )         # load TIR format file
+                    TIR_Expand_Treelist( D, SVS )           # expand the treelist
+                else:
+                    SVS.CSV_Load_File( f )                  # load SvsAddin format .csv file
+                #print 'D.Stand.keys()=%s' % (D.Stand.keys())
+                #raw_input( "Processing .csv file, press return to continue: " )
+            else:
+                raw_input( 'unknown file type, press return to exit' )
+                sys.exit()
+
+            #raw_input( "Pause" )
+
+            if( OPT['c'] ):                             # generate tree coordinates based on requested pattern
+                SVS.Generate_Clumped( 15, 40 )          # generate clummped coordinates
+                # should be using cLumpiness and clumPration parameters
+            elif( OPT['f'] ):
+                SVS.Generate_Fixed()                    # generate fixed coordinates
+            elif( OPT['r'] ):
+                SVS.Generate_Random()                   # generate random coordinates
+                # should be using the randomness factor
+            elif( OPT['u'] ):
+                SVS.Generate_Uniform( Variation=2.0 )   # generate uniform coordinates
+
+            if( OPT['s'] ):                             # output to SVS
+                if( DEBUG ): print( 'output SVS' )
+                SVS.SVS_Create_Files( dirname )
+                SVS.SVS_Show_Files( dirname )
+            elif( OPT['x'] ):                           # output to Excel .csv file
+                if( DEBUG ): print( 'output csv file' )
+                SVS.CSV_Write_File( '%s/%s.csv' % (dirname, DataSet) )
+            elif( OPT['h'] ):                           # output to html page
+                if( DEBUG ): print( 'output html' )
+                SVS.SVS_Create_Files( dirname )
+                SVS.SVS_Webpage_Create( dirname )
+                if( OPT['z'] ): SVS.SVS_Webpage_Zip( dirname )   # if -z then zip the website for download
+            elif( OPT['b'] ):                           # output to bitmaps (.PNG)
+                if( DEBUG ): print( 'ouptut bmp file' )
+                SVS.SVS_Create_Files( dirname )
+                SVS.SVS_Create_Bitmaps( dirname )
+
+    except SystemExit:
+        pass
+    except:
+        StandViz_ReportError( sys.exc_info(), sys.argv, Header='StandViz.py\n' )
+
+##############################
+# Begin Function Definitions #
+##############################
+
+def StandViz_ReportError( errorobj, args, Header = None ):              # error reporting and traceback function
+    """ReportError( sys.exec_info(), errorfilename, sys.argv )"""
+    (MyPath, MyFile) = os.path.split( args[0] )                         # retrieve filename and path of running python script
+    (MyBaseName, MyExt) = os.path.splitext( MyFile )                    # separate basefilename from extension
+    errorfilename = "{}.txt".format(MyBaseName)                         # create new error filename based on base of script filename
+    ERRFILE = open( errorfilename, 'w' )                                # open text file for writting
+    if( Header != None ): ERRFILE.write( '%s\n' % Header )              # if Header defined, write Header to file
+    ERRFILE.write( "Error running '{}'\n".format(MyFile) )              # write error message with filename
+    MyTrace = errorobj[2]                                               # retrieve error object
+    while( MyTrace != None ):                                           # loop through stack trace
+        (line, file, name) = ( MyTrace.tb_lineno, MyTrace.tb_frame.f_code.co_filename, MyTrace.tb_frame.f_code.co_name )    # extract line, file, and error name
+        F = open( file, 'r' )                                           # open source file of Python script
+        L = F.readlines()                                               # read scripot source into memory
+        F.close()                                                       # close script file
+        code = L[line-1].strip()                                        # extract line of source code that caused error
+        ERRFILE.write( "  File '{}', line {}, in {}\n    %s\n".format(file, line, name, code) )     # write filename, source code line, error name, and error code
+        MyTrace = MyTrace.tb_next                                       # step to next level of call stack trace
+    ERRFILE.write( "errorobj: {}\n".format(errorobj) )                  # write error object and arguments for call
+    ERRFILE.write( "Calling Argument Vector: {}\n".format(args) )       # write calling arguments
+    ERRFILE.close()                                                     # close text file with error stack trace
+    os.system( "notepad.exe {}".format(errorfilename) )                 # display error log file with notepad.exe
+
 
 # -B# clump ratio # clumps = (0.01 - 0.5) * TPA
 # -G# clumpiness factor = 1.5-1.4*clumpiness factor)*clump spacing
 # -R# Randomness Factor (0 = perfect rows and columns; 0.4-0.8 aproximate planted stands; > 0.8 some clumps of 2-3 trees
 
 # not used: egijknoqy
-
-def ArgumentProcessor( args ):
-    """process command line arguments into opt dictionary and return file list"""
-    import getopt   # ?=help, a #=rAndomness factor, b=Bitmap, c=Clumped, d=scale Dia, f=Fixed, g=debuG, h=Html, l #=cLumpiness factor, m=Mechanical,
-    options = '?a:bcdfghl:mnp:rstuvw:xz' # n=Notify, p #=clumP ratio, r=Random, s=Svs, t=TIR, u=Uniform, v=Berbose, w=Worksheet, x=eXcel, z=Zip
-    global OPT
-    OPT = { '?':0, 'a':0, 'b':0, 'c':0, 'd':0, 'f':0, 'g':0, 'h':0, 'l':0, 'm':0, 'n':0, 'p':0, 'r':0, 's':0, 't':0, 'u':0, 'v':0, 'w':0, 'x':0, 'z':0 }
-    try:
-        (optlist, arglist) = getopt.getopt( args, options )
-    except getopt.error:
-        ReportError( sys.exc_info(), sys.argv, Header='PySvsAddin.py\n' )
-        return( ' ' )
-    # print 'optlist = %s, arglist = %s' % (optlist, arglist)
-    index = 0
-    for item in arglist:
-        if( item[0] == '@' ):                               # look for response file
-            fl = open( item[1:], 'r' )                      # open response file
-            while 1:                                        # read file, passing each line to getopt()
-                line = fl.readline()                        # read a line
-                if not line: break                          # stop and end of file
-                roptlist, rarglist = getopt.getopt( line.split(), options )
-                # print 'roptlist =', roptlist
-                if( len( roptlist ) > 0 ):
-                    n = len( optlist )
-                    optlist[n:n] = roptlist
-                if( len( rarglist ) > 0 ):
-                    n = len( arglist )
-                    arglist[n:n] = rarglist
-            fl.close()
-            del arglist[index]                              # delete @file from args
-        index = index + 1
-    for item in optlist:
-        if( item[1] != '' ): OPT[item[0][1]] = item[1]
-        else: OPT[item[0][1]] = 1
-    return( arglist )
-
-def ReportError( errorobj, args, Header = None ):
-    """ReportError( sys.exec_info(), errorfilename, sys.argv )"""
-    (MyPath, MyFile) = os.path.split( args[0] )
-    (MyBaseName, MyExt) = os.path.splitext( MyFile )
-    errorfilename = '%s.txt' % (MyBaseName)
-    ERRFILE = open( errorfilename, 'w' )
-    if( Header != None ): ERRFILE.write( '%s\n' % Header )
-    ERRFILE.write( 'Error running "%s"\n' % (MyFile) )
-    MyTrace = errorobj[2]
-    while( MyTrace != None ):
-        line = MyTrace.tb_lineno
-        file = MyTrace.tb_frame.f_code.co_filename
-        name = MyTrace.tb_frame.f_code.co_name
-        F = open( '%s\\%s' % (MyPath, MyFile), 'r' )
-        L = F.readlines()
-        F.close()
-        code = L[line-1].strip()
-        ERRFILE.write( '  File "%s", line %s, in %s\n    %s\n' % (file, line, name, code) )
-        MyTrace = MyTrace.tb_next
-    ERRFILE.write( '%s: %s\n' % (errorobj[0], errorobj[1].args[0]) )
-    ERRFILE.write( 'Calling Argument Vector: %s\n' % (args) )
-    ERRFILE.close()
-    os.system( 'notepad.exe %s' % (errorfilename) )
 
 ###########################
 # Begin Class Definitions #
@@ -135,8 +233,8 @@ class MeasurementData:
     # D.STand['StandName'].Plot[0] = PlotData( 0, Size=1.0 )
     #D.Stand['StandName'].Plot[0].Tree[1] = TreeData( Species, TreeNumber, X, Y )
     #D.Stand['StandName'].Plot[0].Tree[1].Year[1] = (DBH, Height, CrownRatio, TPA, Live, Status, Condition, ... )
-    def __init__( self, DBH=None, Height=None, CrownRatio=None, TPA=None, Live=None, Status=None, 
-                  Condition=None, Bearing=None, BrokenHeight=None, BrokenOffset=None, 
+    def __init__( self, DBH=None, Height=None, CrownRatio=None, TPA=None, Live=None, Status=None,
+                  Condition=None, Bearing=None, BrokenHeight=None, BrokenOffset=None,
                   CrownRadius=None, DMR=None, LeanAngle=None, RootWad=None ):
         self.DBH = DBH                      # Diameter at Breat Height
         self.Height = Height                # Height
@@ -189,9 +287,9 @@ class StandData:
     #D.Stand[1] = StandData( 'StandName' )
     def __init__( self, Name, Plots=False ):
         self.Name = Name                    # name for stand
-        if( Plots ): 
+        if( Plots ):
             self.Plot = {}                      # dictionary to hold PlotData objects
-        else: 
+        else:
             self.Tree = {}                      # dictionary for TreeData objects
             self.Year = {}                      # dictionary to hold stand summary information
 
@@ -214,8 +312,8 @@ class ForestData:
 #         for t in D.Stand[s].Plot[p].Tree.keys()
 #             (Spp, Dbh, Ht, Cr, TPA) = D.Stand[s].Plot[p].Tree[t]
 
-class PyStandViz:
-    """class to handle interface for SVS-Addin"""
+class SVS:
+    """class to handle interface to Stand Visualization System (SVS)"""
     def __init__( self, DataSetName ):
         self.ResolutionLow = '1024x768'
         self.ResolutionHigh = '2048x1536'
@@ -308,7 +406,7 @@ class PyStandViz:
                 for t in trees:
                     if( not self.Data.Stand[s].Tree.has_key(t) ): continue
                     if( not self.Data.Stand[s].Tree[t].Year.has_key(y) ): continue
-                    (species, dbh, ht, tpa, treeno, live, cclass, status) = ( self.Data.Stand[s].Tree[t].Species, 
+                    (species, dbh, ht, tpa, treeno, live, cclass, status) = ( self.Data.Stand[s].Tree[t].Species,
                             self.Data.Stand[s].Tree[t].Year[y].DBH, self.Data.Stand[s].Tree[t].Year[y].Height,
                             self.Data.Stand[s].Tree[t].Year[y].TPA, self.Data.Stand[s].Tree[t].TreeNumber,
                             self.Data.Stand[s].Tree[t].Year[y].Live, self.Data.Stand[s].Tree[t].Year[y].Condition,
@@ -399,10 +497,10 @@ class PyStandViz:
             trees = self.Data.Stand[s].Tree.keys()
             trees.sort()
             for t in trees:
-                if( x > 208.71 ): 
+                if( x > 208.71 ):
                     x = 5
                     y += spacing
-                if( y > 208.71 ): 
+                if( y > 208.71 ):
                     x = 5
                     y = 5
                 GRID[t] = (x,y)
@@ -535,13 +633,13 @@ class PyStandViz:
         ProjectName = self.Data.Name
         #if( not os.path.exists( 'svsfiles' ) ): os.mkdir( 'svsfiles' )
         target_path = '%s\\svsfiles' % (dirname)
-        if( not os.path.exists( target_path ) ): 
+        if( not os.path.exists( target_path ) ):
             print( 'did not find %s, create it' % (target_path) )
             os.mkdir( target_path )
         #else: print '%s exists already' % (target_path)
         target_path = '%s\\svsfiles\\%s' % (dirname, ProjectName)
         print( 'Creating SVS files in %s' % (target_path) )
-        if( not os.path.exists( target_path ) ): 
+        if( not os.path.exists( target_path ) ):
             print( 'did not find %s, create it' % (target_path) )
             os.mkdir( target_path )
         #else: print '%s exists already' % (target_path)
@@ -576,7 +674,7 @@ class PyStandViz:
                 for t in trees:
                     if( not self.Data.Stand[s].Tree.has_key(t) ): continue
                     if( not self.Data.Stand[s].Tree[t].Year.has_key(y) ): continue
-                    (species, dbh, ht, tpa, treeno, live, cclass, status) = ( self.Data.Stand[s].Tree[t].Species, 
+                    (species, dbh, ht, tpa, treeno, live, cclass, status) = ( self.Data.Stand[s].Tree[t].Species,
                              self.Data.Stand[s].Tree[t].Year[y].DBH, self.Data.Stand[s].Tree[t].Year[y].Height,
                              self.Data.Stand[s].Tree[t].Year[y].TPA, self.Data.Stand[s].Tree[t].TreeNumber,
                              self.Data.Stand[s].Tree[t].Year[y].Live, self.Data.Stand[s].Tree[t].Year[y].Condition,
@@ -637,7 +735,7 @@ class PyStandViz:
     def SVS_Write_Tree( self, species, treeno, pclass, cclass, status, dbh, ht,lang, bearing, edia, cw, cr, tpa, mark, x, y, z ):
         """"""
         fmtstr = '%-15s %-14s %4s %4s %4s %6s %6s %5s %5s %5s %6.2f %4.2f %6.2f %4.2f %6.2f %4.2f %6.2f %4.2f %6s %3s %9.2f %8.2f %8s\n'
-        self.SVF.write( fmtstr % (species, treeno, pclass, cclass, status, dbh, ht, lang, bearing, edia, cw, cr, cw, cr, cw, cr, 
+        self.SVF.write( fmtstr % (species, treeno, pclass, cclass, status, dbh, ht, lang, bearing, edia, cw, cr, cw, cr, cw, cr,
                    cw, cr, tpa, mark, x, y, z ) )
 
     def SVS_Write_Tree_Broken( self, species, treeno, pclass, cclass, status, dbh, ht,lang, bearing, edia, cw, cr, tpa, mark, x, y, z ):
@@ -857,8 +955,8 @@ def TIR_Expand_Treelist( D, SVS ):
             if( not D.Stand[s].Tree.has_key(t) ): continue
             if( not D.Stand[s].Tree[t].Year.has_key(y) ): continue
             #print 'Looking for %s, %s, %s' % (s,t,y)
-            (species, dbh, ht, live, status, cclass, tpa) = (D.Stand[s].Tree[t].Species, D.Stand[s].Tree[t].Year[y].DBH, 
-                D.Stand[s].Tree[t].Year[y].Height, D.Stand[s].Tree[t].Year[y].Live, D.Stand[s].Tree[t].Year[y].Status, 
+            (species, dbh, ht, live, status, cclass, tpa) = (D.Stand[s].Tree[t].Species, D.Stand[s].Tree[t].Year[y].DBH,
+                D.Stand[s].Tree[t].Year[y].Height, D.Stand[s].Tree[t].Year[y].Live, D.Stand[s].Tree[t].Year[y].Status,
                 D.Stand[s].Tree[t].Year[y].Condition, D.Stand[s].Tree[t].Year[y].TPA)
             for n in range( 1, int( math.ceil( tpa ) )+1, 1 ):
                 ntree = len( SVS.Data.Stand[s].Tree ) + 1
@@ -872,8 +970,8 @@ def TIR_Expand_Treelist( D, SVS ):
                 if( not D.Stand[s].Tree.has_key(t) ): continue
                 if( not D.Stand[s].Tree[t].Year.has_key(y) ): continue
                 #print y, t
-                (species, dbh, ht, live, status, cclass, tpa) = (D.Stand[s].Tree[t].Species, D.Stand[s].Tree[t].Year[y].DBH, 
-                    D.Stand[s].Tree[t].Year[y].Height, D.Stand[s].Tree[t].Year[y].Live, D.Stand[s].Tree[t].Year[y].Status, 
+                (species, dbh, ht, live, status, cclass, tpa) = (D.Stand[s].Tree[t].Species, D.Stand[s].Tree[t].Year[y].DBH,
+                    D.Stand[s].Tree[t].Year[y].Height, D.Stand[s].Tree[t].Year[y].Live, D.Stand[s].Tree[t].Year[y].Status,
                     D.Stand[s].Tree[t].Year[y].Condition, D.Stand[s].Tree[t].Year[y].TPA)
                 ntree = 0
                 for n in range( 1, int( math.ceil( tpa ) )+1, 1 ):
@@ -906,7 +1004,7 @@ def TIR_Load_Data( DataSet, filename ):
             if( not TD[standname][year][treeno].has_key( 'Live' ) ):
                 TD[standname][year][treeno]['Live'] = (species, dbh, ht, tpa, live, status, cclass)
             else: print( 'error, already have tree record' )
-        elif( status == 'Cut' ): 
+        elif( status == 'Cut' ):
             if( not TD[standname][year][treeno].has_key( 'Cut' ) ):
                 TD[standname][year][treeno]['Cut'] = (species, dbh, ht, tpa, live, status, cclass)
             else: print( 'error, already have cut record' )
@@ -942,11 +1040,11 @@ def TIR_Load_Data( DataSet, filename ):
             print( '%s at %s: %s' % (s, y, trees) )
             for t in trees:
                 #print 'Tree %s, Live=%s' % (t, TD[s][y][t]['Live'])
-                if( TD[s][y][t].has_key('Live')): 
+                if( TD[s][y][t].has_key('Live')):
                     (species, dbh, ht, tpa, live, status, cclass) = TD[s][y][t]['Live']
                     if( not D.Stand[s].Tree.has_key(t) ): D.Stand[s].Tree[t] = TreeData( species, TreeNumber=t )
                     D.Stand[s].Tree[t].Year[y] = MeasurementData( dbh, ht, '', tpa, live, status, cclass)
-                if( TD[s][y][t].has_key('Cut')): 
+                if( TD[s][y][t].has_key('Cut')):
                     (species, dbh, ht, tpa, live, status, cclass) = TD[s][y][t]['Cut']
                     if( not D.Stand[s].Cut.has_key(t) ): D.Stand[s].Cut[t] = TreeData( species, TreeNumber=t )
                     D.Stand[s].Cut[t].Year[y] = MeasurementData( dbh, ht, '', tpa, live, status, cclass)
@@ -1008,8 +1106,8 @@ def Test_Excel_Format( filename ):
     for sheet in WB.Sheets:
         #print 'Worksheet: %s' % (sheet.Name)
         XLS = XL.Worksheets( sheet.Name )
-        if( sheet.Name == 'Configuration' ): 
-            A1 = XLS.Range( "A1:A1" ).Value 
+        if( sheet.Name == 'Configuration' ):
+            A1 = XLS.Range( "A1:A1" ).Value
             B1 = XLS.Range( "B1:B1" ).Value
             if( (A1 == 'Worksheet') & (B1 == 'TreeformFile') ): bHaveConfig = True
         else:
@@ -1028,121 +1126,6 @@ def Test_Excel_Format( filename ):
     del XL
     return( FileFormat )
 
-
-#####################################
-# Define default interface for file #
-#####################################
-
-def main():
-    """Default interface for file"""
-    try:
-        #print 'Arg0=%s' % (sys.argv[0])
-        (OWNPATH, file) = os.path.split(sys.argv[0])
-        #raw_input('argv=%s, OWNPATH=%s' % (sys.argv[0], OWNPATH))
-        cmdline = ArgumentProcessor( sys.argv[1:] )
-        (DEBUG, NOTIFY, VERBOSE) = (0,0,0)
-        if( OPT['g'] ): DEBUG = 1
-        if( OPT['v'] ): VERBOSE = 1
-        if( OPT['n'] ): NOTIFY = 1
-        nfiles = len(cmdline)
-        if( nfiles == 0 ):
-            PrintUsage()
-            sys.exit( 0 )
-        if( (OPT['b']==0) & (OPT['h']==0) & (OPT['s']==0) & (OPT['x']==0) ): OPT['s'] = 1   # SVS is default output
-        if( (OPT['c']==0) & (OPT['f']==0) & (OPT['r']==0) & (OPT['u']==0) ): OPT['r'] = 1   # random is default coordinate generation
-
-        if( NOTIFY ): print( 'PyStandViz.py - Python implementation of Stand Visualization Addin for Excel' )
-        if( VERBOSE ): print( 'len(cmdline)=%d, cmdline="%s", OPT=%s' % (nfiles, cmdline, OPT) )
-
-        if( OPT['t'] ): 
-            #raw_input( 'Processing TIR format files, press return to continue' )
-            if( not os.path.exists( '%s/PyTIRData.py' % (OWNPATH) ) ):
-                raw_input( "PyTIRData.py does not exist, can't do TIR format files ")
-
-
-        for f in cmdline:
-            D = {}              # create data dictionary
-            if( DEBUG ): print( 'File: %s' % (f) )
-            (dirname, filename) = os.path.split( f )
-            if( DEBUG ): print( 'dirname=%s, filename=%s' % (dirname, filename) )
-            (basename, ext) = os.path.splitext( filename )
-            if( DEBUG ): print( 'dirname=%s, filename=%s, basename=%s, ext=%s' % (dirname, filename, basename, ext) )
-            DataSet = 'None'
-            if( re.search( '.csv', filename ) != None ):        # create DataSet name from filename
-                DataSet = re.sub( '.csv', '', filename )
-            elif( re.search( '.xlsx', filename ) != None ):
-                DataSet = re.sub( '.xlsx', '', filename )
-            elif( re.search( '.xls', filename ) != None ):
-                DataSet = re.sub( '.xls', '', filename )
-
-            #print 'DataSet = %s' % (DataSet)
-            SVS = PyStandViz( DataSet )                 # create class/dataset for input file
-
-            # if extension is .xls or xlsx file then need to determine if we are a SvsAddin format or TIR format file
-            if( ext in ['.xls', '.xlsx' ] ):            # test eXcel file for type
-                FileFormat = 'Excel'
-                FileFormat = Test_Excel_Format( f )
-                #raw_input( "Paused: After Test_Excel_Format(): %s is %s" % (f, FileFormat) )
-                if( FileFormat == 'TIR' ):      # TIR format excel files, run PyTIRData.py to extract
-                    BAT = open( '%s\\RunPyTIRData.bat' % (OWNPATH), 'w' )
-                    cmd = '"%s\\python.exe" "%s\\PyTIRData.py" "%s"\n' % (OWNPATH, OWNPATH, f)
-                    BAT.write( cmd )
-                    BAT.close()
-                    cmd = '%s\\RunPyTIRData.bat' % (OWNPATH)
-                    #raw_input( 'Running: %s' % (cmd) )
-                    os.system( cmd )
-                    #os.unlink( cmd )
-                    (standname, treatment, age) = filename.split('_')
-                    #dirname = '%s\\%s_%s' % (dirname, standname, treatment)
-                    csvfilename = '%s\\%s_%s.csv' % (dirname, standname, treatment)
-                    SVS.CSV_Load_File( csvfilename )
-                else:       # unknown excel file format
-                    sys.exit()
-            elif( ext in [ '.csv' ] ):
-                #SVS.CSV_Load_File( f )                      # load the data from .cvs file
-                if( OPT['t'] ): 
-                    D = TIR_Load_Data( DataSet, f )         # load TIR format file
-                    TIR_Expand_Treelist( D, SVS )           # expand the treelist
-                else: 
-                    SVS.CSV_Load_File( f )                  # load SvsAddin format .csv file
-                #print 'D.Stand.keys()=%s' % (D.Stand.keys())
-                #raw_input( "Processing .csv file, press return to continue: " )
-            else:
-                raw_input( 'unknown file type, press return to exit' )
-                sys.exit()
-                
-            #raw_input( "Pause" )
-
-            if( OPT['c'] ):                             # generate tree coordinates based on requested pattern
-                SVS.Generate_Clumped( 15, 40 )          # generate clummped coordinates
-                # should be using cLumpiness and clumPration parameters
-            elif( OPT['f'] ):
-                SVS.Generate_Fixed()                    # generate fixed coordinates
-            elif( OPT['r'] ):
-                SVS.Generate_Random()                   # generate random coordinates
-                # should be using the randomness factor
-            elif( OPT['u'] ):
-                SVS.Generate_Uniform( Variation=2.0 )   # generate uniform coordinates
-
-            if( OPT['s'] ):                             # output to SVS
-                if( DEBUG ): print( 'output SVS' )
-                SVS.SVS_Create_Files( dirname )
-                SVS.SVS_Show_Files( dirname )
-            elif( OPT['x'] ):                           # output to Excel .csv file
-                if( DEBUG ): print( 'output csv file' )
-                SVS.CSV_Write_File( '%s/%s.csv' % (dirname, DataSet) )
-            elif( OPT['h'] ):                           # output to html page
-                if( DEBUG ): print( 'output html' )
-                SVS.SVS_Create_Files( dirname )
-                SVS.SVS_Webpage_Create( dirname )
-                if( OPT['z'] ): SVS.SVS_Webpage_Zip( dirname )   # if -z then zip the website for download
-            elif( OPT['b'] ):                           # output to bitmaps (.PNG)
-                if( DEBUG ): print( 'ouptut bmp file' )
-                SVS.SVS_Create_Files( dirname )
-                SVS.SVS_Create_Bitmaps( dirname )
-
-    except (StandardError), e:
-        ReportError( sys.exc_info(), sys.argv, Header='PyStandViz.py' )
 
 ########################
 # Begin Execution Here #
@@ -1192,9 +1175,9 @@ if( __name__ == "__main__" ):
 
 # random.random()  # rand float between 0 and 1
 # RS = random.getstate()
-# random.setstate( RS) 
+# random.setstate( RS)
 # random.seed( longint )
-    
+
 """
 TQI = 1-2
 Tree[tqi][drank]

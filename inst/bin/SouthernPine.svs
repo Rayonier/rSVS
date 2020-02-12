@@ -2,9 +2,9 @@
 #PLOTSIZE    208.71 208.71
 #FORMAT      2
 #UNITS       ENGLISH
-#PALETTE .\inst\bin\SVS\SvAddin.pal
+##PALETTE .\inst\bin\SVS\SvAddin.pal
 ;
-#TREEFORM .\inst\bin\SVS\PLANTS-SvAddin.trf
+#TREEFORM .\inst\bin\SVS\NRCS.trf
 ;
 ;              |                                                           Crown       Crown       Crown       Crown
 ;              |    Plant        Class   Tree                            end  RadiusRatio RadiusRatio RadiusRatio RadiusRatio Expans Mark  X Coor-  Y Coor-
