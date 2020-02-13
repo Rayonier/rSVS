@@ -29,7 +29,11 @@ NULL
 #' @export
 SVS_Demo <- function( Stand=NULL ) {
     svsexe <- system.file( "bin/svs", "winsvs.exe", package="rSVS" )
-    if( Stand=='BottomlandHardwood' ) {
+    if( is.null(Stand) ) {
+        print( paste0( "Please pick one of: BottomlandHardwood, Douglas-fir, LodgepolePine, MixedConifer, MontaneOak-Hickory, ",
+                       "PacificSilverFir-Hemlock, Redwood, SouthernPine, or Spruce-Fir" ) )
+        return('SVS_Demo() exited.')
+    } else if( Stand=='BottomlandHardwood' ) {
         svsfile <- system.file( "bin", "BottomlandHardwood.svs", package="rSVS" )
     } else if( Stand == 'Douglas-fir' ) {
         svsfile <- system.file( "bin", "Douglas-fir.svs", package="rSVS" )
@@ -47,14 +51,11 @@ SVS_Demo <- function( Stand=NULL ) {
         svsfile <- system.file( "bin", "SouthernPine.svs", package="rSVS" )
     } else if( Stand == 'Spruce-Fir') {
         svsfile <- system.file( "bin", "Spruce-Fir.svs", package="rSVS" )
-    } else {
-        print( paste0( "Please pick one of: BottomlandHardwood, Douglas-fir, LodgepolePine, MixedConifer, MontaneOak-Hickory, ",
-                       "PacificSilverFir-Hemlock, Redwood, SouthernPine, or Spruce-Fir" ) )
-        return()
     }
     cmdline <- paste0( svsexe, " ", svsfile )
-    print( cmdline )
+    #print( cmdline )
     system( cmdline, invisible=FALSE )
+    return( 'SVS existed.' )
 }
 
 #' Visualize stand using the Stand Visualization System (SVS)
