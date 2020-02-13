@@ -17,27 +17,67 @@ NULL
 #   Check Package:             'Ctrl + Shift + E'
 #   Test Package:              'Ctrl + Shift + T'
 
+#' Demonstrate Stand Visualiztion on several stand types
+#'
+#' Display one of several included SVS files to demonstrate different stand types.
+#'
+#' @param StandType Name of stand to display
+#' @author Jim McCarter \email{jim.mccarter@@rayonier.com}
+#' @examples
+#' SVS_Demo( 'SouthernPine' )
+#' SVS_Demo( 'Douglas-fir' )
+#' @export
+SVS_Demo <- function( Stand=NULL ) {
+    svsexe <- system.file( "bin/svs", "winsvs.exe", package="rSVS" )
+    if( Stand=='BottomlandHardwood' ) {
+        svsfile <- system.file( "bin", "BottomlandHardwood.svs", package="rSVS" )
+    } else if( Stand == 'Douglas-fir' ) {
+        svsfile <- system.file( "bin", "Douglas-fir.svs", package="rSVS" )
+    } else if( Stand == 'LodgepolePine' ) {
+        svsfile <- system.file( "bin", "LodgepolePine.svs", package="rSVS" )
+    } else if( Stand == 'MixedConifer' ) {
+        svsfile <- system.file( "bin", "MixedConifer.svs", package="rSVS" )
+    } else if( Stand == 'MontaneOak-Hickory' ) {
+        svsfile <- system.file( "bin", "MontaneOak-Hickory.svs", package="rSVS" )
+    } else if( Stand == 'PacificSilverFir-Hemlock' ) {
+        svsfile <- system.file( "bin", "PacificSilverFir-Hemlock.svs", package="rSVS" )
+    } else if( Stand == 'Redwood' ) {
+        svsfile <- system.file( "bin", "Redwood.svs", package="rSVS" )
+    } else if( Stand == 'SouthernPine' ) {
+        svsfile <- system.file( "bin", "SouthernPine.svs", package="rSVS" )
+    } else if( Stand == 'Spruce-Fir') {
+        svsfile <- system.file( "bin", "Spruce-Fir.svs", package="rSVS" )
+    } else {
+        print( paste0( "Please pick one of: BottomlandHardwood, Douglas-fir, LodgepolePine, MixedConifer, MontaneOak-Hickory, ",
+                       "PacificSilverFir-Hemlock, Redwood, SouthernPine, or Spruce-Fir" ) )
+        return()
+    }
+    cmdline <- paste0( svsexe, " ", svsfile )
+    print( cmdline )
+    system( cmdline, invisible=FALSE )
+}
+
 #' Visualize stand using the Stand Visualization System (SVS)
 #'
 #' The SVS() function will create stand level visualizations of data frames containing appropriate information.  The
 #' function has the abillity to generate coordinates if they are not provided.
 #'
-#' pystandviz internal format:
+#' StandViz internal format:
 #' stand, year, species, treeno, x, y, dbh, height, crownratio, crownradius, tpa, live, status, condition, svsstatus, bearing, brokenht, brokenoffset, dmr, leanangle, rootwad
 #'
 #' rsvs data frame format:
 #' stand, year, treeno, species, dbh, height, crownratio, crownradius, tpa, x, y, live, status, condition, (svsstatus, brokenht, brokenoffset, bearing, dmr, leanangle, rootwad)
 #'
 #' @param data compatible data frame (see details)
-#' @param output what and were to product output
-#' @param clumped generate clumped coordinates
-#' @param random generate random coordiantes
-#' @param row generate coordinates for rows (plantation)
-#' @param uniform generate uniform coordinates
+#' @param output what and were to product output (SVS | BITMAP | WEB | CSV )
+#' @param clumped if TRUE generate clumped coordinates
+#' @param random if TRUE generate random coordiantes
+#' @param row if TRUE generate coordinates for rows (plantation)
+#' @param uniform if TRUE generate uniform coordinates
 #' @param randommess control "noise" of coordinates generated
 #' @param clumpiness adjust clump strength
 #' @param clumpratio adjust number/size of clumps
-#' @author james mccarter
+#' @author James Mccarter \email{jim.mccarter@@rayonier.com}
 #' @examples
 #' svs( d )
 #' svs( d, random=true )    # visualize stand in svs using random tree locations
@@ -53,6 +93,13 @@ SVS <- function( data, output='svs', clumped=false, random=false, row=true, unif
     cmdline <- paste0( svsexe, " ", demosvsfile )
     print( cmdline )
     system( cmdline, invisible=FALSE )
+    # if reticulate
+    # library(reticulate)
+    # SVS <- import_from_path( "StandViz", path="inst/python" ) 
+    # else
+    # pyexe <- system.file( "bin/python38", "python.exe", package="rSVS" )
+    # StandViz <- system.file( "python", "StandViz.py", package="rSVS" )
+    # cmdline <- paste0( pyexe, " ", StandViz, " arguments go here" )
 }
 
 
