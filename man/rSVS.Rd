@@ -5,5 +5,15 @@
 \alias{rSVS}
 \title{A packge for stand level visualization using the Stand Visualization System (SVS).}
 \description{
-The rSVS package provides and interface to perform SVS visualiations from R.
+This rSVS package provides and interface to perform SVS visualiations from R.
+}
+\details{
+The package includes the following functions:
+\itemize{
+    \item SVS() - main function for performing visualziations
+    \item SVS_Demo() - show reginal example visulizations
+    \item FIA2NRCS() - convert species codes from FIA # to NRCS code
+    \item NRCS2FIA() - convert species codes from NRCS code to FIA #
+    \item SVS_Species() - list known species
+}
 }

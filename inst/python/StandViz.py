@@ -10,6 +10,7 @@
 import argparse             # ArgumentParser()
 import math
 import os                   # os.path.split(), os.path.splitext()
+import pandas as pd         # Pandas DataFrame, .read_csv()
 import platform             # platform.system()
 import re                   # re.search()
 import sys
@@ -41,12 +42,13 @@ def main():     # implement main scope for handling of command line execution of
     global DEBUG, NOTIFY, VERBOSE
     try:
         (DEBUG, NOTIFY, VERBOSE) = (False, False, False)
-        # ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789
+        # ..C.E.GHIJKLMNOPQR.TU...YZ .b..e.g.ijk.m.o.q.st..wxyz 0123456789
         SARG = argparse.ArgumentParser( add_help=False, usage=" %(prog)s [-B|-W|-S|-X] [-c|-f|-r|-u] [dDhnv] [-a #] [-l #] [-p #] [-w worksheet] file [file [...]]\n" +
                                                               "\t%(prog)s [-v] [-A [FIA|NRCS]] [-F]" )
 
         SARGO = SARG.add_argument_group( "Output arguments" )
         SARGO.add_argument( "-B", action="store_true", help="output to Bitmap (capture .bmp, convert to .png)" )
+        SARGO.add_argument( "-D", action="store_true", help="Debug output" )
         SARGO.add_argument( "-W", action="store_true", help="output to HTML (create .png, generate .html page)" )
         SARGO.add_argument( "-S", action="store_true", help="output to SVS (default)" )
         SARGO.add_argument( "-X", action="store_true", help="output to eXcel (.csv file)" )
@@ -63,7 +65,6 @@ def main():     # implement main scope for handling of command line execution of
 
         SARGG = SARG.add_argument_group( "General arguments" )
         SARGG.add_argument( "-d", action="store_true", help="scale Diameter: dbh>10*1.25; dbh>15*1.50" )
-        SARGG.add_argument( "-D", action="store_true", help="Debug output" )
         SARGG.add_argument( "-h", action="store_true", help="display help" )
         SARGG.add_argument( "-n", action="store_true", help="Notify progress in DOS window" )
         SARGG.add_argument( "-v", action="store_true", help="Verbose output" )
@@ -74,6 +75,7 @@ def main():     # implement main scope for handling of command line execution of
         SARGT = SARG.add_argument_group( "Treeform arguments" )
         SARGT.add_argument( "-A", action="store", nargs=1, metavar="TRFile", help="Audit treeform file versions rSVS_Species.csv" )
         SARGT.add_argument( "-F", action="store_true", help="create FIA.TRF from NRCS.trf" )
+        SARGT.add_argument( "-V", action="store_true", help="Validate rSVS_Species.csv file" )
 
 
         SARG.add_argument( "FILELIST", nargs="*", help="Files [File [...]]")
@@ -83,6 +85,48 @@ def main():     # implement main scope for handling of command line execution of
         if( SOPT.D ): DEBUG = 1
         if( SOPT.v ): VERBOSE = 1
         if( SOPT.n ): NOTIFY = 1
+
+        if( SOPT.A ):           # audit TreeForm file against rSVS_Species.csv
+            print( "Performing audit of {}.trf against rSVS_Species.csv".format(SOPT.A[0]) )
+            SppFile = "../bin/rSVS_Species.csv"
+            SPP = pd.read_csv( SppFile )
+            print( "Read {} lines from {}".format(len(SPP.index), SppFile) )
+            SppCodes = SOPT.A[0]
+            TreeFormFile = "../bin/SVS/{}.trf".format(SppCodes)
+            (SpecialForm, SppForm) = SVS_LoadTreeFormFile( TreeFormFile )
+            print( "Read {} lines from {}".format(len(SppForm.keys()), TreeFormFile) )
+            AUDIT = {}
+            for S in SPP.itertuples():
+                (FIA, NRCS, Genus, Species) = (S.FIA, S.NRCS, S.Genus, S.Species)
+                if( SppCodes == 'NRCS' ):
+                    if( not NRCS in AUDIT ): AUDIT[NRCS] = 1
+                elif( SppCodes == 'FIA' ):
+                    if( not FIA in AUDIT ): AUDIT[FIA] = 1
+            (Have, Missing) = (0, 0)
+            for S in sorted(SppForm.keys()):
+                if( not S in AUDIT ): Missing += 1
+                else: Have += 1
+            print( "{}: Has {}, Missing {}".format(TreeFormFile, Have, Missing) )
+            sys.exit("performed audit")
+
+        if( SOPT.F ):       # create FIA.trf from NCRS.trf
+            print( "Creating FIA.trf..." )
+            SppFile = "../bin/rSVS_Species.csv"
+            SPP = pd.read_csv( SppFile )
+            print( "Read {} lines from {}".format(len(SPP.index), SppFile) )
+            TreeFormFile = "../bin/SVS/{}.trf".format('NRCS')
+            (SpecialForm, SppForm) = SVS_LoadTreeFormFile( TreeFormFile )
+            print( "Read {} lines from {}".format(len(SppForm.keys()), TreeFormFile) )
+            # loop through SppForm.keys() and change species to FIA # from SPP
+            NewTreeFormFile = 'TEST.trf'
+            # SVS_Write_TreeFormFile( NewTreeFormFile, SpecialForm, SppForm )
+            sys.exit( "created FIA.trf" )
+
+        if( SOPT.V ):
+            print( "Performing audit of rSVS_Species.csv file" )
+            SppFile = "../bin/rSVS_Species.csv"
+            SPP = pd.read_csv( SppFile )
+            sys.exit( "audited rSVS_Species.csv" )
 
         #nfiles = len(cmdline)
         if( (nFile==0) | SOPT.h ):
@@ -96,14 +140,15 @@ def main():     # implement main scope for handling of command line execution of
         if( DEBUG ): print( 'len(cmdline)=%d, cmdline="%s", OPT=%s' % (nfiles, cmdline, OPT) )
 
 
-        for f in cmdline:
-            D = {}              # create data dictionary
+        for FILE in FILELIST:
+        #for f in cmdline:
+            #D = {}              # create data dictionary
             if( DEBUG ): print( 'File: %s' % (f) )
             (dirname, filename) = os.path.split( f )
             if( DEBUG ): print( 'dirname=%s, filename=%s' % (dirname, filename) )
             (basename, ext) = os.path.splitext( filename )
             if( DEBUG ): print( 'dirname=%s, filename=%s, basename=%s, ext=%s' % (dirname, filename, basename, ext) )
-            DataSet = 'None'
+            #DataSet = 'None'
             if( re.search( '.csv', filename ) != None ):        # create DataSet name from filename
                 DataSet = re.sub( '.csv', '', filename )
             elif( re.search( '.xlsx', filename ) != None ):
@@ -112,70 +157,70 @@ def main():     # implement main scope for handling of command line execution of
                 DataSet = re.sub( '.xls', '', filename )
 
             #print 'DataSet = %s' % (DataSet)
-            SVS = StandViz( DataSet )                 # create class/dataset for input file
+            #SVS = StandViz( DataSet )                 # create class/dataset for input file
 
             # if extension is .xls or xlsx file then need to determine if we are a SvsAddin format or TIR format file
-            if( ext in ['.xls', '.xlsx' ] ):            # test eXcel file for type
-                FileFormat = 'Excel'
-                FileFormat = Test_Excel_Format( f )
-                #raw_input( "Paused: After Test_Excel_Format(): %s is %s" % (f, FileFormat) )
-                if( FileFormat == 'TIR' ):      # TIR format excel files, run PyTIRData.py to extract
-                    BAT = open( '%s\\RunPyTIRData.bat' % (OWNPATH), 'w' )
-                    cmd = '"%s\\python.exe" "%s\\PyTIRData.py" "%s"\n' % (OWNPATH, OWNPATH, f)
-                    BAT.write( cmd )
-                    BAT.close()
-                    cmd = '%s\\RunPyTIRData.bat' % (OWNPATH)
-                    #raw_input( 'Running: %s' % (cmd) )
-                    os.system( cmd )
-                    #os.unlink( cmd )
-                    (standname, treatment, age) = filename.split('_')
-                    #dirname = '%s\\%s_%s' % (dirname, standname, treatment)
-                    csvfilename = '%s\\%s_%s.csv' % (dirname, standname, treatment)
-                    SVS.CSV_Load_File( csvfilename )
-                else:       # unknown excel file format
-                    sys.exit()
-            elif( ext in [ '.csv' ] ):
-                #SVS.CSV_Load_File( f )                      # load the data from .cvs file
-                if( OPT['t'] ):
-                    D = TIR_Load_Data( DataSet, f )         # load TIR format file
-                    TIR_Expand_Treelist( D, SVS )           # expand the treelist
-                else:
-                    SVS.CSV_Load_File( f )                  # load SvsAddin format .csv file
-                #print 'D.Stand.keys()=%s' % (D.Stand.keys())
-                #raw_input( "Processing .csv file, press return to continue: " )
-            else:
-                raw_input( 'unknown file type, press return to exit' )
-                sys.exit()
+            #if( ext in ['.xls', '.xlsx' ] ):            # test eXcel file for type
+            #    FileFormat = 'Excel'
+            #    FileFormat = Test_Excel_Format( f )
+            #    #raw_input( "Paused: After Test_Excel_Format(): %s is %s" % (f, FileFormat) )
+            #    if( FileFormat == 'TIR' ):      # TIR format excel files, run PyTIRData.py to extract
+            #        BAT = open( '%s\\RunPyTIRData.bat' % (OWNPATH), 'w' )
+            #        cmd = '"%s\\python.exe" "%s\\PyTIRData.py" "%s"\n' % (OWNPATH, OWNPATH, f)
+            #        BAT.write( cmd )
+            #        BAT.close()
+            #        cmd = '%s\\RunPyTIRData.bat' % (OWNPATH)
+            #        #raw_input( 'Running: %s' % (cmd) )
+            #        os.system( cmd )
+            #        #os.unlink( cmd )
+            #        (standname, treatment, age) = filename.split('_')
+            #        #dirname = '%s\\%s_%s' % (dirname, standname, treatment)
+            #        csvfilename = '%s\\%s_%s.csv' % (dirname, standname, treatment)
+            #        SVS.CSV_Load_File( csvfilename )
+            #    else:       # unknown excel file format
+            #        sys.exit()
+            #elif( ext in [ '.csv' ] ):
+            #    #SVS.CSV_Load_File( f )                      # load the data from .cvs file
+            #    if( OPT['t'] ):
+            #        D = TIR_Load_Data( DataSet, f )         # load TIR format file
+            #        TIR_Expand_Treelist( D, SVS )           # expand the treelist
+            #    else:
+            #        SVS.CSV_Load_File( f )                  # load SvsAddin format .csv file
+            #    #print 'D.Stand.keys()=%s' % (D.Stand.keys())
+            #    #raw_input( "Processing .csv file, press return to continue: " )
+            #else:
+            #    raw_input( 'unknown file type, press return to exit' )
+            #    sys.exit()
 
             #raw_input( "Pause" )
 
-            if( OPT['c'] ):                             # generate tree coordinates based on requested pattern
-                SVS.Generate_Clumped( 15, 40 )          # generate clummped coordinates
-                # should be using cLumpiness and clumPration parameters
-            elif( OPT['f'] ):
-                SVS.Generate_Fixed()                    # generate fixed coordinates
-            elif( OPT['r'] ):
-                SVS.Generate_Random()                   # generate random coordinates
-                # should be using the randomness factor
-            elif( OPT['u'] ):
-                SVS.Generate_Uniform( Variation=2.0 )   # generate uniform coordinates
+            #if( OPT['c'] ):                             # generate tree coordinates based on requested pattern
+            #    SVS.Generate_Clumped( 15, 40 )          # generate clummped coordinates
+            #    # should be using cLumpiness and clumPration parameters
+            #elif( OPT['f'] ):
+            #    SVS.Generate_Fixed()                    # generate fixed coordinates
+            #elif( OPT['r'] ):
+            #    SVS.Generate_Random()                   # generate random coordinates
+            #    # should be using the randomness factor
+            #elif( OPT['u'] ):
+            #    SVS.Generate_Uniform( Variation=2.0 )   # generate uniform coordinates
 
-            if( OPT['s'] ):                             # output to SVS
-                if( DEBUG ): print( 'output SVS' )
-                SVS.SVS_Create_Files( dirname )
-                SVS.SVS_Show_Files( dirname )
-            elif( OPT['x'] ):                           # output to Excel .csv file
-                if( DEBUG ): print( 'output csv file' )
-                SVS.CSV_Write_File( '%s/%s.csv' % (dirname, DataSet) )
-            elif( OPT['h'] ):                           # output to html page
-                if( DEBUG ): print( 'output html' )
-                SVS.SVS_Create_Files( dirname )
-                SVS.SVS_Webpage_Create( dirname )
-                if( OPT['z'] ): SVS.SVS_Webpage_Zip( dirname )   # if -z then zip the website for download
-            elif( OPT['b'] ):                           # output to bitmaps (.PNG)
-                if( DEBUG ): print( 'ouptut bmp file' )
-                SVS.SVS_Create_Files( dirname )
-                SVS.SVS_Create_Bitmaps( dirname )
+            #if( OPT['s'] ):                             # output to SVS
+            #    if( DEBUG ): print( 'output SVS' )
+            #    SVS.SVS_Create_Files( dirname )
+            #    SVS.SVS_Show_Files( dirname )
+            #elif( OPT['x'] ):                           # output to Excel .csv file
+            #    if( DEBUG ): print( 'output csv file' )
+            #    SVS.CSV_Write_File( '%s/%s.csv' % (dirname, DataSet) )
+            #elif( OPT['h'] ):                           # output to html page
+            #    if( DEBUG ): print( 'output html' )
+            #    SVS.SVS_Create_Files( dirname )
+            #    SVS.SVS_Webpage_Create( dirname )
+            #    if( OPT['z'] ): SVS.SVS_Webpage_Zip( dirname )   # if -z then zip the website for download
+            #elif( OPT['b'] ):                           # output to bitmaps (.PNG)
+            #    if( DEBUG ): print( 'ouptut bmp file' )
+            #    SVS.SVS_Create_Files( dirname )
+            #    SVS.SVS_Create_Bitmaps( dirname )
 
     except SystemExit:
         pass
@@ -208,6 +253,84 @@ def StandViz_ReportError( errorobj, args, Header = None ):              # error 
     ERRFILE.close()                                                     # close text file with error stack trace
     os.system( "notepad.exe {}".format(errorfilename) )                 # display error log file with notepad.exe
 
+def SVS_LoadTreeFormFile( TreeFormFile ):
+    SppForm = {}
+    SpecialForm = {}
+    SpecialList = [ '--', '@flame.eob', 'CAR', 'CRANEBOOM', 'CRANETOWER', 'CONIFER', 'DEFAULT', 'DMBROOM', 'HARDWOOD', 'MARKER', 'MISTBROOM', 'R6CLUMP',
+                    'R6SHRUB', 'R6SNAG', 'RANGEPOLE', 'ROCK', 'ROOTWAD', 'SEEDLING', 'SHRUB', 'SNAG', 'SNAG2', 'SNAG3', 'SNAG4', 'SNAG5', 'TETRAHEDRON', 'TRUCK' ]
+    TRF = open( TreeFormFile, 'r' )
+    for L in TRF:
+        if( re.search( "^;", L ) != None ): pass    # skip comment/header lines
+        else:
+            (Spp, PlantClass, CrownClass, PlantForm, NoBranch, NoWhorl, BrBase, BrAngle, LowX, LowY, HighX, HighY, BaseUp, TopUp, StemCol, BrCol,
+             Fol1, Fol2, SampHt, SampRat, SampRad, Scale) = L.split()
+            if( Spp in SpecialList ):               # if Spp code in SpedialList save to SpecialForm
+                SpecialForm[Spp] = {}
+                if( not PlantClass in SpecialForm[Spp] ): SpecialForm[Spp][PlantClass] = {}
+                if( not PlantForm in SpecialForm[Spp][PlantClass] ): SpecialForm[Spp][PlantClass][PlantForm] = {}
+                if( not CrownClass in SpecialForm[Spp][PlantClass][PlantForm] ):
+                    SpecialForm[Spp][PlantClass][PlantForm][CrownClass] = (NoBranch,NoWhorl,BrBase,BrAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemCol,BrCol,
+                                                                           Fol1,Fol2,SampHt,SampRat,SampRad,Scale)
+            else:                                   # otherwide handle normal species treeforms
+                if( not Spp in SppForm ): SppForm[Spp] = {}
+                if( not PlantClass in SppForm[Spp] ): SppForm[Spp][PlantClass] = {}
+                if( not PlantForm in SppForm[Spp][PlantClass] ): SppForm[Spp][PlantClass][PlantForm] = {}
+                if( not CrownClass in SppForm[Spp][PlantClass][PlantForm] ):
+                    SppForm[Spp][PlantClass][PlantForm][CrownClass] = (NoBranch,NoWhorl,BrBase,BrAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemCol,BrCol,
+                                                                       Fol1,Fol2,SampHt,SampRat,SampRad,Scale)
+    TRF.close()
+    return( SpecialForm, SppForm )
+
+def SVS_Write_TreeFormFile( TreeFormFile, SpecialForm, SppForm ):
+    TFM = open( TreeFormFile, 'w' )
+    SVS_Write_Header( TFM )
+    for TF in sorted(SpecialForm.keys()):
+        for PC in sorted(SpecialForm[TF].keys()):
+            for PF in sorted(SpecialForm[TF][PC].keys()):
+                for CC in sorted(SpecialForm[TF][PC][PF]):
+                    (NoBranch,NoWhorl,BrBase,BrAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemCol,BrCol,Fol1,Fol2,SampHt,SampRat,SampRad,Scale) = SpecialForm[TF][PC][PF][CC]
+                    SVS_Write_TreeForm( TFM, TF, PC, CC, PF, NoBranch, NoWhorl, BrBase, BrAngle, LowX, LowY, HighX, HighY, BaseUp, TopUp, StemCol, BrCol,
+                                        Fol1, Fol2, SampHt, SampRat, SampRad, Scale )
+    nRec = 0
+    for TF in sorted(SppForm.keys()):
+        for PC in sorted(SppForm[TF].keys()):
+            for PF in sorted(SppForm[TF][PC].keys()):
+                for CC in sorted(SppForm[TF][PC][PF]):
+                    (NoBranch,NoWhorl,BrBase,BrAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemCol,BrCol,Fol1,Fol2,SampHt,SampRat,SampRad,Scale) = SppForm[TF][PC][PF][CC]
+                    SVS_Write_TreeForm( TFM, TF, PC, CC, PF, NoBranch, NoWhorl, BrBase, BrAngle, LowX, LowY, HighX, HighY, BaseUp, TopUp, StemCol, BrCol,
+                                        Fol1, Fol2, SampHt, SampRat, SampRad, Scale )
+                    nRec += 1
+    TFM.close()
+    print( "Should have written {} lines".format(nRec) )
+
+
+def SVS_Write_Header( OUT ):
+    OUT.write( ";Stand Visualization System\n" )
+    OUT.write( ";Plant form definition file\n" )
+    OUT.write( ";File produced by SVS version: 3.24\n" )
+    OUT.write( ";\n" )
+    OUT.write( ";DO NOT EDIT THIS FILE BY HAND!!!!!\n" )
+    OUT.write( ";SVS does not perform rigorous validation of the parameters\n" )
+    OUT.write( ";in this file so any mistakes could cause SVS to crash\n" )
+    OUT.write( ";NOTE: Allow 15 characters for the species code!!\n" )
+    OUT.write( ";              | this marks column 16\n" )
+    OUT.write( ";              |\n" )
+    OUT.write( ";Species       | Plant  Crown  Plant     #        #     Branch  Branch  Low pt  Low pt  High pt  High pt    Base    Top    Stem   Branch  Foliage  " )
+    OUT.write( "Foliage  Sample    Sample    Sample    Scale\n" )
+    OUT.write( "; code         | class  class  form   branches  whorls   base   angle     X       Y        X        Y      uptilt  uptilt  color  " )
+    OUT.write( "color   color 1  color 2  height    cratio    cradius\n" )
+    OUT.write( ";---------------------------------------------------------------------------------------------------------------------------------" )
+    OUT.write( "-------------------------------------------------------------\n" )
+    #OUT.write( "--                99     99      0       190      13     0.00    49     1.00    0.15     0.83     0.55    -2.40    5.00     10     10      " )
+    #OUT.write( "18       18      120.0     0.50      13.00      0\n" )
+    #OUT.write( "@flame.eob        99     99     15       100       0     0.00    47     1.00    0.10     0.60     0.80     0.05    0.05      0      1       " )
+    #OUT.write( "0        0       38.0     0.40      18.00      0\n" )
+
+def SVS_Write_TreeForm( OUT, Spp, PlantClass, CrownClass, PlantForm, NoBranch, NoWhorl, BranchBase, BranchAngle, LowX, LowY, HighX, HighY, BaseUp, TopUp,
+                        StemColor, BranchColor, Foliage1, Foliage2, SampHt, SampRat, SampRad, Scale ):
+    OUT.write( "{:15s}{:>5s}{:>7s}{:>7s}{:>10s}{:>8s}{:>9s}{:>6s}{:>9s}{:>8s}{:>9s}{:>9s}{:>9s}{:>8s}{:>7s}{:>7s}{:>8s}{:>9s}{:>11s}{:>9s}{:>11s}{:>7s}\n".format(Spp,
+               PlantClass,CrownClass,PlantForm,NoBranch,NoWhorl,BranchBase,BranchAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemColor,BranchColor,Foliage1,Foliage2,
+               SampHt,SampRat,SampRad,Scale) )
 
 # -B# clump ratio # clumps = (0.01 - 0.5) * TPA
 # -G# clumpiness factor = 1.5-1.4*clumpiness factor)*clump spacing

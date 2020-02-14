@@ -2,10 +2,22 @@
 #
 #' A packge for stand level visualization using the Stand Visualization System (SVS).
 #'
-#' The rSVS package provides and interface to perform SVS visualiations from R.
+#' This rSVS package provides and interface to perform SVS visualiations from R.
+#'
+#' The package includes the following functions:
+#' \itemize{
+#'     \item SVS() - main function for performing visualziations
+#'     \item SVS_Demo() - show reginal example visulizations
+#'     \item FIA2NRCS() - convert species codes from FIA # to NRCS code
+#'     \item NRCS2FIA() - convert species codes from NRCS code to FIA #
+#'     \item SVS_Species() - list known species
+#' }
+#'
 #' @docType package
 #' @name rSVS
 NULL
+
+
 
 # You can learn more about package authoring with RStudio at:
 #
@@ -21,6 +33,19 @@ NULL
 #'
 #' Display one of several included SVS files to demonstrate different stand types.
 #'
+#' Current list of stand types include:
+#' \itemize{
+#'    \item BottomlandHardwood
+#'    \item Douglas-fir
+#'    \item LodgepolePine
+#'    \item MixedConifer
+#'    \item MontaneOak-Hickory
+#'    \item PacificSilverFir-Hemlock
+#'    \item Redwood
+#'    \item SouthernPine
+#'    \item Spruce-Fir
+#' }
+#'
 #' @param StandType Name of stand to display
 #' @author Jim McCarter \email{jim.mccarter@@rayonier.com}
 #' @examples
@@ -28,33 +53,40 @@ NULL
 #' SVS_Demo( 'Douglas-fir' )
 #' @export
 SVS_Demo <- function( Stand=NULL ) {
-    svsexe <- system.file( "bin/svs", "winsvs.exe", package="rSVS" )
-    if( is.null(Stand) ) {
-        print( paste0( "Please pick one of: BottomlandHardwood, Douglas-fir, LodgepolePine, MixedConifer, MontaneOak-Hickory, ",
-                       "PacificSilverFir-Hemlock, Redwood, SouthernPine, or Spruce-Fir" ) )
+    SavedDir <- getwd()                                                             # get and save current working directory
+    setwd( path.package("rSVS") )                                                   # set working directory to package location
+    svsexe <- system.file( "bin/svs", "winsvs.exe", package="rSVS" )                # get location of winsvs.exe
+    if( is.null(Stand) ) {                                                          # if no stand type provided, print message and return
+        print( paste0( "Please pick from: BottomlandHardwood, Douglas-fir, LodgepolePine, MixedConifer, ",
+                       "MontaneOak-Hickory, PacificSilverFir-Hemlock, Redwood, SouthernPine, or Spruce-Fir" ) )
         return('SVS_Demo() exited.')
-    } else if( Stand=='BottomlandHardwood' ) {
-        svsfile <- system.file( "bin", "BottomlandHardwood.svs", package="rSVS" )
-    } else if( Stand == 'Douglas-fir' ) {
+    } else if( grepl( 'BottomlandHardwood', Stand, ignore.case=TRUE ) ) {           # check, ignoring case to eliminate some case typos
+        svsfile <- system.file( "bin", "BottomlandHardwood.svs", package="rSVS" )   # get location of SVS file
+    } else if( grepl( 'Douglas-fir', Stand, ignore.case=TRUE ) ) {
         svsfile <- system.file( "bin", "Douglas-fir.svs", package="rSVS" )
-    } else if( Stand == 'LodgepolePine' ) {
+    } else if( grepl( 'LodgepolePine', Stand, ignore.case=TRUE ) ) {
         svsfile <- system.file( "bin", "LodgepolePine.svs", package="rSVS" )
-    } else if( Stand == 'MixedConifer' ) {
+    } else if( grepl( 'MixedConifer', Stand, ignore.case=TRUE ) ) {
         svsfile <- system.file( "bin", "MixedConifer.svs", package="rSVS" )
-    } else if( Stand == 'MontaneOak-Hickory' ) {
+    } else if( grepl( 'MontaneOak-Hickory', Stand, ignore.case=TRUE ) ) {
         svsfile <- system.file( "bin", "MontaneOak-Hickory.svs", package="rSVS" )
-    } else if( Stand == 'PacificSilverFir-Hemlock' ) {
+    } else if( grepl( 'PacificSilverFir-Hemlock', Stand, ignore.case=TRUE ) ) {
         svsfile <- system.file( "bin", "PacificSilverFir-Hemlock.svs", package="rSVS" )
-    } else if( Stand == 'Redwood' ) {
+    } else if( grepl( 'Redwood', Stand, ignore.case=TRUE ) ) {
         svsfile <- system.file( "bin", "Redwood.svs", package="rSVS" )
-    } else if( Stand == 'SouthernPine' ) {
+    } else if( grepl( 'SouthernPine', Stand, ignore.case=TRUE ) ) {
         svsfile <- system.file( "bin", "SouthernPine.svs", package="rSVS" )
-    } else if( Stand == 'Spruce-Fir') {
+    } else if( grepl( 'Spruce-Fir', Stand, ignore.case=TRUE ) ) {
         svsfile <- system.file( "bin", "Spruce-Fir.svs", package="rSVS" )
+    } else {                                                                        # demo file not found, print message and return
+        print( paste0( "Unknown demo file: '", Stand,"'. Please pick from: BottomlandHardwood, Douglas-fir, LodgepolePine, ",
+                       "MixedConifer, MontaneOak-Hickory, PacificSilverFir-Hemlock, Redwood, SouthernPine, or Spruce-Fir" ) )
+        return('SVS_Demo() exited.')
     }
-    cmdline <- paste0( svsexe, " ", svsfile )
+    cmdline <- paste0( svsexe, " ", svsfile )                                       # create command line
     #print( cmdline )
-    system( cmdline, invisible=FALSE )
+    system( cmdline, invisible=FALSE )                                              # spawn SVS program
+    setwd( SavedDir )                                                               # restore working directory to original
     return( 'SVS existed.' )
 }
 
