@@ -31,9 +31,9 @@ NULL
 
 #' Demonstrate Stand Visualiztion on several stand types
 #'
-#' Display one of several included SVS files to demonstrate different stand types.
+#' Display one of several stand types using example SVS files includes with the package.
 #'
-#' Current list of stand types include:
+#' The list of stand types includes:
 #' \itemize{
 #'    \item BottomlandHardwood
 #'    \item Douglas-fir
@@ -101,7 +101,13 @@ SVS_Demo <- function( Stand=NULL ) {
 #' rsvs data frame format:
 #' stand, year, treeno, species, dbh, height, crownratio, crownradius, tpa, x, y, live, status, condition, (svsstatus, brokenht, brokenoffset, bearing, dmr, leanangle, rootwad)
 #'
-#' @param data compatible data frame (see details)
+#' Live/Dead: live or l|dying|dead or d|stump or s
+#' Status: standing or s|broken or b|brokentop|deadtop|down or d
+#' Condition: Live:  1 or dominant or d|2 or codominant or c|3 or intermediate or i|4 or suppressed
+#'            Dying: 1|2|3
+#'            Dead:  1|2|3|4|5
+#'
+#' @param data compatible data frame or string containing filename with path (see details)
 #' @param output what and were to product output (SVS | BITMAP | WEB | CSV )
 #' @param clumped if TRUE generate clumped coordinates
 #' @param random if TRUE generate random coordiantes
@@ -112,11 +118,13 @@ SVS_Demo <- function( Stand=NULL ) {
 #' @param clumpratio adjust number/size of clumps
 #' @author James Mccarter \email{jim.mccarter@@rayonier.com}
 #' @examples
-#' svs( d )
-#' svs( d, random=true )    # visualize stand in svs using random tree locations
-#' svs( d, row=true )       # visualize stand in svs using rows
+#' SVS( d )
+#' SVS( '../MyFiles/Stand1.csv' )
+#' SVS( '../MyFiles/Stand2.xlsx', Sheet='Sheet1' )
+#' SVS( d, random=true )    # visualize stand in svs using random tree locations
+#' SVS( d, row=true )       # visualize stand in svs using rows
 #' @export
-SVS <- function( data, output='svs', clumped=false, random=false, row=true, uniform=false, randomness=null, clumpiness=null, clumpratio=null ) {
+SVS <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, row=FALSE, uniform=FALSE, randomness=NULL, clumpiness=NULL, clumpratio=NULL ) {
     #print( data )
     if( ! "reticulate" %in% .packages() ) print( paste0( "reticulate package NOT loaded" ) )
     if( ! "reticulate" %in% rownames(installed.packages()) ) print( paste0( "reticulate package NOT installed" ) )

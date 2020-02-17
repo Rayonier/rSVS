@@ -6,18 +6,19 @@
 \usage{
 SVS(
   data,
+  sheet = FALSE,
   output = "svs",
-  clumped = false,
-  random = false,
-  row = true,
-  uniform = false,
-  randomness = null,
-  clumpiness = null,
-  clumpratio = null
+  clumped = FALSE,
+  random = TRUE,
+  row = FALSE,
+  uniform = FALSE,
+  randomness = NULL,
+  clumpiness = NULL,
+  clumpratio = NULL
 )
 }
 \arguments{
-\item{data}{compatible data frame (see details)}
+\item{data}{compatible data frame or string containing filename with path (see details)}
 
 \item{output}{what and were to product output (SVS | BITMAP | WEB | CSV )}
 
@@ -47,9 +48,11 @@ rsvs data frame format:
 stand, year, treeno, species, dbh, height, crownratio, crownradius, tpa, x, y, live, status, condition, (svsstatus, brokenht, brokenoffset, bearing, dmr, leanangle, rootwad)
 }
 \examples{
-svs( d )
-svs( d, random=true )    # visualize stand in svs using random tree locations
-svs( d, row=true )       # visualize stand in svs using rows
+SVS( d )
+SVS( '../MyFiles/Stand1.csv' )
+SVS( '../MyFiles/Stand2.xlsx', Sheet='Sheet1' )
+SVS( d, random=true )    # visualize stand in svs using random tree locations
+SVS( d, row=true )       # visualize stand in svs using rows
 }
 \author{
 James Mccarter \email{jim.mccarter@rayonier.com}

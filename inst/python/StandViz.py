@@ -87,6 +87,7 @@ def main():     # implement main scope for handling of command line execution of
         if( SOPT.n ): NOTIFY = 1
 
         if( SOPT.A ):           # audit TreeForm file against rSVS_Species.csv
+            # move to function
             print( "Performing audit of {}.trf against rSVS_Species.csv".format(SOPT.A[0]) )
             SppFile = "../bin/rSVS_Species.csv"
             SPP = pd.read_csv( SppFile )
@@ -101,31 +102,74 @@ def main():     # implement main scope for handling of command line execution of
                 if( SppCodes == 'NRCS' ):
                     if( not NRCS in AUDIT ): AUDIT[NRCS] = 1
                 elif( SppCodes == 'FIA' ):
+                    if( pd.isna(FIA) ): continue
+                    else: FIA = "{}".format(int(FIA))
                     if( not FIA in AUDIT ): AUDIT[FIA] = 1
+            #print(sorted(AUDIT.keys()))
             (Have, Missing) = (0, 0)
             for S in sorted(SppForm.keys()):
+                #print("'{}'".format(S))
                 if( not S in AUDIT ): Missing += 1
                 else: Have += 1
-            print( "{}: Has {}, Missing {}".format(TreeFormFile, Have, Missing) )
+            print( "{}: Has {}, Missing {}".format(TreeFormFile, Have, len(SPP.index)-Have) )
             sys.exit("performed audit")
 
         if( SOPT.F ):       # create FIA.trf from NCRS.trf
+            # move to function
             print( "Creating FIA.trf..." )
             SppFile = "../bin/rSVS_Species.csv"
             SPP = pd.read_csv( SppFile )
             print( "Read {} lines from {}".format(len(SPP.index), SppFile) )
+            TRANSLATE = {}
+            for S in SPP.itertuples():
+                TRANSLATE[S.NRCS] = S.FIA
             TreeFormFile = "../bin/SVS/{}.trf".format('NRCS')
             (SpecialForm, SppForm) = SVS_LoadTreeFormFile( TreeFormFile )
+            FIAForm = {}
             print( "Read {} lines from {}".format(len(SppForm.keys()), TreeFormFile) )
             # loop through SppForm.keys() and change species to FIA # from SPP
-            NewTreeFormFile = 'TEST.trf'
-            # SVS_Write_TreeFormFile( NewTreeFormFile, SpecialForm, SppForm )
+            for S in sorted(SppForm.keys()):
+                if( not S in TRANSLATE ): print( "No FIA # for {}, skipping.".format(S) )
+                else: 
+                    #print("Need to translate {} to {}".format(S,int(TRANSLATE[S])))
+                    FIAForm[int(TRANSLATE[S])] = SppForm[S]
+                    #input(FIAForm[int(TRANSLATE[S])])
+            NewTreeFormFile = '../bin/SVS/FIA.trf'
+            SVS_Write_TreeFormFile( NewTreeFormFile, SpecialForm, FIAForm )
             sys.exit( "created FIA.trf" )
 
         if( SOPT.V ):
+            # move to function
             print( "Performing audit of rSVS_Species.csv file" )
             SppFile = "../bin/rSVS_Species.csv"
             SPP = pd.read_csv( SppFile )
+            print( "Read {} lines from {}".format(len(SPP.index), SppFile) )
+            DUP = {'FIA':{}, 'NRCS':{}}
+            (nMissF, nMissN, nMissG, nMissS, nMissC) = (0, 0, 0, 0, 0)
+            (nDupF, nDupN) = (0,0)
+            for S in SPP.itertuples():      # loop across species codes
+                (FIA, NRCS, Genus, Species, Common, Comment, NRCSTRF, FVSVar, FVSSpp) = (S.FIA, S.NRCS, S.Genus, S.Species, S.Common, S.Comment, S._7, S._8, S.SpCode)
+                if( pd.isna(FIA) ): nMissF += 1
+                else:
+                    FIA = int(FIA)
+                    if( not FIA in DUP['FIA'] ): DUP['FIA'][FIA] = 1
+                    else:
+                        print( "Duplicate FIA #{}".format(FIA) )
+                        nDupF += 1
+                if( pd.isna(NRCS) ): nMissN += 1
+                else:
+                    if( not NRCS in DUP['NRCS'] ): DUP['NRCS'][NRCS] = 1
+                    else:
+                        print( "Duplcate NRCS code: {}".format(NRCS) )
+                        nDupN += 1
+                if( pd.isna(Genus) ): nMissG += 1
+                if( pd.isna(Species) ): nMissS += 1
+                if( pd.isna(Common) ): nMissC += 1
+                #print( "{}, {}, {} {}, {}, {}, {}, {}, {}".format(FIA, NRCS, Genus, Species, Common, Comment, NRCSTRF, FVSVar, FVSSpp) )
+            print( "Total Species {}: ".format( len(SPP.index) ) )
+            print( "    FIA: Have {}, Missing {}, Dup {}".format( len(DUP['FIA'].keys()), nMissF, nDupF) )
+            print( "    NRCS Have {}, Missing {}, Dup {}".format( len(DUP['NRCS'].keys()), nMissN, nDupN ) )
+            print( "    Genus (Missing {}), Species (Missing  {}), Common (Missing {})".format( nMissG, nMissS, nMissC) )
             sys.exit( "audited rSVS_Species.csv" )
 
         #nfiles = len(cmdline)
@@ -246,17 +290,19 @@ def StandViz_ReportError( errorobj, args, Header = None ):              # error 
         L = F.readlines()                                               # read scripot source into memory
         F.close()                                                       # close script file
         code = L[line-1].strip()                                        # extract line of source code that caused error
-        ERRFILE.write( "  File '{}', line {}, in {}\n    %s\n".format(file, line, name, code) )     # write filename, source code line, error name, and error code
+        ERRFILE.write( "  File '{}', line {}, in {}\n    {}\n".format(file, line, name, code) )     # write filename, source code line, error name, and error code
         MyTrace = MyTrace.tb_next                                       # step to next level of call stack trace
     ERRFILE.write( "errorobj: {}\n".format(errorobj) )                  # write error object and arguments for call
     ERRFILE.write( "Calling Argument Vector: {}\n".format(args) )       # write calling arguments
     ERRFILE.close()                                                     # close text file with error stack trace
     os.system( "notepad.exe {}".format(errorfilename) )                 # display error log file with notepad.exe
 
+# create SVSTreeForm class and move the SVS_LoadTreeFormFile(), SVS_Write_TreeFormFile(), SVS_WriteHeader() and other appropriate functions into class
 def SVS_LoadTreeFormFile( TreeFormFile ):
     SppForm = {}
     SpecialForm = {}
-    SpecialList = [ '--', '@flame.eob', 'CAR', 'CRANEBOOM', 'CRANETOWER', 'CONIFER', 'DEFAULT', 'DMBROOM', 'HARDWOOD', 'MARKER', 'MISTBROOM', 'R6CLUMP',
+    SpecialList = [ '--', '@flame.eob', 'CAR', 'CRANEBOOM', 'CRANETOWER', 'CONIFER', 'CUBE', 'DEFAULT', 'DMBROOM', 'HARDWOOD', 'MARKER', 'MISTBROOM', 'OTHER', 'PALM', 
+                    'R6CLUMP',
                     'R6SHRUB', 'R6SNAG', 'RANGEPOLE', 'ROCK', 'ROOTWAD', 'SEEDLING', 'SHRUB', 'SNAG', 'SNAG2', 'SNAG3', 'SNAG4', 'SNAG5', 'TETRAHEDRON', 'TRUCK' ]
     TRF = open( TreeFormFile, 'r' )
     for L in TRF:
@@ -328,7 +374,12 @@ def SVS_Write_Header( OUT ):
 
 def SVS_Write_TreeForm( OUT, Spp, PlantClass, CrownClass, PlantForm, NoBranch, NoWhorl, BranchBase, BranchAngle, LowX, LowY, HighX, HighY, BaseUp, TopUp,
                         StemColor, BranchColor, Foliage1, Foliage2, SampHt, SampRat, SampRad, Scale ):
-    OUT.write( "{:15s}{:>5s}{:>7s}{:>7s}{:>10s}{:>8s}{:>9s}{:>6s}{:>9s}{:>8s}{:>9s}{:>9s}{:>9s}{:>8s}{:>7s}{:>7s}{:>8s}{:>9s}{:>11s}{:>9s}{:>11s}{:>7s}\n".format(Spp,
+    
+    #print( "{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}\n".format(Spp,
+    #           PlantClass,CrownClass,PlantForm,NoBranch,NoWhorl,BranchBase,BranchAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemColor,BranchColor,Foliage1,Foliage2,
+    #           SampHt,SampRat,SampRad,Scale) )
+    #Species = "{:15d}".format(Spp)
+    OUT.write( "{:15s}{:>5s}{:>7s}{:>7s}{:>10s}{:>8s}{:>9s}{:>6s}{:>9s}{:>8s}{:>9s}{:>9s}{:>9s}{:>8s}{:>7s}{:>7s}{:>8s}{:>9s}{:>11s}{:>9s}{:>11s}{:>7s}\n".format(str(Spp),
                PlantClass,CrownClass,PlantForm,NoBranch,NoWhorl,BranchBase,BranchAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemColor,BranchColor,Foliage1,Foliage2,
                SampHt,SampRat,SampRad,Scale) )
 
