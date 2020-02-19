@@ -14,7 +14,8 @@ SVS(
   uniform = FALSE,
   randomness = NULL,
   clumpiness = NULL,
-  clumpratio = NULL
+  clumpratio = NULL,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ SVS(
 
 \item{clumpratio}{adjust number/size of clumps}
 
+\item{verbose}{turn on verbose output}
+
 \item{randommess}{control "noise" of coordinates generated}
 }
 \description{
@@ -46,6 +49,12 @@ stand, year, species, treeno, x, y, dbh, height, crownratio, crownradius, tpa, l
 
 rsvs data frame format:
 stand, year, treeno, species, dbh, height, crownratio, crownradius, tpa, x, y, live, status, condition, (svsstatus, brokenht, brokenoffset, bearing, dmr, leanangle, rootwad)
+
+Live/Dead: live or l|dying|dead or d|stump or s
+Status: standing or s|broken or b|brokentop|deadtop|down or d
+Condition: Live:  1 or dominant or d|2 or codominant or c|3 or intermediate or i|4 or suppressed
+           Dying: 1|2|3
+           Dead:  1|2|3|4|5
 }
 \examples{
 SVS( d )

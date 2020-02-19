@@ -10,10 +10,10 @@ SVS_Demo(Stand = NULL)
 \item{StandType}{Name of stand to display}
 }
 \description{
-Display one of several included SVS files to demonstrate different stand types.
+Display one of several stand types using example SVS files includes with the package.
 }
 \details{
-Current list of stand types include:
+The list of stand types includes:
 \itemize{
    \item BottomlandHardwood
    \item Douglas-fir

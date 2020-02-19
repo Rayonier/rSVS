@@ -116,6 +116,7 @@ SVS_Demo <- function( Stand=NULL ) {
 #' @param randommess control "noise" of coordinates generated
 #' @param clumpiness adjust clump strength
 #' @param clumpratio adjust number/size of clumps
+#' @param verbose turn on verbose output
 #' @author James Mccarter \email{jim.mccarter@@rayonier.com}
 #' @examples
 #' SVS( d )
@@ -124,16 +125,28 @@ SVS_Demo <- function( Stand=NULL ) {
 #' SVS( d, random=true )    # visualize stand in svs using random tree locations
 #' SVS( d, row=true )       # visualize stand in svs using rows
 #' @export
-SVS <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, row=FALSE, uniform=FALSE, randomness=NULL, clumpiness=NULL, clumpratio=NULL ) {
+SVS <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, row=FALSE, uniform=FALSE, randomness=NULL, clumpiness=NULL, clumpratio=NULL, verbose=FALSE ) {
     #print( data )
+    if( typeof(data) == "character" ) {
+        if( verbose ) print( paste0( "Data = \"character\"" ) )
+        cmdline <- paste0( ".\\python38\\python.exe ", system.file( "python", "StandViz.py", package="rSVS" ), " -D -v ", data )
+        if( verbose ) print( cmdline )
+        system( cmdline, invisible=FALSE, wait=TRUE )
+    } else if( typeof(data) == "list" ) {
+        if( verbose ) print( paste0( "Data = \"list\", need to save data or pass through reticulate interface" ) )
+    } else {
+        print( paste0( "Don't know how to handle data or type ", typeof(data) ) )
+    }
     if( ! "reticulate" %in% .packages() ) print( paste0( "reticulate package NOT loaded" ) )
     if( ! "reticulate" %in% rownames(installed.packages()) ) print( paste0( "reticulate package NOT installed" ) )
-    svsexe <- system.file( "bin/svs", "winsvs.exe", package="rSVS" )
-    demosvsfile <- system.file( "bin", "SouthernPine.svs", package="rSVS" )
-    print( demosvsfile )
-    cmdline <- paste0( svsexe, " ", demosvsfile )
-    print( cmdline )
-    system( cmdline, invisible=FALSE )
+    #svsexe <- system.file( "bin/svs", "winsvs.exe", package="rSVS" )
+    #demosvsfile <- system.file( "bin", "SouthernPine.svs", package="rSVS" )
+    #print( demosvsfile )
+    #cmdline <- paste0( svsexe, " ", demosvsfile )
+    #print( cmdline )
+    #system( cmdline, invisible=FALSE )
+    #cmdline <- paste0( ".\\python38\\python.exe -i .\\inst\\python\\StandViz.py -D -v -A")
+    #cmdline <- paste0( ".\\python38\\python.exe ", system.file( "python", "StandViz.py", package="rSVS" ), " -D -v ", system.file( "bin", data, package="rSVS") )
     # if reticulate
     # library(reticulate)
     # SVS <- import_from_path( "StandViz", path="inst/python" ) 

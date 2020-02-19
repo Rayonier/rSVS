@@ -9,7 +9,7 @@
 
 import argparse             # ArgumentParser()
 import math
-import os                   # os.path.split(), os.path.splitext()
+import os                   # os.path.split(), os.path.splitext(), os.system()
 import pandas as pd         # Pandas DataFrame, .read_csv()
 import platform             # platform.system()
 import re                   # re.search()
@@ -42,6 +42,7 @@ def main():     # implement main scope for handling of command line execution of
     global DEBUG, NOTIFY, VERBOSE
     try:
         (DEBUG, NOTIFY, VERBOSE) = (False, False, False)
+        # do everything relative to this script's path
         # ..C.E.GHIJKLMNOPQR.TU...YZ .b..e.g.ijk.m.o.q.st..wxyz 0123456789
         SARG = argparse.ArgumentParser( add_help=False, usage=" %(prog)s [-B|-W|-S|-X] [-c|-f|-r|-u] [dDhnv] [-a #] [-l #] [-p #] [-w worksheet] file [file [...]]\n" +
                                                               "\t%(prog)s [-v] [-A [FIA|NRCS]] [-F]" )
@@ -70,12 +71,12 @@ def main():     # implement main scope for handling of command line execution of
         SARGG.add_argument( "-v", action="store_true", help="Verbose output" )
         #SARGG.add_argument( "-z", action="store_true", help="zip file for transfer" )
         #SARGG.add_argument( "-m", action="store_true", help="Mechanical (row) thinning (only for Fixed coordinates)" )
-        #SARGG.add_argument( "-t", action="store_true", help="TIR format files" )
+        SARGG.add_argument( "-t", action="store_true", help="Test and debugging option" )
 
         SARGT = SARG.add_argument_group( "Treeform arguments" )
-        SARGT.add_argument( "-A", action="store", nargs=1, metavar="TRFile", help="Audit treeform file versions rSVS_Species.csv" )
+        SARGT.add_argument( "-C", action="store", nargs=1, metavar="TRFile", help="Compare treeform file versus rSVS_Species.xlsx" )
         SARGT.add_argument( "-F", action="store_true", help="create FIA.TRF from NRCS.trf" )
-        SARGT.add_argument( "-V", action="store_true", help="Validate rSVS_Species.csv file" )
+        SARGT.add_argument( "-A", action="store_true", help="Audit rSVS_Species.csv file" )
 
 
         SARG.add_argument( "FILELIST", nargs="*", help="Files [File [...]]")
@@ -86,64 +87,22 @@ def main():     # implement main scope for handling of command line execution of
         if( SOPT.v ): VERBOSE = 1
         if( SOPT.n ): NOTIFY = 1
 
-        if( SOPT.A ):           # audit TreeForm file against rSVS_Species.csv
-            # move to function
-            print( "Performing audit of {}.trf against rSVS_Species.csv".format(SOPT.A[0]) )
-            SppFile = "../bin/rSVS_Species.csv"
-            SPP = pd.read_csv( SppFile )
-            print( "Read {} lines from {}".format(len(SPP.index), SppFile) )
-            SppCodes = SOPT.A[0]
-            TreeFormFile = "../bin/SVS/{}.trf".format(SppCodes)
-            (SpecialForm, SppForm) = SVS_LoadTreeFormFile( TreeFormFile )
-            print( "Read {} lines from {}".format(len(SppForm.keys()), TreeFormFile) )
-            AUDIT = {}
-            for S in SPP.itertuples():
-                (FIA, NRCS, Genus, Species) = (S.FIA, S.NRCS, S.Genus, S.Species)
-                if( SppCodes == 'NRCS' ):
-                    if( not NRCS in AUDIT ): AUDIT[NRCS] = 1
-                elif( SppCodes == 'FIA' ):
-                    if( pd.isna(FIA) ): continue
-                    else: FIA = "{}".format(int(FIA))
-                    if( not FIA in AUDIT ): AUDIT[FIA] = 1
-            #print(sorted(AUDIT.keys()))
-            (Have, Missing) = (0, 0)
-            for S in sorted(SppForm.keys()):
-                #print("'{}'".format(S))
-                if( not S in AUDIT ): Missing += 1
-                else: Have += 1
-            print( "{}: Has {}, Missing {}".format(TreeFormFile, Have, len(SPP.index)-Have) )
-            sys.exit("performed audit")
+        OriginalWindowsPath = os.getcwd()
+        ScriptPath = _MyPath
+        if( DEBUG ): print( "OriginalPath={}, ScriptPath={}, os.path.realpath()={}".format(OriginalWindowsPath, ScriptPath, os.path.realpath(ScriptPath)) )
 
-        if( SOPT.F ):       # create FIA.trf from NCRS.trf
-            # move to function
-            print( "Creating FIA.trf..." )
-            SppFile = "../bin/rSVS_Species.csv"
-            SPP = pd.read_csv( SppFile )
-            print( "Read {} lines from {}".format(len(SPP.index), SppFile) )
-            TRANSLATE = {}
-            for S in SPP.itertuples():
-                TRANSLATE[S.NRCS] = S.FIA
-            TreeFormFile = "../bin/SVS/{}.trf".format('NRCS')
-            (SpecialForm, SppForm) = SVS_LoadTreeFormFile( TreeFormFile )
-            FIAForm = {}
-            print( "Read {} lines from {}".format(len(SppForm.keys()), TreeFormFile) )
-            # loop through SppForm.keys() and change species to FIA # from SPP
-            for S in sorted(SppForm.keys()):
-                if( not S in TRANSLATE ): print( "No FIA # for {}, skipping.".format(S) )
-                else: 
-                    #print("Need to translate {} to {}".format(S,int(TRANSLATE[S])))
-                    FIAForm[int(TRANSLATE[S])] = SppForm[S]
-                    #input(FIAForm[int(TRANSLATE[S])])
-            NewTreeFormFile = '../bin/SVS/FIA.trf'
-            SVS_Write_TreeFormFile( NewTreeFormFile, SpecialForm, FIAForm )
-            sys.exit( "created FIA.trf" )
+        #os.chdir( ScriptPath )
 
-        if( SOPT.V ):
+        if( SOPT.A ):
             # move to function
             print( "Performing audit of rSVS_Species.csv file" )
-            SppFile = "../bin/rSVS_Species.csv"
-            SPP = pd.read_csv( SppFile )
-            print( "Read {} lines from {}".format(len(SPP.index), SppFile) )
+            #SppFile = "../bin/rSVS_Species.csv"
+            #SPP = pd.read_csv( SppFile )
+            SppXlsFile = "{}/rSVS_Species.xlsx".format(os.path.realpath("{}/bin".format(os.path.split(ScriptPath)[0])))
+            print(SppXlsFile)
+            SPPXLS = pd.ExcelFile( SppXlsFile )
+            SPP = SPPXLS.parse( 'rSVS_Species' )                                                    # get tree records from Blackrock worksheet
+            print( "Read {} lines from {}".format(len(SPP.index), SppXlsFile) )
             DUP = {'FIA':{}, 'NRCS':{}}
             (nMissF, nMissN, nMissG, nMissS, nMissC) = (0, 0, 0, 0, 0)
             (nDupF, nDupN) = (0,0)
@@ -170,8 +129,75 @@ def main():     # implement main scope for handling of command line execution of
             print( "    FIA: Have {}, Missing {}, Dup {}".format( len(DUP['FIA'].keys()), nMissF, nDupF) )
             print( "    NRCS Have {}, Missing {}, Dup {}".format( len(DUP['NRCS'].keys()), nMissN, nDupN ) )
             print( "    Genus (Missing {}), Species (Missing  {}), Common (Missing {})".format( nMissG, nMissS, nMissC) )
+            #os.chdir( OriginalWindowsPath )
             sys.exit( "audited rSVS_Species.csv" )
 
+        if( SOPT.C ):           # audit TreeForm file against rSVS_Species.csv
+            # move to function
+            print( "Performing audit of {}.trf against rSVS_Species.csv".format(SOPT.A[0]) )
+            #SppFile = "../bin/rSVS_Species.csv"
+            #SPP = pd.read_csv( SppFile )
+            SppXlsFile = "../bin/rSVS_Species.xlsx"
+            SPPXLS = pd.ExcelFile( SppXlsFile )
+            SPP = SPPXLS.parse( 'rSVS_Species' )                                                    # get tree records from Blackrock worksheet
+            print( "Read {} lines from {}".format(len(SPP.index), SppXlsFile) )
+            SppCodes = SOPT.A[0]
+            TreeFormFile = "../bin/SVS/{}.trf".format(SppCodes)
+            (SpecialForm, SppForm) = SVS_LoadTreeFormFile( TreeFormFile )
+            print( "Read {} lines from {}".format(len(SppForm.keys()), TreeFormFile) )
+            AUDIT = {}
+            for S in SPP.itertuples():
+                (FIA, NRCS, Genus, Species) = (S.FIA, S.NRCS, S.Genus, S.Species)
+                if( SppCodes == 'NRCS' ):
+                    if( not NRCS in AUDIT ): AUDIT[NRCS] = 1
+                elif( SppCodes == 'FIA' ):
+                    if( pd.isna(FIA) ): continue
+                    else: FIA = "{}".format(int(FIA))
+                    if( not FIA in AUDIT ): AUDIT[FIA] = 1
+            #print(sorted(AUDIT.keys()))
+            (Have, Missing) = (0, 0)
+            for S in sorted(SppForm.keys()):
+                #print("'{}'".format(S))
+                if( not S in AUDIT ): Missing += 1
+                else: Have += 1
+            print( "{}: Has {}, Missing {}".format(TreeFormFile, Have, len(SPP.index)-Have) )
+            sys.exit("performed audit")
+
+        if( SOPT.F ):       # create FIA.trf from NCRS.trf
+            # move to function
+            print( "Creating FIA.trf..." )
+            #SppFile = "../bin/rSVS_Species.csv"
+            #SPP = pd.read_csv( SppFile )
+            SppXlsFile = "../bin/rSVS_Species.xlsx"
+            SPPXLS = pd.ExcelFile( SppXlsFile )
+            SPP = SPPXLS.parse( 'rSVS_Species' )                                                    # get tree records from Blackrock worksheet
+            print( "Read {} lines from {}".format(len(SPP.index), SppXlsFile) )
+            TRANSLATE = {}
+            for S in SPP.itertuples():
+                TRANSLATE[S.NRCS] = S.FIA
+            TreeFormFile = "../bin/SVS/{}.trf".format('NRCS')
+            (SpecialForm, SppForm) = SVS_LoadTreeFormFile( TreeFormFile )
+            FIAForm = {}
+            print( "Read {} lines from {}".format(len(SppForm.keys()), TreeFormFile) )
+            # loop through SppForm.keys() and change species to FIA # from SPP
+            for S in sorted(SppForm.keys()):
+                if( not S in TRANSLATE ): print( "No FIA # for {}, skipping.".format(S) )
+                else: 
+                    #print("Need to translate {} to {}".format(S,int(TRANSLATE[S])))
+                    FIAForm[int(TRANSLATE[S])] = SppForm[S]
+                    #input(FIAForm[int(TRANSLATE[S])])
+            NewTreeFormFile = '../bin/SVS/FIA.trf'
+            SVS_Write_TreeFormFile( NewTreeFormFile, SpecialForm, FIAForm )
+            sys.exit( "created FIA.trf" )
+
+
+        if( SOPT.t ):
+            print( "No testing function currently defined!")
+            #CMDLINE = ".\\inst\\bin\\SVS\\winsvs.exe ./inst/bin/SouthernPine.svs"
+            #print( "StandViz.py: CMDLINE={}".format(CMDLINE) )
+            #os.system(CMDLINE)
+            sys.exit()
+        
         #nfiles = len(cmdline)
         if( (nFile==0) | SOPT.h ):
             SARG.print_help()
@@ -181,25 +207,38 @@ def main():     # implement main scope for handling of command line execution of
         if( (SOPT.B==0) & (SOPT.W==0) & (SOPT.S==0) & (SOPT.X==0) ): SOPT.S = 1   # SVS is default output
 
         if( NOTIFY ): print( 'StandViz.py - Python implementation of Stand Visualization Addin for Excel' )
-        if( DEBUG ): print( 'len(cmdline)=%d, cmdline="%s", OPT=%s' % (nfiles, cmdline, OPT) )
+        print(sys.argv)
+        #if( DEBUG ): print( 'nFile={}, FILELIST={}' % (nFile, SOPT.FILELIST) )
+        #if( DEBUG ): print( 'Using Python {} on {} from {}'.format(sys.version, sys.platform, sys.prefix) )
 
 
-        for FILE in FILELIST:
+
+        for FILE in SOPT.FILELIST:
         #for f in cmdline:
             #D = {}              # create data dictionary
-            if( DEBUG ): print( 'File: %s' % (f) )
-            (dirname, filename) = os.path.split( f )
-            if( DEBUG ): print( 'dirname=%s, filename=%s' % (dirname, filename) )
+            print( FILE )
+            #if( DEBUG ): print( "File: {}.format(FILE) )
+            #if( DEBUG ): print( 'dirname={} filename={} % (dirname, filename) )
+            (dirname, filename) = os.path.split( FILE )
             (basename, ext) = os.path.splitext( filename )
-            if( DEBUG ): print( 'dirname=%s, filename=%s, basename=%s, ext=%s' % (dirname, filename, basename, ext) )
+            if( DEBUG ): print( "File: {}, dirname={} filename={} basename={} ext={}".format(FILE, dirname, filename, basename, ext) )
             #DataSet = 'None'
-            if( re.search( '.csv', filename ) != None ):        # create DataSet name from filename
+            if( re.search( '.svs', filename ) != None ):            # process .svs files, just pass through to winsvs.exe if the file exists
+                # just load .svs file
+                SVSEXE = "inst\\bin\SVS\winsvs.exe"
+                CMDLINE = "{} {}".format(SVSEXE, FILE)
+                print(CMDLINE)
+                os.system(CMDLINE)
+            elif( re.search( '.csv', filename ) != None ):          # process .csv files
                 DataSet = re.sub( '.csv', '', filename )
-            elif( re.search( '.xlsx', filename ) != None ):
+            elif( re.search( '.xlsx', filename ) != None ):         # process .xlsx or .xlx files
                 DataSet = re.sub( '.xlsx', '', filename )
             elif( re.search( '.xls', filename ) != None ):
                 DataSet = re.sub( '.xls', '', filename )
 
+            # data loader for Postex plots: Plot, Plot_Radius, Nr, Tree_Spc, Tree_Dia(.1 in), Tree_Hgt(ft), Tree_Postex1, Tree_Poste2, Tree_Postx3,
+            # Tree_Local_x, Tree_Local_y, Tree_Local_Dist, Tree_Local_Angle, Tree_Angle_ToPlotCenter, Latitude, Longitude, Tree_Nr
+            # TreeSpc: 1=Unforked pine, 2=hardwood, 3=dead tree (pine or hardwood), 4=forked pine
             #print 'DataSet = %s' % (DataSet)
             #SVS = StandViz( DataSet )                 # create class/dataset for input file
 
@@ -1351,6 +1390,9 @@ if( __name__ == "__main__" ):
 # RS = random.getstate()
 # random.setstate( RS)
 # random.seed( longint )
+
+# if need python modules
+# python.exe pip -m pip install module_name
 
 """
 TQI = 1-2
