@@ -10,115 +10,117 @@ FIA,NRCS,Genus,Species,Common,Comment,NRCS.trf,FVS .trf,SpCode,FVS East,FVS West
 19,ABLA,Abies,lasicarpa,subapline fir,,ABLA,PN,AF,,ABLA
 20,ABMA,Abies,magnifica (magnifica),red fir,california red fir,ABMA,PN,RF,,ABMA
 21,ABSH,Abies,magnifica (shatensis),shasta red fir,,ABSH,SO,SH,,ABSH
-22,ABPR,Abies,procera,noble fir,,ABPR,PN,NF,,
-40,CHAMA4,Chamaecyparis,spp,cedar species,,,,,CHAMA4,
-41,CHLA,Chamaecyparis,lawsoniana,port orford cedar,port-orford-cedar,CHLA,CA,PC,,
-42,CHNO,Chamaecyparis,nootkatensis,Alaska yelllow cedar,alaska yellow-cedar,CHNO,PN,YC,,
-43,CHTH2,Chamaecyparis,thyoides,Atlantic white cedar,Atlantic white-cedar,CHTH2,NE,AW,,
-50,CUPRE,Cupressus,spp,Cypress species,,,,,CUPRE,
-51,CUAR,Cupressus,arizonica,Arizona cypress,,,,,CUAR,
-52,CUBA,Cupressus,bakeri,Baker cypress,Baker or Modoc cypress,,,,,
+22,ABPR,Abies,procera,noble fir,,ABPR,PN,NF,,ABPR
+40,CHAMA4,Chamaecyparis,spp,cedar species,,,,,CHAMA4,CHAMA4
+41,CHLA,Chamaecyparis,lawsoniana,port orford cedar,port-orford-cedar,CHLA,CA,PC,,CHLA
+42,CANO9,Callitropsis,nootkatensis,Alaska cedar,,,,,,CANO9
+42,CHNO,Chamaecyparis,nootkatensis,Alaska yelllow cedar,alaska yellow-cedar,CHNO,PN,YC,,CHNO
+43,CHTH2,Chamaecyparis,thyoides,Atlantic white cedar,Atlantic white-cedar,CHTH2,NE,AW,CHTH2,
+50,CUPRE,Cupressus,spp,Cypress species,,,,,CUPRE,CUPRE
+51,CUAR,Cupressus,arizonica,Arizona cypress,,,,,CUAR,CUAR
+52,CUBA,Cupressus,bakeri,Baker cypress,Baker or Modoc cypress,,,,,CUBA
+53,CUFO2,Cupressus,forbesii,tecate cypress,,,,,,CUFO2
 53,CUGUF,Cupressus,guadalupensis var. forbesii,Tecate cypress,,,,,,
-54,CUMA2,Cupressus,macrocarpa,Montery cypress,,,,,,
-55,CUSA3,Cupressus,sargentii,Sargent's cypress,,,,,,
-56,CUMA,Cupressus,macnabiana,MacNab's cypress,,,,,,
-57,JUNIP,Juniperus,spp,redcedar spp.,redcedar / juniper spp.,JUNIP,CS,JU,JUNIP,
-58,JUPI,Juniperus,pinchotii,Pinchot juniper,,,,,JUPI,
-59,JUER,Juniperus,erythrocarpa,redberry juniper,,,,,,
+54,CUMA2,Cupressus,macrocarpa,Montery cypress,,,,,,CUMA2
+55,CUSA3,Cupressus,sargentii,Sargent's cypress,,,,,,CUSA3
+56,CUMA,Cupressus,macnabiana,MacNab's cypress,,,,,,CUMA
+57,JUNIP,Juniperus,spp,redcedar spp.,redcedar / juniper spp.,JUNIP,CS,JU,JUNIP,JUNIP
+58,JUPI,Juniperus,pinchotii,Pinchot juniper,,,,,JUPI,JUPI
+59,JUER,Juniperus,erythrocarpa,redberry juniper,,,,,,JUER
 60,JUFL,Juniperus,flaccida,Drooping juniper,,,,,,
 61,JUAS,Juniperus,ashei,Ashe juniper,,,,,JUAS,
-62,JUCA,Juniperus,californica,California juniper,,,,,,
-63,JUDE2,Juniperus,deppeana,alligator juniper,,,,,JUDE2,
-64,JUOC,Juniperus,occidentalis,western juniper,,JUOC,CA,JU,,
-65,JUOS,Juniperus,osteosperma,Utah juniper,,,TT,UJ,,
-66,JUSC2,Juniperus,scopulorum,Rocky Mountain juniper,,JUSC2,IE,RM,JUSC2,
+62,JUCA,Juniperus,californica,California juniper,,,,,,JUCA
+63,JUDE2,Juniperus,deppeana,alligator juniper,,,,,JUDE2,JUDE2
+64,JUOC,Juniperus,occidentalis,western juniper,,JUOC,CA,JU,,JUOC
+65,JUOS,Juniperus,osteosperma,Utah juniper,,,TT,UJ,,JUOS
+66,JUSC2,Juniperus,scopulorum,Rocky Mountain juniper,,JUSC2,IE,RM,JUSC2,JUSC2
 67,JUVIS ,Juniperus,virginiana L. var. silicicola (Small) J. Silba,southern redcedar,,,,,JUVIS ,
-68,JUVI,Juniperus,virginiana,eastern redcedar,,JUVI,CS,RC,JUVI,
-69,JUCO11,Juniperus,coahuilensis (Martiñez) Gaussen ex R.P. Adams,Redberry Juniper,,,,,JUCO11,
-69,JUMO,Juniperus,monosperma,oneseed juniper,,,,,JUMO,
-70,LARIX,Larix,spp,Larsh spp,,,,,LARIX,
-71,LALA,Larix,laricina,tamarack,,LALA,NE,TA,LALA,
-72,LALY,Larix,lyallii,subalpine larch,,LALY,PN,LL,,
-73,LAOC,Larix,occidentalis,western larch,,LAOC,SO,WL,,
-81,CADE27,Calocedrus,decurrens,incense cedar,incense-cedar,CADE27,PN,IC,,
-90,PICEA,Picea,spp,Spruce species,,PICEA,NE,PI,PICEA,
-91,PIAB,Picea,abies,Norway spruce,,PIAB,NE,NS,,
-92,PIBR,Picea,breweriana,Brewer spruce,,PIBR,CA,BR,,
-93,PIEN,Picea,engelmannii,engelmann spruce,,PIEN,PN,ES,,
-94,PIGL,Picea,glauca,white spruce,,PIGL,NE,WS,PIGL,
-95,PIMA,Picea,mariana,black spruce,,PIMA,NE,BA,PIMA,
-96,PIPU,Picea,pungens,blue spruce,,PIPU,UT,BS,PIPU,
+68,JUVI,Juniperus,virginiana,eastern redcedar,,JUVI,CS,RC,JUVI,JUVI
+69,JUCO11,Juniperus,coahuilensis (Martiñez) Gaussen ex R.P. Adams,Redberry Juniper,,,,,JUCO11,JUCO11
+69,JUMO,Juniperus,monosperma,oneseed juniper,,,,,JUMO,JUMO
+70,LARIX,Larix,spp,Larch spp,,,,,LARIX,LARIX
+71,LALA,Larix,laricina,tamarack,,LALA,NE,TA,LALA,LALA
+72,LALY,Larix,lyallii,subalpine larch,,LALY,PN,LL,,LALY
+73,LAOC,Larix,occidentalis,western larch,,LAOC,SO,WL,,LAOC
+81,CADE27,Calocedrus,decurrens,incense cedar,incense-cedar,CADE27,PN,IC,,CADE27
+90,PICEA,Picea,spp,Spruce species,,PICEA,NE,PI,PICEA,PICEA
+91,PIAB,Picea,abies,Norway spruce,,PIAB,NE,NS,PIAB,
+92,PIBR,Picea,breweriana,Brewer spruce,,PIBR,CA,BR,,PIBR
+93,PIEN,Picea,engelmannii,engelmann spruce,,PIEN,PN,ES,,PIEN
+94,PIGL,Picea,glauca,white spruce,,PIGL,NE,WS,PIGL,PIGL
+95,PIMA,Picea,mariana,black spruce,,PIMA,NE,BA,PIMA,PIMA
+96,PIPU,Picea,pungens,blue spruce,,PIPU,UT,BS,PIPU,PIPU
 97,PIRU,Picea,rubens,red spruce,,PIRU,NE,RS,PIRU,
-98,PISI,Picea,sitchensis,sitka spruce,,PISI,PN,SS,,
-100,PINUS,Pinus,spp,pine species,,PINUS,NE,OP,PINUS,
-101,PIAL,Pinus,albicaulis,whitebark pine,,PIAL,SO,WB,,
-102,PIAR,Pinus,aristata,bristlecone pine,Rockly Mountain bristlecone pine,PIAR,CR,BC,,
-103,PIAT,Pinus,attenuata,Knobcone pine,,PIAT,PN,KP,,
-104,PIBA,Pinus,balfouriana,foxtail pine,,,,,PIBA,
+98,PISI,Picea,sitchensis,sitka spruce,,PISI,PN,SS,,PISE
+100,PINUS,Pinus,spp,pine species,,PINUS,NE,OP,PINUS,PINUS
+101,PIAL,Pinus,albicaulis,whitebark pine,,PIAL,SO,WB,,PIAL
+102,PIAR,Pinus,aristata,bristlecone pine,Rockly Mountain bristlecone pine,PIAR,CR,BC,,PIAR
+103,PIAT,Pinus,attenuata,Knobcone pine,,PIAT,PN,KP,,PIAT
+104,PIBA,Pinus,balfouriana,foxtail pine,,,,,,PIBA
 105,PIBA2,Pinus,banksiana,jack pine,,PIBA2,NE,JP,PIBA2,
-106,PIED,Pinus,edulis,common pinyon,Pinyon pine/common pinyon,PIED,IE,PI,PIED,
+106,PIED,Pinus,edulis,common pinyon,Pinyon pine/common pinyon,PIED,IE,PI,PIED,PIED
 107,PICL,Pinus,clausa,sand pine,,PICL,SN,PU,PICL,
-108,PICO,Pinus,contorta,lodgepole pine,,PICO,PN,LP,,
-109,PICO3,Pinus,coulteri,Coulter pine,,,CA,CP,,
+108,PICO,Pinus,contorta,lodgepole pine,,PICO,PN,LP,,PICO
+109,PICO3,Pinus,coulteri,Coulter pine,,,CA,CP,,PICO3
 110,PIEC2,Pinus,echinata,shortleaf pine,,PIEC2,NE,SP,PIEC2,
 111,PIEL,Pinus,elliottii,slash pine,,PIEL,SN,SA,PIEL,
-112,PIEN2,Pinus,engelmannii,Apache pine,,,,,,
-113,PIFL2,Pinus,flexilis,limber pine,,PIFL2,CA,LM,,
-114,PIST3,Pinus,strobiformis,southwestern white pine,,PIST3,CR,WP,PIST3,
+112,PIEN2,Pinus,engelmannii,Apache pine,,,,,,PIEN2
+113,PIFL2,Pinus,flexilis,limber pine,,PIFL2,CA,LM,,PIFL2
+114,PIST3,Pinus,strobiformis,southwestern white pine,,PIST3,CR,WP,PIST3,PIST3
 115,PIGL2,Pinus,glabra,Spruce pine,,,SN,SR,PIGL2,
-116,PIJE,Pinus,jeffreyi,jeffrey pine,PIBL2?,PIJE,PN,JP,,
-117,PILA,Pinus,lambertiana,sugar pine,,PILA,SO,SP,,
-118,PILEC,Pinus,leiophylla var. chihauhuana,Chihuahua pine,,,,,,
-119,PIMO3,Pinus,monticola,western white pine,,PIMO3,NI,WP,,
-120,PIMU,Pinus,muricata D. Don,bishop pine,,,,,,
+116,PIJE,Pinus,jeffreyi,jeffrey pine,PIBL2?,PIJE,PN,JP,,PIJE
+117,PILA,Pinus,lambertiana,sugar pine,,PILA,SO,SP,,PILA
+118,PILEC,Pinus,leiophylla var. chihuahuana,Chihuahuan pine,,,,,,PILEC
+119,PIMO3,Pinus,monticola,western white pine,,PIMO3,NI,WP,,PIMO3
+120,PIMU,Pinus,muricata D. Don,bishop pine,,,,,,PIMU
 121,PIPA2,Pinus,palustris,longleaf pine,,PIPA2,SN,LL,PIPA2,
-122,PIPO,Pinus,ponderosa,ponderosa pine,,PIPO,CA,PP,PIPO,
+122,PIPO,Pinus,ponderosa,ponderosa pine,,PIPO,CA,PP,PIPO,PIPO
 123,PIPU5,Pinus,pungens,Table mountain pine,,PIPU5,NE,TM,PIPU5,
-124,PIRA2,Pinus,radiata,Montery pine,radiata/Monterey pine,PIRA2,CA,MP,,
+124,PIRA2,Pinus,radiata,Montery pine,radiata/Monterey pine,PIRA2,CA,MP,,PIRA2
 125,PIRE,Pinus,resinosa,red pine,,PIRE,NE,RN,PIRE,
 126,PIRI,Pinus,rigida,pitch pine,,PIRI,NE,PP,PIRI,
-127,PISA2,Pinus,sabiniana,gray pine,,PISA2,CA,GP,,
+127,PISA2,Pinus,sabiniana,gray pine,California foothill pine,PISA2,CA,GP,,PISA2
 128,PISE,Pinus,serotina,pond pine,,PISE,NE,PD,PISE,
 129,PIST,Pinus,strobus,eastern white pine,,PIST,SN,WP,PIST,
-130,PISY,Pinus,sylvestris,Scotch pine,,PISY,NE,SC,PISY,
+130,PISY,Pinus,sylvestris,Scotch pine,,PISY,NE,SC,PISY,PISY
 131,PITA,Pinus,taeda,loblolly pine,,PITA,SN,LP,PITA,
 132,PIVI2,Pinus,virginiana,virginia pine,,PIVI2,SN,VP,PIVI2,
-133,PIMO,Pinus,monophylla,singleleaf pinyon,,PIMO,TT,PM,,
-134,PIDI3,Pinus,discolor,border pinyon,,,,,,
-135,PIAR5,Pinus,arizonica,Arizona pine,,,,,,
-136,PINI,Pinus,nigra Arnold,Austrian pine,,,,,PINI,
-137,PIWA,Pinus,washoensis,Washoe pine,,,,,,
-138,PIQU,Pinus,quadrifolia Parl. Ex Sudw.,four-needle pinyon,four-needle/four-leaf/Parry pinyon,,,,,
-139,PITO,Pinus,torreyana,Torrey pine,,,,,,
-140,PICE,Pinus,cembroides,Mexican pinyon pine,,,,,,
+133,PIMO,Pinus,monophylla,singleleaf pinyon,,PIMO,TT,PM,,PIMO
+134,PIDI3,Pinus,discolor,border pinyon,,,,,,PIDI3
+135,PIAR5,Pinus,arizonica,Arizona pine,,,,,PIAR5,PIAR5
+136,PINI,Pinus,nigra Arnold,Austrian pine,,,,,PINI,PINI
+137,PIWA,Pinus,washoensis,Washoe pine,,,,,,PIWA
+138,PIQU,Pinus,quadrifolia Parl. Ex Sudw.,four-needle pinyon,four-needle/four-leaf/Parry pinyon,,,,,PIQU
+139,PITO,Pinus,torreyana,Torrey pine,,,,,,PITO
+140,PICE,Pinus,cembroides,Mexican pinyon pine,,,,,,PICE
 141,PIRE5,Pinus,remota,Papershell pinyon pine,,,,,,
-142,PILO,Pinus,longaeva,Great Basin bristlecone pine,,,,,,
-143,PIMOF,Pinus,monophylla Torr. & Fram. Var. fallax (Little) silba,Arizona pinyon pine,,,,,,
+142,PILO,Pinus,longaeva,Great Basin bristlecone pine,,,,,,PILO
+143,PIMOF,Pinus,monophylla Torr. & Fram. var. fallax (Little) silba,Arizona pinyon pine,,,,AZ,,PIMOF
 144,PIELE2,Pinus,elliottii Engelm. var. elliottii,Carribean Pine,,,,,PIELE2,
 144,PIOO2,Pinus,oocarpa,Ocote chino,Honduras pine,,,,,
-200,PSEUD,Pseudotsuga,spp,Douglas-fir spp.,,,,,,
-201,PSMA,Pseudotsuga,macrocarpa,bigcone Douglas-fir,,,,,,
-202,PSME,Pseudotsuga,menziesii,Douglas-fir,,PSME,PN,DF,PSME,
-211,SESE3,Sequia,sempervirens,redwood,,SESE3,PN,RW,,
-212,SEGI2,Sequoiadendron,giganteum,giant sequoia,,SEGI2,CA,GS,,
+200,PSEUD,Pseudotsuga,spp,Douglas-fir spp.,,,,OD,,
+201,PSMA,Pseudotsuga,macrocarpa,bigcone Douglas-fir,,,,,,PSMA
+202,PSME,Pseudotsuga,menziesii,Douglas-fir,,PSME,PN,DF,PSME,PSME
+211,SESE3,Sequia,sempervirens,redwood,,SESE3,PN,RW,,SESE3
+212,SEGI2,Sequoiadendron,giganteum,giant sequoia,,SEGI2,CA,GS,,SEGI2
 220,TAXOD,Taxodium,spp,baldcypress spp.,,,,,TAXOD,
 221,TADI2,Taxodium,distichum,baldcypress,,TADI2,SN,BY,TADI2,
 222,TAAS,Taxodium,ascendens,pondcypress,,TAAS,SN,PC,TAAS,
 223,TAMU,Taxodium,mucronatum,Montezuma bald cypress,,,,,,
-230,TAXUS,Taxus,spp,yew spp.,,,,,TAXUS,
-231,TABR2,Taxus,brevifolia,pacific yew,,TABR2,PN,PY,,
+230,TAXUS,Taxus,spp,yew spp.,,,,,TAXUS,TAXUS
+231,TABR2,Taxus,brevifolia,pacific yew,,TABR2,PN,PY,,TABR2
 232,TAFL,Taxus,floridana,Florida yew,,,,,TAFL,
-240,THUJA,Thuja,spp,Thuja species,,,,,THUJA,
+240,THUJA,Thuja,spp,Thuja species,,,,,THUJA,THUJA
 241,THOC2,Thuja,occidentalis,northern white-cedar,,THOC2,NE,WC,THOC2,
-242,THPL,Thuja,plicata,western redcedar,,THPL,PN,RC,,
+242,THPL,Thuja,plicata,western redcedar,,THPL,PN,RC,,THPL
 250,TORRE,Torreya,spp,Torreya species,Torreya (nutmeg) species,,,,TORRE,
-251,TOCA,Torreya,californica,California torreya,California torrey (nutmeg),TOCA,CA,CN,,
+251,TOCA,Torreya,californica,California torreya,California torrey (nutmeg),TOCA,CA,CN,,TOCA
 252,TOTA,Torreya,taxifolia,Florida torreya,,,,,TOTA,
-260,TSUGA,Tsuga,spp,hemlock spp.,,TSUGA,NE,HM,TSUGA,
+260,TSUGA,Tsuga,spp,hemlock spp.,,TSUGA,NE,HM,TSUGA,TSUGA
 261,TSCA,Tsuga,canadensis,eastern hemlock,,TSCA,NE,EH,TSCA,
 262,TSCA2,Tsuga,caroliniana,Carolina hemlock,,,,,TSCA2,
-263,TSHE,Tsuga,heterophylla,western hemlock,,TSHE,PN,WH,,
-264,TSME,Tsuga,mertensiana,mountain hemlock,,TSME,CA,MH,,
+263,TSHE,Tsuga,heterophylla,western hemlock,,TSHE,PN,WH,,TSHE
+264,TSME,Tsuga,mertensiana,mountain hemlock,,TSME,CA,MH,,TSME
 270,CAEQ,Casuarina,equisetifolia,Australian pine,"Australian-pine, gagu",,,,,
 298,OTHERS,Tree,softwood,other softwood,,,,,,
 299,2TE,Tree,evergreen,unknown dead conifer,,,IE,OS,2TE,2TE
@@ -127,7 +129,7 @@ FIA,NRCS,Genus,Species,Common,Comment,NRCS.trf,FVS .trf,SpCode,FVS East,FVS West
 304,ACGR,Acacia,greggii,Catclaw acacia,,,,,ACGR,
 310,ACER,Acer,spp,maple species,,ACER,SE,MP,ACER,
 311,ACBA3,Acer,barbatum,Florida maple,,ACBA3,SN,FM,ACBA3,
-312,ACMA3,Acer,macrophyllum,bigleaf maple,,ACMA3,PN,BM,,
+312,ACMA3,Acer,macrophyllum,bigleaf maple,,ACMA3,PN,BM,,ACMA3
 313,ACNE2,Acer,negundo,boxelder,,ACNE2,SN,BE,ACNE2,
 314,ACNI5,Acer,nigrum,black maple,,ACNI5,NE,BM,ACNI5,
 315,ACPE,Acer,pensylvanicum,striped maple,,ACPE,NE,ST,ACPE,
@@ -139,37 +141,39 @@ FIA,NRCS,Genus,Species,Common,Comment,NRCS.trf,FVS .trf,SpCode,FVS East,FVS West
 321,ACGL,Acer,glabrum,Rocky mountain maple,,ACGL,IE,MM,ACGL,
 322,ACGR3,Acer,grandidentatum,bigtooth maple,,,TT,BI,ACGR3,
 323,ACLE,Acer,leucoderme,chalk maple,,ACLE,SE,CM,ACLE,
-330,AESCU,Aesculus,spp,buckeye/horsechestnut,,AESCU,NE,BU,AESCU,
-331,AEGL,Aesculus,glabra,Ohio buckeye,,AEGL,CS,OB,AEGL,
+330,AESCU,Aesculus,spp,buckeye/horsechestnut,,AESCU,NE,BU,AESCU,AESCU
+331,AEGL,Aesculus,glabra,Ohio buckeye,,AEGL,CS,OB,AEGL,AEGL
 332,AEFL,Aesculus,flava,Yellow buckeye,,AEFL,NE,YY,AEFL,
-333,AECA,Aesculus,californica,California buckeye,,AECA,CA,BU,,
+333,AECA,Aesculus,californica,California buckeye,,AECA,CA,BU,,AECA
 334,AEGLA,Aesculus,glabra var. arguta,Texas buckeye,,,,,AEGLA,
 336,AEPA,Aesculus,pavia,Red buckeye,,,,,AEPA,
 337,AESY,Aesculus,sylvatica W. Bartram,Painted buckeye,,,,,AESY,
-341,AIAL,Ailanthus,altissima,Ailanthus,,AIAL,NE,AI,AIAL,
-345,ALJU,Albizia,julibrissin,Mimosa/silktree,,,,,ALJU,
-350,ALNUS,Alnus,spp,Alder spp.,,,,,ALNUS,
-351,ALRU2,Alnus,rubra,Red alder,,ALRU2,PN,RA,,
-352,ALRH2,Alnus,rhombifolia,White alder,,ALRH2,PN,WA,,
-353,ALOB2,Alnus,oblongifolia,Arizona alder,,,,,,
-355,ALGL2,Alnus,glutinosa,European alder,,,,,ALGL2,
+341,AIAL,Ailanthus,altissima,Ailanthus,,AIAL,NE,AI,AIAL,AIAL
+345,ALJU,Albizia,julibrissin,Mimosa/silktree,,,,,ALJU,ALJU
+350,ALNUS,Alnus,spp,Alder spp.,,,,,ALNUS,ALNUS
+351,ALRU2,Alnus,rubra,Red alder,,ALRU2,PN,RA,,ALRU2
+352,ALRH2,Alnus,rhombifolia,White alder,,ALRH2,PN,WA,,ALRH2
+353,ALOB2,Alnus,oblongifolia,Arizona alder,,,,,,ALOB2
+355,ALGL2,Alnus,glutinosa,European alder,,,,,ALGL2,ALGL2
 356,AMELA,Amelanchier,spp,Serviceberry,,AMELA,,,AMELA,
 357,AMAR3,Amelanchier,arborea,Commong serviceberry,,,,,AMAR3,
 358,AMSA,Amelanchier,sanguinea,Roundleaf serviceberry,,,,,AMSA,
-360,ARBUT,Arbutus,spp,Madrone spp,,,,,,
-361,ARME,Arbutus,menziesii,Pacific madrone,,ARME,CA,MA,,
-362,ARAR2,Arbutus,arizonica,Arizona madrone,,,,,,
-363,ARXA80,Arbutus,xalapensis,Texas madrone,Texana Buckley,,,,ARXA80,
+360,ARBUT,Arbutus,spp,Madrone spp,,,,,,ARBUT
+361,ARME,Arbutus,menziesii,Pacific madrone,,ARME,CA,MA,,ARME
+362,ARAR2,Arbutus,arizonica,Arizona madrone,,,,,,ARAR2
+363,ARXA80,Arbutus,xalapensis,Texas madrone,Texana Buckley,,,,ARXA80,ARXA80
 367,ASTR,Asimina,triloba,Pawpaw,,,,,ASTR,
-370,BETUL,Betula,spp,Birch spp.,,BETUL,SN,BB,BETUL,
+370,BETUL,Betula,spp,Birch spp.,,BETUL,SN,BB,BETUL,BETUL
 371,BEAL2,Betula,alleghaniensis,Yellow birch,,BEAL2,NE,YB,BEAL2,
 372,BELE,Betula,lenta,Sweet birch,sweet birch/black birch,BELE,NE,SB,BELE,
 373,BENI,Betula,nigra,River birch,,BINI,NE,RB,BENI,
-374,BEOC2,Betula,occidentalis,Water birch,,BEOC2,NE,WR,BEOC2,
-375,BEPA,Betula,papyrifera,Paper birch,,BAPA,PN,PB,BEPA,
-376,BEPAC,Betula,papyrifera var. commutata,Western paper birch,,,,,BEPAC,
+374,BEOC2,Betula,occidentalis,Water birch,,BEOC2,NE,WR,BEOC2,BEOC2
+375,BEPA,Betula,papyrifera,Paper birch,,BAPA,PN,PB,BEPA,BEPA
+376,BENE4,Betula,neoalaskana,resin birch,,,,,,BENE4
+376,BEPAC,Betula,papyrifera var. commutata,Western paper birch,,,,,BEPAC,BEPAC
 377,BEUB,Betula,uber,Virginia roundleaf birch,,,,,BEUB,
 378,BEPAS,Betula,papyrifera var. subcordata,Northwestern paper birch,,,,,,
+378,BEUT,Betula,×utahensis,birch,,,,,,BEUT
 379,BEPO,Betula,populifolia,Gray birch,,BEPO,NE,GB,BEPO,
 381,SILAL3,Sideroxylon,lanuginosum Michx. ssp. lanuginosum,gum bully,"chittamwood,gum bumelia",,,,SILAL3,
 383,QUVI,Quercus,virginiana,Live oak,,QUVI,SN,LO,QUVI,
@@ -194,22 +198,23 @@ FIA,NRCS,Genus,Species,Common,Comment,NRCS.trf,FVS .trf,SpCode,FVS East,FVS West
 423,CAPUO,Castanea,pumila (L.) Mill. var. ozarkensis (Ashe) Tucker,Ozark chinkapin,,,,,CAPUO,
 424,CAMO83,Castanea,mollissima,Chinease chestnut,,,,,CAMO83,
 430,CASTA7,Castanopsis,spp,Chinkapin,,,,,,
-431,CHCHC4,Castanopsis,chrysophylla,Giant chinkapin,,,PN,GC,,
-450,CATAL,Catalpa,spp,Catalpa spp.,,CATAL,CS,CA,CATAL,
-451,CABI8,Catalpa,bignonioides,Southern catalpa,,,,,CABI8,
-452,CASP8,Catalpa,speciosa,Northern catalpa,,,,,CASP8,
-460,CELTI,Celtis,spp,Hackberry spp.,,CELTI,SN,HB,CELTI,
-461,CELA,Celtis,laevigata,Sugarberry,,CELA,CS,SG,CELA,
-462,CEOC,Celtis,occidentalis,Hackberry,,CEOC,CS,HK,CEOC,
-463,CELAR,Celtis,laevigata var. reticulata,Netleaf hackberry,,,,,CELAR,
+431,CHCHC4,Castanopsis,chrysophylla,Giant chinkapin,,,PN,GC,,CHCHC4
+450,CATAL,Catalpa,spp,Catalpa spp.,,CATAL,CS,CA,CATAL,CATAL
+451,CABI8,Catalpa,bignonioides,Southern catalpa,,,,,CABI8,CABI8
+452,CASP8,Catalpa,speciosa,Northern catalpa,,,,,CASP8,CASP8
+460,CELTI,Celtis,spp,Hackberry spp.,,CELTI,SN,HB,CELTI,CELTI
+461,CELA,Celtis,laevigata,Sugarberry,,CELA,CS,SG,CELA,CELA
+462,CEOC,Celtis,occidentalis,Hackberry,,CEOC,CS,HK,CEOC,CEOC
+463,CELAR,Celtis,laevigata var. reticulata,Netleaf hackberry,,,,,CELAR,CELAR
 471,CECA4,Cercis,canadensis,Eastern redbud,,CECA4,CS,RD,CECA4,
-475,CELE3,Cercocarpus,ledifolius Nutt.,Curlleaf mountain-mahogany,,CELE3,SO,MC,,
-478,CEMOM4,Cercocarpus,alnifolius,Birchleaf mountain mahogany,,,SO,MB,,
+475,CELE3,Cercocarpus,ledifolius Nutt.,Curlleaf mountain-mahogany,,CELE3,SO,MC,,CELE3
+478,CEAL8,Cercocarpus,alnifolius,birchleaf mountain mahogany,,,,,,CEAL8
+478,CEMOM4,Cercocarpus,alnifolius,Birchleaf mountain mahogany,,,SO,MB,,CEMOM4
 481,CLKE,Cladrastis,kentukea,Yellowwood,,,,,CLKE,
-490,CORNU,Cornus,spp,Dogwood species,,,,,CORNU,
+490,CORNU,Cornus,spp,Dogwood species,,,,,CORNU,CORNU
 491,COFL2,Cornus,florida,Flowering dogwood,,COFL2,CS,DW,COFL2,
-492,CONU4,Cornus,nuttalli,Pacific dogwood,,CONU4,PN,DG,,
-500,CRATA,Crataegus,spp,Hawthorn,,CRATA,PN,HT,CRATA,
+492,CONU4,Cornus,nuttalli,Pacific dogwood,,CONU4,PN,DG,,CONU4
+500,CRATA,Crataegus,spp,Hawthorn,,CRATA,PN,HT,CRATA,CRATA
 501,CRCR2,Crataegus,crus-galli,Cockspur hawthorn,,,,,CRCR2,
 502,CRMO2,Crataegus,mollis,Downy hawthorn,,,,,CRMO2,
 503,CRBR3,Crataegus,brainerdii,Brainerd hawthorn,,,,,CRBR3,
@@ -219,24 +224,24 @@ FIA,NRCS,Genus,Species,Common,Comment,NRCS.trf,FVS .trf,SpCode,FVS East,FVS West
 507,CRFL,Crataegus,fiabellata,Fanleaf hawthorn,,,,,CRFL,
 508,CRMO3,Crataegus,monogyna,Oneseed hawthorn,,,,,CRMO3,
 509,CRPE,Crataegus,pediceliata,Scarlet hawthorn,,,,,CRPE,
-510,EUCAL,Eucalyptus,spp,Eucalyptus spp,,,,,EUCAL,
+510,EUCAL,Eucalyptus,spp,Eucalyptus spp,,,,,EUCAL,EUCAL
 511,EUDO7,Eucalyptus,globulus,Tasmanian bluegum,,,,,,
-512,EUCA2,Eucalyptus,camaldulensis,river redgum,,,,,EUCA2,
+512,EUCA2,Eucalyptus,camaldulensis,river redgum,,,,,EUCA2,EUCA2
 513,EUGR12,Eucalyptus,grandis,grand eucalyptus,,,,,EUGR12,
 514,EURO2,Eucalyptus,robusta,swampmahogany,,,,,EURO2,
 520,DIOSP,Diospyros,spp,Persimmon spp.,,,,,DIOSP,
-521,DIVI5,Diospyros,virginiana,Common persimmon,,DIVI5,CS,PS,DIVI5,
+521,DIVI5,Diospyros,virginiana,Common persimmon,,DIVI5,CS,PS,DIVI5,DIVI5
 522,DITE3,Diospyros,texana,Texas persimmon,,,,,DITE3,
 523,EHAN,Ehretia,anacua,Anacua knockaway,,,,,,
-531,FAGR,Fagus,grandifolia,American beech,,FAGR,CS,AB,FAGR,
-540,FRAXI,Fraxinus,spp,Ash spp.,,FRAXI,CS,AS,FRAXI,
-541,FRAM2,Fraxinus,americana,White ash,,FRAM2,CS,WA,FRAM2,
-542,FRLA,Fraxinus,latifolia,Oregon ash,,FRLA,CA,FL,,
+531,FAGR,Fagus,grandifolia,American beech,,FAGR,CS,AB,FAGR,FAGR
+540,FRAXI,Fraxinus,spp,Ash spp.,,FRAXI,CS,AS,FRAXI,FRAXI
+541,FRAM2,Fraxinus,americana,White ash,,FRAM2,CS,WA,FRAM2,FRAM2
+542,FRLA,Fraxinus,latifolia,Oregon ash,,FRLA,CA,FL,,FRLA
 543,FRNI,Fraxinus,nigra,Black ash,,FRNI,CS,BA,FRNI,
-544,FRPE,Fraxinus,pennsylvanica,Green ash,,FRPE,CS,GA,FRPE,
+544,FRPE,Fraxinus,pennsylvanica,Green ash,,FRPE,CS,GA,FRPE,FRPE
 545,FRPR,Fraxinus,profunda,Pumpkin ash,,FRPR,CS,PA,FRPR,
 546,FRQU,Fraxinus,quadranulata,Blue ash,,FRQU,CS,UA,FRQU,
-547,FRVE2,Fraxinus,velutina,Velvet ash,,,,,FRVE2,
+547,FRVE2,Fraxinus,velutina,Velvet ash,,,,,FRVE2,FRVE2
 548,FRCA3,Fraxinus,caroliniana,Carolina ash,,,,,FRCA3,
 549,FRTE,Fraxinus,texensis,Texas ash,,,,,FRTE,
 550,GLEDI,Gleditsia,spp,Honeylocust spp.,,,,,GLEDI,
@@ -250,14 +255,14 @@ FIA,NRCS,Genus,Species,Common,Comment,NRCS.trf,FVS .trf,SpCode,FVS East,FVS West
 582,HADI3,Halesia,diperta,Two-winged silverbell,,,,,HADI3,
 583,HAPA2,Halesia,parviflora,Little silverbell,,,,,HAPA2,
 591,ILOP,Ilex,opaca,American holly,,ILOP,NE,HY,ILOP,
-600,JUGLA,Juglans,spp,Walnut spp.,,JUGLA,CA,WN,JUGLA,
+600,JUGLA,Juglans,spp,Walnut spp.,,JUGLA,CA,WN,JUGLA,JUGLA
 601,JUCI,Juglans,cinerea,Butternut,,JUCI,CS,BN,JUCI,
-602,JUNI,Juglans,nigra,Black walnut,,JUNI,CS,WN,JUNI,
-603,JUHI,Juglans,hindsii,California black walnut,,,,,,
-604,JUCA7,Juglans,californica,Southern California black walnut,,,,,,
-605,JUMI,Juglans,microcarpa,Texas walnut,,,,,JUMI,
-606,JUMA,Juglans,major,Arizona walnut,,,,,JUMA,
-611,LIST2,Liquidamber,styraciflua,Sweetgum,,LIST2,CS,SU,LIST2,
+602,JUNI,Juglans,nigra,Black walnut,,JUNI,CS,WN,JUNI,JUNI
+603,JUHI,Juglans,hindsii,California black walnut,,,,,,JUHI
+604,JUCA7,Juglans,californica,Southern California black walnut,,,,,,JUCA7
+605,JUMI,Juglans,microcarpa,Texas walnut,,,,,JUMI,JUMI
+606,JUMA,Juglans,major,Arizona walnut,,,,,JUMA,JUMA
+611,LIST2,Liquidamber,styraciflua,Sweetgum,,LIST2,CS,SU,LIST2,LIST2
 621,LITU,Liriodendron,tulipifera,Yellow-poplar,,LITU,CS,YP,LITU,
 631,LIDE3,Lithocarpus,densiflorus,Tanoak,,LIDE3,CA,TO,,
 641,MAPO,Maclura,pomifera,Osage-orange,,MAPO,CS,OO,MAPO,
@@ -269,95 +274,95 @@ FIA,NRCS,Genus,Species,Common,Comment,NRCS.trf,FVS .trf,SpCode,FVS East,FVS West
 655,MAFR,Magnolia,fraseri,Mountain magnolia,mountain or Fraser magnolia,,,,MAFR,
 657,MAPY,Magnolia,pyramidata,Pyramid magnolia,,,,,MAPY,
 658,MATR,Magnolia,tripetala,Umbrells magnolia,,,,,MATR,
-660,MALUS,Malus,spp,Apple spp.,,MALUS,NE,AP,MALUS,
-661,MAFU,Malus,fusca,Oregon crab apple,,,,,,
+660,MALUS,Malus,spp,Apple spp.,,MALUS,NE,AP,MALUS,MALUS
+661,MAFU,Malus,fusca,Oregon crab apple,,,,,,MAFU
 662,MAAN3,Malus,angustifolia,Southern crabapple,,,,,MAAN3,
-663,MACO5,Malus,coronaria,Sweet crabapple,,,,,MACO5,
+663,MACO5,Malus,coronaria,Sweet crabapple,,,,,MACO5,MACO5
 664,MAIO,Malus,ioensis,Prairie crabapple,,,,,MAIO,
-680,MORUS,Morus,spp,Mulberry spp.,,MORUS,CS,MB,MORUS,
-681,MOAL ,Morus,alba L.,White Mulberry,,MOAL,SE,WM,MOAL,
+680,MORUS,Morus,spp,Mulberry spp.,,MORUS,CS,MB,MORUS,MORUS
+681,MOAL ,Morus,alba L.,White Mulberry,,MOAL,SE,WM,MOAL,MOAL 
 682,MORU2,Morus,rubra,Red mulberry,,MORU2,SE,RY,MORU2,
-683,MOMI ,Morus,microphylla Buckley,Texas Mulberry,,,,,MOMI,
+683,MOMI ,Morus,microphylla Buckley,Texas Mulberry,,,,,MOMI,MOMI 
 684,MONI ,Morus,nigra L.,Black Mulberry,,,,,MONI,
 690,NYSSA,Nyssa,spp,tupelo species,,NYSSA,CS,TL,NYSSA,
 691,NYAQ2,Nyssa,aquatica,Water tupelo,,NYAQ2,CS,WT,NYAQ2,
 692,NYOG,Nyssa,ogeche,Ogeechee tupelo,,NYOG,SE,OG,NYOG,
 693,NYSY,Nyssa,sylvatica,blackgum,,NYSY,CS,BG,NYSY,
 694,NYBI,Nyssa,sylvatica var. biflora,swamp tupelo,,NYBI,CS,TS,NYBI,
-701,OSVI,Ostrya,virginiana,eastern hophornbeam,,OSVI,CS,HH,OSVI,
+701,OSVI,Ostrya,virginiana,eastern hophornbeam,,OSVI,CS,HH,OSVI,OSVI
 711,OXAR,Oxydendrum,Arboretum,sourwood,,OXAR,CS,SD,OXAR,
 712,PATO2,Paulownia,tomentosa,paulownia,"paulownia, empress-tree",PATO2,NE,PW,PATO2,
 720,PERSE,Persea,spp,Bay species,,,,,PERSE,
 721,PEBO,Persea,borbonia,redbay,,PEBO,SN,RA,PEBO,
 722,PLAQ,Planera,aquatica,"Water-elm, planertree",,,,,PLAQ,
-729,PLATA,Platanus,spp,Sycamore spp.,,,,,PLATA,
-730,PLRA,Platanus,racemosa,California sycamore,,PLRA,CA,SY,,
-731,PLOC,Platanus,occidentalis,American sycamore,,PLOC,SN,SY,PLOC,
-732,PLWR2,Platanus,wrightii,Arizona sycamore,,,,,,
-740,POPUL,Populus,spp,Cottonwood and poplar spp.,,POPUL,SN,CW,POPUL,
-741,POBA2,Populus,balsamifera,Balsam poplar,,POBA2,NE,BP,POBA2,
-742,PODE3,Populus,deltoides,Eastern cottonwood,,PODE3,NE,EC,PODE3,
+729,PLATA,Platanus,spp,Sycamore spp.,,,,,PLATA,PLATA
+730,PLRA,Platanus,racemosa,California sycamore,,PLRA,CA,SY,,PLRA
+731,PLOC,Platanus,occidentalis,American sycamore,,PLOC,SN,SY,PLOC,PLOC
+732,PLWR2,Platanus,wrightii,Arizona sycamore,,,,,,PLWR2
+740,POPUL,Populus,spp,Cottonwood and poplar spp.,,POPUL,SN,CW,POPUL,POPUL
+741,POBA2,Populus,balsamifera,Balsam poplar,,POBA2,NE,BP,POBA2,POBA2
+742,PODE3,Populus,deltoides,Eastern cottonwood,,PODE3,NE,EC,PODE3,PODE3
 743,POGR4,Populus,grandidentata,Bigtooth aspen,,POGR4,SN,BT,POGR4,
 744,POHE4,Populus,heterophylla,Swamp cottonwood,,POHE4,NE,PY,POHE4,
-745,PODEM,Populus,deltoides spp. Moniifera,Plains cottonwood,,,,,PODEM,
-746,POTR5,Populus,tremuloides,Quaking aspen,,POTR5,PN,AS,POTR5,
-747,POBAT,Populus,balsamifera L. spp. trichocarpa,Black cottonwood,,POBAT,SO,CW,,
-748,POFR2,Populus,fremontii,Fremont cottonwood,"Fremont cottonwood, Rio Grande cottonwood",,,,POFR2,
-749,POAN3,Populus,angustifolia,Narrowleaf cottonwood,,,TT,NC,POAN3,
-752,POAL7,Populus,alba,Silver poplar,,,,,POAL7,
-753,PONI,Populus,nigra,Lombardy poplar,,,,,PONI,
-755,PROSO,Prosopis,spp,Mesquite,,,,,,
-756,PRGLT,Prosopis,glandulosa var. torreyana,Western honey mesquite,,,,,,
-757,PRVE,Prosopis,velutina,Velvet mesquite,,,,,PRVE,
-758,PRPU,Prosopis,pubescens Benth.,Screwbean mesquite,,,,,PRPU,
-760,PRUNU,Prunus,spp,Cherry and plum spp.,,PRUNU,NE,PL,PRUNU,
+745,PODEM,Populus,deltoides spp. Moniifera,Plains cottonwood,,,,,PODEM,PODEM
+746,POTR5,Populus,tremuloides,Quaking aspen,,POTR5,PN,AS,POTR5,POTR5
+747,POBAT,Populus,balsamifera L. spp. trichocarpa,Black cottonwood,,POBAT,SO,CW,,POBAT
+748,POFR2,Populus,fremontii,Fremont cottonwood,"Fremont cottonwood, Rio Grande cottonwood",,,,POFR2,POFR2
+749,POAN3,Populus,angustifolia,Narrowleaf cottonwood,,,TT,NC,POAN3,POAN3
+752,POAL7,Populus,alba,Silver poplar,,,,,POAL7,POAL7
+753,PONI,Populus,nigra,Lombardy poplar,,,,,PONI,PONI
+755,PROSO,Prosopis,spp,Mesquite,,,,,PROSO,PROSO
+756,PRGLT,Prosopis,glandulosa var. torreyana,Western honey mesquite,,,,,,PRGLT
+757,PRVE,Prosopis,velutina,Velvet mesquite,,,,,PRVE,PRVE
+758,PRPU,Prosopis,pubescens Benth.,Screwbean mesquite,,,,,PRPU,PRPU
+760,PRUNU,Prunus,spp,Cherry and plum spp.,,PRUNU,NE,PL,PRUNU,PRUNU
 761,PRPE2,Prunus,pensylvanica,Pin cherry,,PRPE2,NE,PR,PRPE2,
 762,PRSE2,Prunus,serotina,Black cherry,,PRSE2,SN,BC,PRSE2,
 763,PRVI,Prunus,virginiana,Chokecherry,,PRVI,LS,CC,PRVI,
 764,PRPE3,Prunus,persica,Peach,,,,,PRPE3,
 765,PRNI,Prunus,nigra,Canada plum,,,,,PRNI,
-766,PRAM,Prunus,americana,American plum,American/wild plum,,,,PRAM,
-768,PREM,Prunus,emarginata,Bitter cherry,,PREM,PN,CH,,
+766,PRAM,Prunus,americana,American plum,American/wild plum,,,,PRAM,PRAM
+768,PREM,Prunus,emarginata,Bitter cherry,,PREM,PN,CH,,PREM
 769,PRAL5,Prunus,alleghaniensis,Allegheny plum,,,,,PRAL5,
 770,PRAN3,Prunus,angustifolia,Chickasaw plum,,,,,PRAN3,
 771,PRAV,Prunus,avium,Sweet cherry,domesticated,,,,PRAV,
 772,PRCE,Prunus,cerassus,Sour cherry,domesticated,,,,PRCE,
 773,PRDO,Prunus,domestica,European plum,domesticated,,,,PRDO,
 774,PRMA,Prunus,mahaleb,Mahaleb plum,domesticated,,,,PRMA,
-800,QUERC,Quercus,spp,Oak spp. -- deciduous,,QUERC,NE,OK,QUERC,
-801,QUAG,Quercus,agrifolia,California live oak,,QUAG,CA,LO,,
+800,QUERC,Quercus,spp,Oak spp. -- deciduous,,QUERC,NE,OK,QUERC,QUERC
+801,QUAG,Quercus,agrifolia,California live oak,,QUAG,CA,LO,,QUAG
 802,QUAL,Quercus,alba,White oak,,QUAL,SN,WO,QUAL,
-803,QUAR,Quercus,arizonica,Arizona white oak,,,,,QUAR,
+803,QUAR,Quercus,arizonica,Arizona white oak,,,,,QUAR,QUAR
 804,QUBI,Quercus,bicolor,Swamp white oak,,QUBI,NE,SW,QUBI,
-805,QUCH2,Quercus,chrysolepis,Canyon live oak,,,,,,
+805,QUCH2,Quercus,chrysolepis,Canyon live oak,,,,,,QUCH2
 806,QUCO2,Quercus,coccinea,Scarlet oak,,QUCO2,SN,SO,QUCO2,
-807,QUDO,Quercus,douglasii,Blue oak,,QUDO,CA,BL,,
+807,QUDO,Quercus,douglasii,Blue oak,,QUDO,CA,BL,,QUDO
 808,QUDU2,Quercus,sinuata var. sinuata,Durand oak,,,,,,
 808,QUSIS,Quercus,sinuata Walter var. sinuata,Durand Oak,,,,,QUSIS,
 809,QUEL,Quercus,ellipsoidalis,Northern pin oak,,QUEL,NE,NP,QUEL,
-810,QUEM,Quercus,emoryi,Emory oak,,,,,QUEM,
-811,QUEN,Quercus,engelmannii,Engelmann oak,,QUEN,CA,EO,,
+810,QUEM,Quercus,emoryi,Emory oak,,,,,QUEM,QUEM
+811,QUEN,Quercus,engelmannii,Engelmann oak,,QUEN,CA,EO,,QUEN
 812,QUFA,Quercus,falcata,Southern red oak,,QUFA,NE,SK,QUFA,
-813,QUPA5,Quercus,pagoda,Cherrybark oak,,QUPA5,NE,CB,,
-814,QUGA,Quercus,gambelii,Gambel oak,,QUGA,,,QUGA,
-815,QUGA4,Quercus,garryana,Oregon white oak,,QUGA4,PN,WO,,
+813,QUPA5,Quercus,pagoda,Cherrybark oak,,QUPA5,NE,CB,QUPA5,
+814,QUGA,Quercus,gambelii,Gambel oak,,QUGA,,,QUGA,QUGA
+815,QUGA4,Quercus,garryana,Oregon white oak,,QUGA4,PN,WO,,QUGA4
 816,QUIL,Quercus,ilicifolia,scrub oak,"bear oak, scrub oak",,,,QUIL,
 817,QUIM,Quercus,imbicaria,Shingle oak,,QUIM,NE,QI,QUIM,
-818,QUKE,Quercus,kelloggii,California black oak,,,,,,
+818,QUKE,Quercus,kelloggii,California black oak,,,,,,QUKE
 819,QULA2,Quercus,laevis,Turkey oak,,QULA2,SN,TO,QULA2,
 820,QULA3,Quercus,laurifolia,Laurel oak,,QULA3,SN,LK,QULA3,
-821,QULO,Quercus,lobata,California white oak,,QULO,CA,VO,,
+821,QULO,Quercus,lobata,California white oak,,QULO,CA,VO,,QULO
 822,QULY,Quercus,lyrata,Overcup oak,,QULY,SN,OV,QULY,
-823,QUMA2,Quercus,macrocarpa,Bur oak,,QUMA2,NE,BR,QUMA2,
+823,QUMA2,Quercus,macrocarpa,Bur oak,,QUMA2,NE,BR,QUMA2,QUMA2
 824,QUMA3,Quercus,marilandica,Blackjack oak,,QUMA3,SN,BJ,QUMA3,
 825,QUMI,Quercus,michauxii,Swamp chestnut oak,,QUMI,NE,SN,QUMI,
-826,QUMU,Quercus,muehlenbergii,Chinkapin oak,,QUMU,SN,CK,QUMU,
+826,QUMU,Quercus,muehlenbergii,Chinkapin oak,,QUMU,SN,CK,QUMU,QUMU
 827,QUNI,Quercus,nigra,Water oak,,QUNI,NE,WK,QUNI,
 828,QUNU ,Quercus,nuttallii,Nutall Oak,,,NK,,QUNU,
 828,QUTE,Quercus,texana,Nuttall oak,Texas red oak/nuttall oak,,CS,NK,QUTE,
-829,QUOB,Quercus,oblongifolia,Mexican blue oak,,,,,QUOB,
-830,QUPA2,Quercus,palustris,Pin oak,,QUPA2,CS,PN,,
-831,QUPH,Quercus,phellos,Willow oak,,QUPH,NE,WL,,
+829,QUOB,Quercus,oblongifolia,Mexican blue oak,,,,,QUOB,QUOB
+830,QUPA2,Quercus,palustris,Pin oak,,QUPA2,CS,PN,QUPA2,
+831,QUPH,Quercus,phellos,Willow oak,,QUPH,NE,WL,QUPH,
 832,QUPR2,Quercus,prinus,Chestnut oak,,QUPR2,NE,CO,QUPR2,
 833,QURU,Quercus,rubra,Northern red oak,,QURU,SN,RO,QURU,
 834,QUSH,Quercus,shumardii,Shumard oak,,QUSH,SN,QS,QUSH,
@@ -365,17 +370,17 @@ FIA,NRCS,Genus,Species,Common,Comment,NRCS.trf,FVS .trf,SpCode,FVS East,FVS West
 836,QUSI2,Quercus,similis,Delta post oak,Delta post oak/bottomland post oak,QUSI2,CS,DO,QUSI2,
 837,QUVE,Quercus,velutina,Black oak,,QUVE,SN,BO,QUVE,
 838,QUFU,Quercus,virginiana,Live oak,,,,,,
-839,QUWI2,Quercus,wislizeni,Interior live oak,,QUWI2,CA,IO,,
+839,QUWI2,Quercus,wislizeni,Interior live oak,,QUWI2,CA,IO,,QUWI2
 840,QUMA13,Quercus,margarettiae,Dwarf post oak,dwarf post oak/sand post oak,,,,,
 840,QUMA6,Quercus,margarettae (Ashe) Small,Dwarf Post Oak,,,,DP,QUMA6,
 841,QUMI2,Quercus,minima,Dwarf live oak,,,,,QUMI2,
 842,QUIN,Quercus,incana,Bluejack oak,,QUIN,SE,QN,QUIN,
-843,QUHY,Quercus,hypoleucoides,Silverleaf oak,,,,,QUHY,
+843,QUHY,Quercus,hypoleucoides,Silverleaf oak,,,,,QUHY,QUHY
 844,QUOG,Quercus,oglethorpensis,Oglethorpe oak,,,,,QUOG,
 845,QUPR,Quercus,prinoides Willd.,Dwarf Chinkapin Oak,,,,,QUPR,
 845,QUPR5,Quercus,prinoides,Dwarf chinkapin oak,,,,,,
-846,QUGR3,Quercus,grisea,Gray oak,,,,,QUGR3,
-847,QURU4,Quercus,rugosa,Netleaf oak,,,,,QURU4,
+846,QUGR3,Quercus,grisea,Gray oak,,,,,QUGR3,QUGR3
+847,QURU4,Quercus,rugosa,Netleaf oak,,,,,QURU4,QURU4
 851,QUGR,Quercus,graciliformis,Chisos oak,,,,,,
 852,AMEL,Amyris,elemifera,Sea torchwood,,,,,AMEL,
 853,ANGL4,Annona,glabra,Pond-apple,,,,,ANGL4,
@@ -383,7 +388,7 @@ FIA,NRCS,Genus,Species,Common,Comment,NRCS.trf,FVS .trf,SpCode,FVS East,FVS West
 855,CASUA,Casuarina,spp,Sheoak spp,,,,,CASUA,
 856,CAGL11,Casuarina,glauca,Grey sheoak,,,,,CAGL11,
 857,CALE28,Casuarina,lepidophloia,Belah,,,,,CALE28,
-858,CICA,Cinnamomum,camphora,Camphortree,,,,,CICA,
+858,CICA,Cinnamomum,camphora,Camphortree,,,,,CICA,CICA
 859,CIFR,Citharexylum,fruticosum,Florida fiddlewood,,,,,CIFR,
 860,CITRU2,Citrus,spp,Cirtus spp,,,,,CITRU2,
 863,CODI8,Coccoloba,diversifolia,Tietongue,Pideon-plum,,,,CODI8,
@@ -397,7 +402,7 @@ FIA,NRCS,Genus,Species,Common,Comment,NRCS.trf,FVS .trf,SpCode,FVS East,FVS West
 873,EURH,Eugenia,rhombea,Red stopper,,,,,EURH,
 874,EXPA,Exothea,paniculata,Butterbough,Inkwood,,,,EXPA,
 876,FIAU,Ficus,aurea,Florida strangler fig,,,,,FIAU,
-877,FICI,Ficus,citrifolia,Wild banyontree,shortleaf fig,,,,FICI,
+877,FICI,Ficus,citrifolia Mill.,Wild banyontree,shortleaf fig,,,,FICI,
 882,GUDI,Guapira,discolor,Beeftree,Longleaf blolly,,,,GUDI,
 883,HIMA2,Hippomane,mancinella,Manchineel,,,,,HIMA2,
 884,LYLA3,Lysiloma,latisiliquum,False tamarind,,,,,LYLA3,
@@ -410,8 +415,8 @@ FIA,NRCS,Genus,Species,Common,Comment,NRCS.trf,FVS .trf,SpCode,FVS East,FVS West
 895,SIGL3,Simarouba,glauca,Paradisetree,,,,,SIGL3,
 896,SYCU,Syzygium,cumini,Java plum,,,,,SYCU,
 897,TAIN2,Tamarindus,indica,Tarafrind,,,,,TAIN2,
-901,ROPS,Robinia,pseudoacacia,black locust,,ROPS,SN,BK,ROPS,
-902,RONE,Robinia,neomexicana,New Mexico locust,,,,,RONE,
+901,ROPS,Robinia,pseudoacacia,black locust,,ROPS,SN,BK,ROPS,ROPS
+902,RONE,Robinia,neomexicana,New Mexico locust,,,,,RONE,RONE
 906,ACWR2,Acoelorrhaphe,wrightii,Everglades plam,Paurotis-palm,,,,ACWR2,
 907,COAR,Coccothrinax,argentata,Florida silver palm,,,,,COAR,
 908,CONU,Cocos,nucifera,Coconut palm,,,,,CONU,
@@ -422,16 +427,16 @@ FIA,NRCS,Genus,Species,Common,Comment,NRCS.trf,FVS .trf,SpCode,FVS East,FVS West
 914,THRA2,Thrinax,radiata,Florida thatch palm,,,,,THRA2,
 915,ARECA,Areca,L.,Other palms,,,,,ARECA,
 919,SADR5,Sapindus,saponaria var. drummondii,Western soapberry,,,,,,
-919,SASAD ,Sapindus,saponaria L. var. drummondii (Hook. & Arn.) L.D. Benson,Western Soapberry,,,,,SASAD ,
-920,SALIX,Salix,spp,Willow,,SALIX,PN,WI,SALIX,
-921,SAAM2,Salix,amygdaloides,Peachleaf willow,,,,,SAAM2,
+919,SASAD ,Sapindus,saponaria L. var. drummondii (Hook. & Arn.) L.D. Benson,Western Soapberry,,,,,SASAD ,SASAD 
+920,SALIX,Salix,spp,Willow,,SALIX,PN,WI,SALIX,SALIX
+921,SAAM2,Salix,amygdaloides,Peachleaf willow,,,,,SAAM2,SAAM2
 922,SANI,Salix,nigra,Black willow,,SANI,NE,NL,SANI,
 923,SAERF ,Salix,eriocephala,Diamond Willow,,,LS,DM,SAERF ,
-924,SABO,Salix,bonplandiana,Bonpland willow,,,,,,
+924,SABO,Salix,bonplandiana,Bonpland willow,,,,,,SABO
 925,SACA5,Salix,caroliniana,Coastal plain willow,,,,,SACA5,
-926,SAPY,Salix,pyrifolia,Balsam willow,,,,,,
-927,SAAL2,Salix,alba,White willow,,SAAL2,,,SAAL2,
-928,SASC,Salix,scouleriana,Scouler's willow,,,,,,
+926,SAPY,Salix,pyrifolia,Balsam willow,,,,,SAPY,
+927,SAAL2,Salix,alba,White willow,,SAAL2,,,SAAL2,SAAL2
+928,SASC,Salix,scouleriana,Scouler's willow,,,,,,SASC
 929,SASE10,Salix,sepulcralis,Weeping willow,,,,,SASE10,
 931,SAAL5,Sassafras,albidum,Sassafras,,,SN,SS,SAAL5,
 934,SORBU,Sorbus,spp,Mountain-ash spp.,,,,,SORBU,
@@ -443,36 +448,36 @@ FIA,NRCS,Genus,Species,Common,Comment,NRCS.trf,FVS .trf,SpCode,FVS East,FVS West
 951,TIAM,Tilia,americana,American basswood,,TIAM,NE,BW,TIAM,
 952,TIAMH,Tilia,americana var. heterophylla,White basswood,,,,,TIAMH,
 953,TIAMC,Tilia,americana var. caroliniana,Carolina basswood,,,,,TIAMC,
-970,ULMUS,Ulmus,spp,Elm spp.,,ULMUS,NE,EL,ULMUS,
+970,ULMUS,Ulmus,spp,Elm spp.,,ULMUS,NE,EL,ULMUS,ULMUS
 971,ULAL,Ulmus,alata,Winged elm,,ULAL,SN,WE,ULAL,
-972,ULAM,Ulmus,americana,American elm,,ULAM,SN,AE,ULAM,
+972,ULAM,Ulmus,americana,American elm,,ULAM,SN,AE,ULAM,ULAM
 973,ULCR,Ulmus,crassifolia,Cedar elm,,,,,ULCR,
-974,ULPU,Ulmus,pumila,Siberian elm,,ULPU,CS,SI,ULPU,
+974,ULPU,Ulmus,pumila,Siberian elm,,ULPU,CS,SI,ULPU,ULPU
 975,ULRU,Ulmus,rubra,Slippery elm,,ULRU,SN,RL,ULRU,
 976,ULSE,Ulmus,serotina,September elm,,,,,ULSE,
 977,ULTH,Ulmus,thomasii,Rock elm,,ULTH,CS,RE,ULTH,
-981,UMCA,Umbellularia,californica,California-laurel,California-laurel/Oregon-myrtle,UMCA,CA,CL,,
+981,UMCA,Umbellularia,californica,California-laurel,California-laurel/Oregon-myrtle,UMCA,CA,CL,,UMCA
 982,YUBR,Yucca,brevifolia,Joshua tree,,,,,,
 986,AVGE,Avicennia,germinans,Black-mangrove,,,,,AVGE,
 987,COER2,Conocarpus,erectus,Buttonwood-mangrove,,,,,COER2,
 988,LARA2,Laguncularia,racemosa,White-mangrove,,,,,LARA2,
 989,RHMA2,Rhizophora,mangle,Mangrove,,,,,RHMA2,
-990,OLTE,Olneya,tesota,desert ironwood,"tesota, Arizona-ironwood",,,,,
-991,TAMAR2,Tamarix,spp,Saltcedar,,,,,TAMAR2,
-992,MEQU,Melaleuca,quinquenervia,Melaleuca,,,,,MEQU,
-993,MEAZ  ,Melia,azedarach L.,Chinaberry,,,,,MEAZ  ,
-994,TRSE6,Triadica,sebefera,Chinese tallowtree,,,,,TRSE6,
-995,VEFO,Veernicia,fordii,tungoil tree,tung-oil-tree,,,,,
+990,OLTE,Olneya,tesota,desert ironwood,"tesota, Arizona-ironwood",,,,,OLTE
+991,TAMAR2,Tamarix,spp,Saltcedar,,,,,TAMAR2,TAMAR2
+992,MEQU,Melaleuca,quinquenervia,Melaleuca,,,,,MEQU,MEQU
+993,MEAZ  ,Melia,azedarach L.,Chinaberry,,,,,MEAZ  ,MEAZ  
+994,TRSE6,Triadica,sebefera,Chinese tallowtree,,,,,TRSE6,TRSE6
+995,VEFO,Veernicia,fordii,tungoil tree,tung-oil-tree,,,,VEFO,
 996,COOB2,Cotinus,obovatus,smoketree,,,,,COOB2,
-997,ELAN,Elaeagnus,angustifolia,Russian-olive,,,,,ELAN,
+997,ELAN,Elaeagnus,angustifolia,Russian-olive,,,,,ELAN,ELAN
 998,2TB,Tree,broadleaf,Unknown dead hardwood,,,IE,OH,2TB,
-998,2TD,Tree,deciduous,Other hardwood,,,,,,2TD
+998,2TD,Tree,deciduous,Other hardwood,,,,,2TD,2TD
 999,2TREE,Other,Other,Other,,,,OT,2TREE,2TREE
 5091,CRPH,Crataegus,phaenopyrun,Washington hawthorn,,,,,,
-5092,CRSU5,Crataegus,succulenta,Fleshy hawthorn,,,,,,
+5092,CRSU5,Crataegus,succulenta,Fleshy hawthorn,,,,,,CRSU5
 5093,CRUN,Crataegus,uniflora,Dward hawthorn,,,,,,
 5491,FRBE,Fraxinus,berlandieriana,Berlandier ash,,,,,,
-7200,FRPU7,Frangula,purshiana (DC.) A. Gray,Cascara,,,,,,
+7200,FRPU7,Frangula,purshiana (DC.) A. Gray,Cascara,,,,,,FRPU7
 7211,PEAM3,Persea,americana,Avacado,,,,,,
 8420,PYRUS,Pyrus,spp,Pear,,,,,,
 8511,QUGR2,Quercus,gravesii,Graves oak,,,,,,
@@ -517,100 +522,318 @@ FIA,NRCS,Genus,Species,Common,Comment,NRCS.trf,FVS .trf,SpCode,FVS East,FVS West
 ,ACNEN,Acer,negundo var. negundo,boxelder,,,,,,ACNEN
 ,ACNET,Acer,negundo var. texanum,boxelder,,,,,,ACNET
 ,ACPA8,Acacia,paradoxa,paradox acacia,,,,,,ACPA8
-,ALIN2,Alnus,incana (L.) Moench,Gray alder,,,NE,NC,ALIN2,
+,ACPO2,Acacia,podalyriifolia,pearl wattle,,,,,,ACPO2
+,ACPY3,Acacia,pycnantha,golden wattle,,,,,,ACPY3
+,ACRE2,Acacia,retinodes,water wattle,,,,,,ACRE2
+,ACRE9,Acacia,redolens,bank catclaw,,,,,,ACRE9
+,ACSA,Acacia,saligna,orange wattle,,,,,,ACSA
+,ACVE2,Acacia,verticillata,prickly Moses,,,,,,ACVE2
+,AEHI,Aesculus,hippocastanum,horse chestnut,,,,,,AEHI
+,ALCO13,Alnus,cordata,Italian alder,,,,,,ALCO13
+,ALIN2,Alnus,incana (L.) Moench,Gray alder,,,NE,NC,ALIN2,ALIN2
 ,ALINR,Alnus,incana (L.) Moench ssp. Rugosa (Du Roi) R.T. Clausen,,,,NE,NC,ALINR,
+,ALINT,Alnus,incana ssp. tenuifolia,thinleaf alder,,,,,,ALINT
+,ALLE,Albizia,lebbeck,woman's tongue,,,,,,ALLE
 ,ALVI5,Alnus,virdidis (Chaix) DC.,Green alder,,,NE,NC,ALVI5,
-,ALVIC,Anlus,viridix (Chaix) DC. Ssp. Crispa (Aiton) Turrill,Mountain alder,,,NE,NC,ALVIC,
+,ALVIC,Anlus,viridix (Chaix) DC. Ssp. Crispa (Aiton) Turrill,Mountain alder,,,NE,NC,ALVIC,ALVIC
+,ALVIF,Alnus,viridis ssp. fruticosa,Siberian alder,,,,,,ALVIF
+,ALVIS,Alnus,viridis ssp. sinuata,Sitka alder,,,,,,ALVIS
 ,AMARA4,Amelanchier,arborea (Mixhx. F.) Fernald var. arborea,Serviceberry variety,,,,,AMARA4,
+,ARALI,Aralia,,spikenard,,,,,,ARALI
+,AREL8,Aralia,elata,Japanese angelica tree,,,,,,AREL8
 ,ARSP2,Aralia,spinosa L.,Devil's walking stick,,,,,ARSP2,
 ,ASOB6,Asimina,obovata (Willd.) Nash,Bigflower pawpaw,,,,,ASOB6,
-,BEPU4,Betula,pumila L.,Bog birch,,,,,BEPU4,
+,BEEA,Betula,×eastwoodiae,birch,,,,,,BEEA
+,BEGL,Betula,glandulosa,resin birch,,,,,,BEGL
+,BENA,Betula,nana,dwarf birch,,,,,,BENA
+,BEPAK,Betula,papyrifera var. kenaica,Kenai birch,,,,,,BEPAK
+,BEPAP,Betula,papyrifera var. papyrifera,paper birch,,,,,,BEPAP
+,BEPE3,Betula,pendula,European white birch,,,,,,BEPE3
+,BEPU4,Betula,pumila L.,Bog birch,,,,,BEPU4,BEPU4
+,BEPUG,Betula,pumila var. glandulifera,bog birch,,,,,,BEPUG
 ,BRPO3,Brunfelia,portoricensis Krug & Urb.,Puerto Rico raintree,,,,,BRPO3,
+,BRPO6,Brachychiton,populneum,whiteflower kurrajong,,,,,,BRPO6
+,CACH6,Chrysolepis,chrysophylla var. chrysophylla,giant chinquapin,,,,,,CACH6
+,CACI10,Carnegiea,gigantea,saguaro,,,,,,
+,CAGI10,Carnegiea,gigantea,saguaro,,,,,,CAGI10
 ,CALU12,Casuarina,lepidophloia F. Muell.,Australian Pine,,,,,CALU12,
 ,CAWO5,Calyptranthes,woodburyi Alain,Woodbury's Lidflower,,,,,CAWO5,
-,CEMO2,Cercocarpus,montanus Raf.,Alderleaf Mountain Mahogany,,,,,CEMO2,
-,CEMOP,Cercocarpus,montanus Raf. var. paucidentatus (S. Watson) F.L. Martin,Hairy Mountain Mahogany,,,,,CEMOP,
+,CEEH,Celtis,ehrenbergiana,spiny hackberry,,,,,,CEEH
+,CEIN7,Cercocarpus,intricatus,littleleaf mountain mahogany,,,,,,CEIN7
+,CELAB,Celtis,laevigata var. brevipes,Sugarberry,,,,,,CELAB
+,CELAT8,Celtis,laevigata var. texana,Texan sugarberry,,,,,,CELAT8
+,CELEI,Cercocarpus,ledifolius var. intercedens,curl-leaf mountain mahogany,,,,,,CELEI
+,CELEL,Cercocarpus,ledifolius var. ledifolius,curl-leaf mountain mahogany,,,,,,CELEL
+,CEMO2,Cercocarpus,montanus Raf.,Alderleaf Mountain Mahogany,,,,,CEMO2,CEMO2
+,CEMOG,Cercocarpus,montanus var. glaber,birchleaf mountain mahogany,,,,BF,,CEMOG
+,CEMOP,Cercocarpus,montanus Raf. var. paucidentatus (S. Watson) F.L. Martin,Hairy Mountain Mahogany,,,,,CEMOP,CEMOP
 ,CEPHA,Cephalanthus,L.,Buttonbush,,,,,CEPHA,
+,CERCO,Cercocarpus,,mountain mahogany,,,,,,CERCO
+,CESI3,Ceratonia,siliqua,St. John's bread,,,,,,CESI3
+,CHCH7,Chrysolepis,chrysophylla,giant chinquapin,,,,,,CHCH7
+,CHCHM,Chrysolepis,chrysophylla var. minor,giant chinquapin,,,,,,CHCHM
+,CHRYS15,Chrysolepis,,chinquapin species,,,,,,CHRYS15
 ,CLADR,Cladrastis,spp Raf.,Yellowwood Spp.,,,,,CLADR,
 ,COAL2,Cornus,alternifolia L. f.,Alternateleaf Dogwood,,,,,COAL2,
 ,COAM3,Corylus,americana Walter,American Hazelnut,,,,,COAM3,
-,COCO6,Corylus,cornuta Marsh.,Beaked Hazelnut,,,,,COCO6,
+,COAU12,Cordyline,australis,cabbage tree,,,,,,COAU12
+,COCI4,Corymbia,citriodora,lemonscented gum,,,,,,COCI4
+,COCO6,Corylus,cornuta Marsh.,Beaked Hazelnut,,,,,COCO6,COCO6
 ,COEL2,Colubrina elliptica (Sw.) Briz. & Stern,,Soldierwood,,,,,COEL2,
+,COGL3,Cornus,glabrata,brown dogwood,,,,,,COGL3
 ,CORU,Cocos nucifera L.,,Coconut Palm,,,,,CORU,
 ,CORU17,Conostegia,rufescens Naud.,Luquillo Mountain Snailwood,,,,,CORU17,
 ,CORYL,Corylus,L.,Hazelnut Spp.,,,,,CORYL,
-,COSE16,Cornus,sericea L. ssp. sericea,Redosier Dogwood,,,,,COSE16,
-,COSES,Cornus,sericea L.,Redosier Dogwood,,,,,COSES,
+,COSE16,Cornus,sericea L. ssp. sericea,Redosier Dogwood,,,,,COSE16,COSE16
+,COSE3,Cornus,sessilis,blackfruit dogwood,,,,,,COSE3
+,COSEO,Cornus,sericea ssp. occidentalis,western dogwood,,,,,,COSEO
+,COSES,Cornus,sericea L.,Redosier Dogwood,,,,,COSES,COSES
+,CRDO2,Crataegus,douglasii,black hawthorn,,,,,,CRDO2
+,CRER,Crataegus,erythropoda,cerro hawthorn,,,,,,CRER
+,CRRI,Crataegus,rivularis,river hawthorn,,,,,,CRRI
+,CRSA2,Cupressus,arizonica ssp. stephensonii,Cuyamaca cypress,,,,,,CRSA2
 ,CRWA,Crataegus,warneri Sarg.,Warners Hawthorn,,,,,CRWA,
+,CUAB,Cupressus,abramsiana,Santa Cruz Island cypress,,,,,,CUAB
+,CUARA,Cupressus,arizonica ssp. arizonica,Arizona cypress,,,,,,CUARA
+,CUARN2,Cupressus,arizonica ssp. nevadensis,Paiute cypress,,,,,,CUARN2
+,CUARS2,Cupressus,arizonica ssp. stephensonii,Cuyamaca cypress,,,,,,CUARS2
+,CUGO,Cupressus,goveniana,Gowen cypress,,,,,,CUGO
+,CUGOG,Cupressus,goveniana ssp. goveniana,Gowen cypress,,,,,,CUGOG
+,CUGOP2,Cupressus,goveniana ssp. pygmaea,pygmy cypress,,,,,,CUGOP2
+,CUNO,Cupressus,nootkatensis,Alaska cedar,,,,,,CUNO
 ,DIPA9,Dirca,palustris L.,Eastern Leatherwood,,,,,DIPA9,
+,ELAEA,Elaeagnus ,,elaeagnus species,,,,,,ELAEA
+,ELCO,Elaeagnus,commutata,silverberry,,,,,,ELCO
+,ERJA3,Eriobotrya,japonica,loquat,,,,,,ERJA3
+,EUCL,Eucalyptus,cladocalyx,sugargum,,,,,,EUCL
 ,EUEG,Eugenia,eggersii Kiaersk.,Guasabara,,,,,EUEG,
-,FAGUS,Fagus,L.,Beech spp,,,,,FAGUS,
-,FICA,Ficus,citrifolia Mill.,"Shortleaf Fig, Wild Banyantree",,,,,FICA,
+,EUGL,Eucalyptus,globulus,Tasmanian bluegum,,,,,,EUGL
+,EUGLG,Eucalyptus,globulus ssp. globulus,Tasmanian bluegum,,,,,,EUGLG
+,EUMO5,Eucalyptus,×mortoniana,gum,,,,,,EUMO5
+,EUPO,Eucalyptus,polyanthemos,redbox,,,,,,EUPO
+,EUPU,Eucalyptus,pulverulenta,silverleaf mountain gum,,,,,,EUPU
+,EUSI2,Eucalyptus,sideroxylon,red ironbark,,,,,,EUSI2
+,EUTE,Eucalyptus,tereticornis,forest redgum,,,,,,EUTE
+,EUTO11,Eucalyptus,torquata,coral gum,,,,,,EUTO11
+,EUVI,Eucalyptus,viminalis,manna gum,,,,,,EUVI
+,FAGUS,Fagus,L.,Beech spp,,,,,FAGUS,FAGUS
+,FASY,Fagus,sylvatica,European beech,,,,,,FASY
+,FICA,Ficus,carica,edible fig,,,,,FICA,FICA
+,FICUS,Ficus ,,fig species,,,,,,FICUS
+,FIPA2,Ficus,palmata,Punjab fig,,,,,,FIPA2
+,FIRU4,Ficus,rubiginosa,Port Jackson fig,,,,,,FIRU4
 ,FRAL4,Frangula,alnus Mill.,Glossy Buckthorn,,,,,FRAL4,
+,FRAN2,Fraxinus,anomala,singleleaf ash,,,,,,FRAN2
+,FRANA,Fraxinus,anomala var. anomala,singleleaf ash,,,,,,FRANA
+,FRANL,Fraxinus,anomala var. lowellii,singleleaf ash,,,,,,FRANL
 ,FRCA13,Frangula,caroliniana (Walter) A. Gray,Carolina Buckthorn,,,,,FRCA13,
+,FRCA6,Fremontodendron,californicum,California flannelbush,,,,,,FRCA6
+,FRCU,Fraxinus,cuspidata,fragrant ash,,,,,,FRCU
+,FRDI2,Fraxinus,dipetala,California ash,,,,,,FRDI2
+,FRGO,Fraxinus,gooddingii,Goodding's ash,,,,,,FRGO
+,FRGR2,Fraxinus greggii ,,Gregg's ash,,,,,,FRGR2
+,FRME2,Fremontodendron,mexicanum,Mexican flannelbush,,,,,,FRME2
+,FRPA4,Fraxinus,papillosa,Chihuahuan ash,,,,,,FRPA4
+,FRUH,Fraxinus,uhdei,shamel ash,,,,,,FRUH
 ,HAMAM,Hamamelis,L.,Witchazel Spp.,,,,,HAMAM,
 ,HAVI4,Hamamelis,virginiana L.,American Witchhazel,,,,,HAVI4,
+,HOPO5,Hoheria,populnea,lacebark,,,,,,HOPO5
+,ILAQ80,Ilex,aquifolium,English holly,,,,,,ILAQ80
 ,ILCO2,Ilex,collina Alexander,Longstalk Holly,,,,,ILCO2,
 ,ILLO,Ilex,longipes Chapm. ex Trel.,Georgia Holly,,,,,ILLO,
 ,ILMO,Ilex,montana Torr. & A. Gray ex A. Gray,Mountain Holly,,,,,ILMO,
 ,ILPA,Illicium,parviflorum Michx. ex Vent.,Yellow Anisetree,,,,,ILPA,
 ,ILVE,Ilex,verticillata (L.) A. Gray,Common Winterberry,,,,,ILVE,
-,JUCO6,Juniperus,communis L.,Common Juniper,,,,,JUCO6,
+,JUCO6,Juniperus,communis L.,Common Juniper,,,,,JUCO6,JUCO6
+,JUCOA2,Juniperus,coahuilensis var. arizonica,redberry juniper,,,,,,JUCOA2
+,JUCOC2,Juniperus,coahuilensis var. coahuilensis,redberry juniper,,,,,,JUCOC2
+,JUCOD,Juniperus,communis var. depressa,common juniper,,,,,,JUCOD
 ,JUCOM2,Juniperus,communis var. saxatilis,Common Juniper Var Montana,,,,,JUCOM2,
+,JUCOS2,Juniperus,communis var. saxatilis,common juniper,,,,,,JUCOS2
+,JUOCA,Juniperus,occidentalis var. australis,western juniper,,,,,,JUOCA
+,JUOCO,Juniperus,occidentalis var. occidentalis,western juniper,,,,,,JUOCO
+,JURE80,Juglans,regia,English walnut,,,,,,JURE80
+,JUVIV,Juniperus,virginiana var. virginiana,eastern redcedar,,,,,,JUVIV
 ,KALA,Kalmia,latifolia L.,Mountain Laurel,,,,,KALA,
+,KOPA,Koelreuteria,paniculata,goldenrain tree,,,,,,KOPA
+,LAAN2,Laburnum,anagyroides,golden chain tree,,,,,,LAAN2
+,LANO80,Laurus,nobilis,sweet bay,,,,,,LANO80
 ,LAPO,Laplacea,portoricensis (Krug & Urb.) Dyer,Nino De Cota,,,,,LAPO,
+,LEES2,Leucaena,esculenta,guaje,,,,,,LEES2
 ,LEFL,Leitneria,floridana Chapm.,Corkwood,,,,,LEFL,
+,LELE10,Leucaena,leucocephala,white leadtree,,,,,,LELE10
+,LEPTO,Leptochloa,,sprangletop,,,,,,LEPTO
+,LEUCA,Leucaena ,,leadtree,,,,,,LEUCA
 ,LIBE3,Lindera,benzoin (L.) Blume,Northern Spicebush,,,,,LIBE3,
+,LIDE,Libocedrus,decurrens,incense-cedar,,,,,,LIDE
+,LIDE2,Lithocarpus,densiflorus var. densiflorus,tanoak,,,,,,LIDE2
+,LIDEE,Lithocarpus,densiflorus var. echinoides,tanoak,,,,,,LIDEE
+,LIMO4,Lithrea,molleoides,aroeira blanca,,,,,,LIMO4
 ,LINDE2,Lindera,Thunb.,Spicebush,,,,,LINDE2,
 ,LISU8,Lindera,subcoriacea B.E. Wofford,Bog Spicebush,,,,,LISU8,
+,LITHO,Lithocarpus,,tanoak species,,,,,,LITHO
+,LYFL2,Lyonothamnus,floribundus,Catalina ironwood,,,,,,LYFL2
+,LYFLA,Lyonothamnus,floribundus ssp. aspleniifolius,Catalina ironwood,,,,,,LYFLA
+,LYFLF,Lyonothamnus,floribundus ssp. floribundus,Catalina ironwood,,,,,,LYFLF
+,LYONO,Lyonothamnus,,lyononthmnus,,,,,,LYONO
 ,MAAS,Magnolia,ashei Weath.,Ashes Magnolia,,,,,MAAS,
 ,MAEL3,Maytenus,elongata (Urb.) Britton,Puerto Rico Mayten,,,,,MAEL3,
+,MAPU,Malus,pumila,paradise apple,,,,,,MAPU
 ,MASI3,Marlierea,sintenisii Kiaersk.,Beruquillo,,,,,MASI3,
 ,MIFO,Miconia,foveolata Cogn.,Puerto Rico Johnnyberry,,,,,MIFO,
 ,MIPY2,Miconia,pycnoneura Urb.,Ridge Johnnyberry,,,,,MIPY2,
+,MOCA6,Morella,californica,California wax myrtle,,,,WM,,MOCA6
 ,MOHO3,Morella,holdridgeana (Lundell) Kartesz,Palo De Cera,,,,,MOHO3,
 ,NEMU2,Ilex,mucronata,Catberry,,,,,NEMU2,
-,NEMU2,Ilex,mucronata,Catberry,,,,,NEMU2,
 ,NYUR2,Nyssa,ursina Small,Bear Tupelo,,,,,NYUR2,
+,OSKN,Ostrya,knowltonii,Knowlton's hophornbeam,,,,,,OSKN
+,OSTRY,Ostrya,,hophornbean species,,,,,,OSTRY
+,OSVIV,Ostrya,virginiana  var. virginiana,hophornbeam,,,,,,OSVIV
 ,PEHU2,Persea,humilis Nash,Silk Bay,,,,,PEHU2,
-,PIPOS,Pinus,ponderosa C. Lawson var. scopulorum Engelm.,Ponderosa Pine Var. Scopularum,,,,,PIPOS,
-,POAC5,Populus,×acuminata Rydb. (pro sp.) [angustifolia × deltoides],Lanceleaf Cottonwood,,,,,POAC5,
-,PODEW,Populus,deltoides Bartram ex Marsh. ssp. wislizeni (S. Watson) Eckenwalder,Rio Grande Cottonwood,,,,,PODEW,
-,PRGL2,Prosopis,glandulosa Torr.,Honey Mesquite,,,,,PRGL2,
-,PSMEG,Pseudotsuga,menziesii (Mirb.) Franco var. glauca (Beissn.) Franco,Rocky Mountain Douglas-Fir,,,,,PSMEG,
+,PHCA13,Phoenix,canariensis,Canary Island date palm,,,,,,PHCA13
+,PHDA4,Phoenix,dactylifera,date palm,,,,,,PHDA4
+,PHOEN2,Phoenix,,date palm,,,,,,PHOEN2
+,PIARA,Pinus,arizonica var. arizonica,Arizona pine,,,,,,PIARA
+,PIARS2,Pinus,arizonica var. stormiae,Arizona pine,,,,,,PIARS2
+,PIAT2,Pinus,×attenuradiata,pine,,,,,,PIAT2
+,PIAT4,Pistacia,atlantica,Mt. Atlas mastic tree,,,,,,PIAT4
+,PIBAA,Pinus,balfouriana ssp. austrina,foxtail pine,,,,,,PIBAA
+,PIBAB,Pinus,balfouriana ssp. balfouriana,foxtail pine,,,,,,PIBAB
+,PICH4,Pistacia,chinensis,Chinese pistache,,,,,,PICH4
+,PICOB,Pinus,contorta var. bolanderi,Bolander beach pine,,,,,,PICOB
+,PICOC,Pinus,contorta var. contorta,beach pine,,,,,,PICOC
+,PICOL,Pinus,contorta var. latifolia,lodgepole pine,,,,,,PICOL
+,PICOM,Pinus,contorta var. murrayana,Sierra lodgepole pine,,,,,,PICOM
+,PIENE,Picea,engelmannii var. engelmannii,Engelmann spruce,,,,,,PIENE
+,PIENM2,Picea,engelmannii var. mexicana,Engelmann spruce,,,,,,PIENM2
+,PIHA7,Pinus,halepensis,aleppo pine,,,,,,PIHA7
+,PILU,Picea,lutzii,Lutz's spruce,,,,,,PILU
+,PIMOC,Pinus,monophylla var. californiarum,California pine,,,,,,PIMOC
+,PIMOM2,Pinus,monophylla var. monophylla,singleleaf pinyon,,,,,,PIMOM2
+,PIPI7,Pinus,pinea,Italian stone pine,,,,,,PIPI7
+,PIPOA,Pinus,ponderosa var. arizonica,Arizona pine,,,,,,PIPOA
+,PIPOA2,Pinus,ponderosa ssp. arizonica,Arizona pine,,,,,,PIPOA2
+,PIPOP,Pinus,ponderosa var. ponderosa,ponderosa pine,,,,,,PIPOP
+,PIPOS,Pinus,ponderosa C. Lawson var. scopulorum Engelm.,ponderosa pine,,,,,PIPOS,PIPOS
+,PISTA,Pistacia,,pistache,,,,,,PISTA
+,PITOI2,Pinus,torreyana var. insularis,Santa Cruz Island Torrey pine,,,,,,PITOI2
+,PITOT2,Pinus,torreyana var. torreyana,Torrey pine,,,,,,PITOT2
+,POAC5,Populus,×acuminata Rydb. (pro sp.) [angustifolia × deltoides],Lanceleaf Cottonwood,,,,,POAC5,POAC5
+,POBAB2,Populus,balsamifera ssp. balsamifera,balsam poplar,,,,,,POBAB2
+,POBR7,Populus,×brayshawii,hybrid balsam poplar,,,,,,POBR7
+,POCA19,Populus,×canadensis,Carolina poplar,,,,,,POCA19
+,PODEW,Populus,deltoides Bartram ex Marsh. ssp. wislizeni (S. Watson) Eckenwalder,Rio Grande Cottonwood,,,,,PODEW,PODEW
+,POFRF3,Populus,fremontii ssp. fremontii,Fremont cottonwood,,,,,,POFRF3
+,POFRM,Populus,fremontii ssp. mesetae,Fremont cottonwood,,,,,,POFRM
+,POHI8,Populus,×hinckleyana,cottonwood,,,,,,POHI8
+,POIN23,Populus,×inopina,cottonwood,,,,,,POIN23
+,POJA2,Populus,×jackii,balm-of-Gilead,,,,,,POJA2
+,POPA11,Populus,×parryi,cottonwood,,,,,,POPA11
+,POTR15,Populus,trichocarpa,black cottonwood,,,,,,POTR15
+,PRGL2,Prosopis,glandulosa Torr.,Honey Mesquite,,,,,PRGL2,PRGL2
+,PRGLG,Prosopis,glandulosa var. glandulosa,honey mesquite,,,,,,PRGLG
+,PRVID,Prunus,virginiana var. demissa,western chokecherry,,,,,,PRVID
+,PSEUD7,Pseudotsuga ,,Pseudotsuga ,,,,,,PSEUD7
+,PSMEG,Pseudotsuga,menziesii (Mirb.) Franco var. glauca (Beissn.) Franco,Rocky Mountain Douglas-Fir,,,,,PSMEG,PSMEG
+,PSMEM,Pseudotsuga,menziesii var. menziesii,Douglas-fir,,,,,,PSMEM
 ,PSSI2,Psidium,sintenisii (Kiaersk.) Alain,Sintenis’ Guava,,,,,PSSI2,
+,PTELE,Ptelea,,hoptree species,,,,,,PTELE
+,PTTR,Ptelea,trifoliata,common hoptree,,,,,,PTTR
+,PTTRC2,Ptelea,trifoliata ssp. pallida  var. confinis,pallid hoptree,,,,,,PTTRC2
+,PTTRP,Ptelea,trifoliata ssp. pallida,pallid hoptree,,,,,,PTTRP
+,PTTRP2,Ptelea,trifoliata ssp. polyadenia,pallid hoptree,,,,,,PTTRP2
+,PYCO,Pyrus communis ,,common pear,,,,,,PYCO
 ,QUAC2,Quercus,acerifolia (Palmer) Stoynoff & Hess,Mapleleaf Oak,,,,,QUAC2,
 ,QUAR2,Quercus,arkansana Sarg.,Arkansas Oak,,,,,QUAR2,
 ,QUBO2,Quercus,boyntonii Beadle,Boynton Sand Post Oak,,,,,QUBO2,
-,QUPA4,Quercus,×pauciloba Rydb. (pro sp.) [gambelii × turbinella],Wavyleaf Oak,,,,,,
-,QUTO2,Quercus,toumeyi Sarg.,Toumey Oak,,,,,QUTO2,
-,QUTU2,Quercus,turbinella Greene,Sonoran Scrub Oak,,,,,QUTU2,
+,QUCHC,Quercus,chrysolepis var. chrysolepis,canyon live oak,,,,,,QUCHC
+,QUDU,Quercus,dumosa,coastal sage scrub oak,,,,,,QUDU
+,QUGAF,Quercus,garryana var. fruticosa,Oregon white oak,,,,,,QUGAF
+,QUGAG,Quercus,gambelii var. gambelii,Gambel oak,,,,,,QUGAG
+,QUGAG2,Quercus,garryana var. garryana,Oregon white oak,,,,,,QUGAG2
+,QUGAS,Quercus,garryana var. semota,Oregon white oak,,,,,,QUGAS
+,QUMO2,Quercus,×moreha,oracle oak,,,,,,QUMO2
+,QUPA4,Quercus,×pauciloba Rydb. (pro sp.) [gambelii × turbinella],Wavyleaf Oak,,,,,,QUPA4
+,QUSA2,Quercus,sadleriana,deer oak,,,,,,QUSA2
+,QUTO2,Quercus,toumeyi Sarg.,Toumey Oak,,,,,QUTO2,QUTO2
+,QUTU2,Quercus,turbinella Greene,Sonoran Scrub Oak,,,,,QUTU2,QUTU2
+,QUUN,Quercus,undulata,Wavyleaf oak,,,,,,QUUN
+,QUVA,Quercus,vacciniifolia,huckleberry oak,,,,,,QUVA
+,QUWIF,Quercus,wislizeni var. frutescens,interior live oak,,,,,,QUWIF
+,QUWIW,Quercus,wislizeni var. wislizeni,interior live oak,,,,,,QUWIW
 ,RAUR,Ravenia,urbanii Engl. ex Urb.,Tortuga Prieto,,,,,RAUR,
 ,RHCA3,Rhamnus,cathartica L.,Common Buckthorn,,,,,RHCA3,
 ,RHGL,Rhus,glabra L.,Smooth Sumac,,,,,RHGL,
 ,RHHI2,Rhus,hirta,Staghorn Sumac,,,,,RHHI2,
 ,RHMA4,Rhododendron,maximum L.,Great Laurel,,,,,RHMA4,
-,ROHIF8,Robinia,hispida L. var. fertilis (Ashe) R.T. Clausen,Bristly Locust,,,,,ROHIF8,
+,ROBIN,Robinia,,locust species,,,,,,ROBIN
+,ROHI,Robinia,hispida,bristly locust,,,,,,ROHI
+,ROHIF8,Robinia,hispida L. var. fertilis (Ashe) R.T. Clausen,Bristly Locust,,,,,ROHIF8,ROHIF8
+,ROHIH,Robinia,hispida var. hispida,bristly locust,,,,,,ROHIH
+,ROHO,Robinia,×holdtii,locust,,,,,,ROHO
+,RONEN,Robinia,neomexicana var. neomexicana,New Mexico locust,,,,,,RONEN
+,RONER,Robinia,neomexicana var. rusbyi,Rusby's locust,,,,,,RONER
 ,ROVIH2,Robinia,viscosa Vent. var. hartwegii (Koehne) Ashe,Hartwigs Locust,,,,,ROVIH2,
-,SABE2,Salix,bebbiana,Beeb willow,,,LS,DM,,
-,SAEX,Salix,exigua Nutt.,Narrowleaf Willow,,,,,SAEX,
+,SAAL,Salix,alaxensis,feltleaf willow,,,,,,SAAL
+,SAALA,Salix,alaxensis var. alaxensis,feltleaf willow,,,,,,SAALA
+,SAALL,Salix,alaxensis var. longistylis,feltleaf willow,,,,,,SAALL
+,SABE2,Salix,bebbiana,Beeb willow,,,LS,DM,,SABE2
+,SAEX,Salix,exigua Nutt.,Narrowleaf Willow,,,,,SAEX,SAEX
 ,SAFL,Salix,floridana Chapm.,Florida Willow,,,,,SAFL,
-,SAGO,Salix,gooddingii C.R. Ball,Gooddings Willow,,,,,SAGO,
-,SALA6,Salix,lasiolepis Benth.,Arrroyo Willow,,,,,SALA6,
-,SANIC4,Sambucus,nigra L. ssp. canadensis (L.) R. Bolli,Common Elderberry,,,,,SANIC4,
-,SAPL2,Salix,planifolia Pursh,Diamnondleaf Willow,,,,,SAPL2,
+,SAFR,Salix,fragilis,crack willow,,,,,,SAFR
+,SAGL,Salix,glauca,grayleaf willow,,,,,,SAGL
+,SAGO,Salix,gooddingii C.R. Ball,Gooddings Willow,,,,,SAGO,SAGO
+,SALA5,Salix,lasiandra,Pacific willow,,,,,,SALA5
+,SALA6,Salix,lasiolepis Benth.,Arrroyo Willow,,,,,SALA6,SALA6
+,SALAB,Salix,lasiolepis var. bigelovii,Bigelow's willow,,,,,,SALAB
+,SALAL2,Salix,lasiolepis var. lasiolepis,arroyo willow,,,,,,SALAL2
+,SALI,Salix,ligulifolia ,strapleaf willow,,,,,,SALI
+,SALU,Salix,lucida,shining willow,,,,,,SALU
+,SALUC,Salix,lucida Muhl. ssp. caudata (Nutt.) E. Murray,Greenleaf Willow,,,,,SALUC,
+,SALUL,Salix,lucida ssp. lasiandra,Pacific willow,,,,,,SALUL
+,SAMA12,Salix,maccalliana,McCalla's willow,,,,,,SAMA12
+,SAMBU,Sambucus,monticola,elderberry species,,,,,,SAMBU
+,SAMO2,Salix,,park willow,,,,,,SAMO2
+,SANIC4,Sambucus,nigra L. ssp. canadensis (L.) R. Bolli,Common Elderberry,,,,,SANIC4,SANIC4
+,SAPIN,Sapindus,,soapberry species,,,,,,SAPIN
+,SAPL2,Salix,planifolia Pursh,Diamnondleaf Willow,,,,,SAPL2,SAPL2
+,SAPLP4,Salix,planifolia sp. planifolia,diamondleaf willow,,,,,,SAPLP4
 ,SARA2,Sambucus,racemosa L.,Red Elderberry,,,,,SARA2,
 ,SARAR3,Sambucus,racemosa L. var. racemosa,Red Elderberry Var Racemosa,,,,,SARAR3,
+,SASA4,Sapindus,saponaria,wingleaf soapberry,,,,,,SASA4
 ,SASE2,Salix,serissima (L.H. Bailey) Fernald,Autumn Willow,,,,,SASE2,
-,SATA,Salix,taxifolia Kunth,Yewleaf Willow,,,,,SATA,
+,SATA,Salix,taxifolia Kunth,Yewleaf Willow,,,,,SATA,SATA
+,SCHIN,Schinus,,peppertree species,,,,,,SCHIN
+,SCMO,Schinus,molle,Peruvian peppertree,,,,,,SCMO
+,SCPO7,Schinus,polygamus,Hardee peppertree,,,,,,SCPO7
+,SCTE,Schinus,terebinthifolius,Brazilian peppertree,,,,,,SCTE
+,SCTER2,Schinus,terebinthifolius var. raddianus,Brazilian peppertree,,,,,,SCTER2
 ,SIDER2,Sideroxylon,L.,Bully,,,,,SIDER2,
 ,SITE2,Sideroxylon,tenax L.,Tough Bully,,,,,SITE2,
 ,SOSES,Cornus,sericea L.,Redosier Dogwood,,,,,,
 ,STTR,Staphylea,trifolia L.,American Bladdernut,,,,,STTR,
-,TARA,Tamarix,ramosissima Ledeb.,Saltcedar Var.,,,,,TARA,
+,SYRE2,Syringa,reticulata,Japanese tree lilac,,,,,,SYRE2
+,SYREA,Syringa,reticulata ssp. amurensis,Amur lilac,,,,,,SYREA
+,SYRIN,Syringa,,lilac species,,,,,,SYRIN
+,SYVU,Syringa,vulgaris,common lilac,,,,,,SYVU
+,TABA80,Taxus,baccata,English yew,,,,,,TABA80
+,TACH2,Tamarix,chinensis,five-stamen tamarisk,,,,,,TACH2
+,TAPA4,Tamarix,parviflora,smallflower tamarisk,,,,,,TAPA4
+,TARA,Tamarix,ramosissima Ledeb.,Saltcedar Var.,,,,,TARA,TARA
 ,TEHE3,Ternstroemia,heptasepala Krug & Urb.,Saintedwood,,,,,TEHE3,
+,TIEU4,Tilia,×europaea,common linden,,,,,,TIEU4
+,TSJE,Tsuga,×jeffreyi,hemlock,,,,,,TSJE
+,ULGL,Ulmus,glabra,Wych elm,,,,,,ULGL
+,ULPA,Ulmus,parvifolia,Chinese elm,,,,,,ULPA
+,ULPR,Ulmus,procera,English elm,,,,,,ULPR
+,UMBEL,Umbellularia,,California laurel,,,,,,UMBEL
+,UMCAC,Umbellularia,californica var. californica,California laurel,,,,,,UMCAC
+,UMCAF,Umbellularia,californica var. fresnensis,California laurel,,,,,,UMCAF
 ,URCH2,Urera,chlorocarpa Urb.,Ortiga,,,,,URCH2,
 ,VAAR,Vaccinium,arboretum,Farkleberry,,,,,VAAR,
+,VACA5,Vauquelinia,californica,Arizona rosewood,,,,,,VACA5
+,VACAP,Vauquelinia,californica  ssp. pauciflora,Arizona rosewood,,,,,,VACAP
+,VAUQU,Vauquelinia,,rosewood species,,,,,,VAUQU
 ,VIBUR,Viburnum,L.,Viburnum,,,,,VIBUR,
 ,VIDE,Vicia,disperma,Southern Arrowwood,,,,,VIDE,
 ,VIDEL,Viburnum,dentatum L.,Southern Arrowwood,,,,,VIDEL,
@@ -619,6 +842,11 @@ FIA,NRCS,Genus,Species,Common,Comment,NRCS.trf,FVS .trf,SpCode,FVS East,FVS West
 ,VIOPA2,Viburnum,opulus L. var. americanum Aiton,American Cranberrybush,,,,,VIOPA2,
 ,VIPR,Viburnum,prunifolium L.,Blackhaw,,,,,VIPR,
 ,VIRU,Viburnum,rufidulum Raf.,Rusty Blackhaw,,,,,VIRU,
+,WAFI,Washingtonia,filifera,California fan palm,,,,,,WAFI
+,WARO,Washingtonia,robusta,Washington fan palm,,,,,,WARO
+,WASHI,Washingtonia,,fan palm,,,,,,WASHI
 ,XYSC3,Xylosma,schwaneckeana (Krug & Urb.) Urb.,Schwaneck’S Logwood,,,,,XYSC3,
+,YUBRB,Yucca,brevifolia var. brevifolia,Joshua tree,,,,,,YUBRB
+,YUBRJ,Yucca,brevifolia var. jaegeriana,Jaeger's Joshua tree,,,,,,YUBRJ
 ,ZAAM,Zanthoxylum,americanum Mill.,Common Pricklyash,,,,,ZAAM,
 ,ZANTH,Zanthoxylum,L.,Pricklyash,,,,,ZANTH,

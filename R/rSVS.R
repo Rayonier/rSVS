@@ -6,34 +6,56 @@
 #'
 #' The package includes the following functions:
 #' \itemize{
-#'     \item SVS() - main function for performing visualziations
-#'     \item SVS_Demo() - show reginal example visulizations
-#'     \item FIA2NRCS() - convert species codes from FIA # to NRCS code
-#'     \item NRCS2FIA() - convert species codes from NRCS code to FIA #
-#'     \item SVS_Species() - list known species
+#'     \item SVS()             - main function for performing visualziations
+#'     \item SVS_Environment() - show reginal example visulizations
+#'     \item SVS_Example()     - show reginal example visulizations
+#'     \item SVS_Species()     - list known species
+#'     \item FIA2NRCS()        - convert species codes from FIA # to NRCS code
+#'     \item NRCS2FIA()        - convert species codes from NRCS code to FIA #
 #' }
 #'
 #' @docType package
 #' @name rSVS
 NULL
 
-
-
-# You can learn more about package authoring with RStudio at:
-#
-#   http://r-pkgs.had.co.nz/
-#
-# Some useful keyboard shortcuts for package authoring:
-#
-#   Build and Reload Package:  'Ctrl + Shift + B'
-#   Check Package:             'Ctrl + Shift + E'
-#   Test Package:              'Ctrl + Shift + T'
-
+#' Check SVS environment
+#'
+#' SVS_Enviroment() checks the package enviroment and alternatively will install a python distribution
+#'
+#' Details go here
+#'
+#' @param Component which part of the enviroment to check, default all
+#' @return Messasge messages return and echoed on console
+#' @author Jim McCarter \email{jim.mccarter@@rayonier.com}
+#' @examples
+#' SVS_Check()
+#' @export
+SVS_Environment <- function(Component='All') {
+    MyComponents <- c( 'SVS', 'Python', 'BMP2PNG', 'Zip' )  # list of components that exist
+    if( Sys.which("python") =="" ) {
+        print( "no Sys.which('python)'")
+        if( system.file("bin","python/python.exe",package="rSVS") == "" ) {
+            print( "No python.exe")
+            if( system.file("bin", "python38.zip",package="rSVS") == "" ) {
+                print( "No python38.zip in package, need python to run" )
+                return()
+            }
+            SaveWD = getwd()
+            setwd( system.file("bin","",package="rSVS") ) # set to bin folder in package
+            print( "No python found on system, give me a few moments to install a package internal copy...")
+            Response <- readline( prompt=paste0( "Install package internal copy of phython?  Y/N: " ) )
+            if( Response == 'Y' ) {
+                system( "unzip.exe python38.zip", invisible=TRUE )
+            }
+            setwd( SaveWD )
+        }
+    }
+}
 #' Demonstrate Stand Visualiztion on several stand types
 #'
 #' Display one of several stand types using example SVS files includes with the package.
 #'
-#' The list of stand types includes:
+#' The list of stand type examples includes:
 #' \itemize{
 #'    \item BottomlandHardwood
 #'    \item Douglas-fir
@@ -46,47 +68,47 @@ NULL
 #'    \item Spruce-Fir
 #' }
 #'
-#' @param StandType Name of stand to display
+#' @param Example Name of stand/stand type example to display
 #' @author Jim McCarter \email{jim.mccarter@@rayonier.com}
 #' @examples
 #' SVS_Demo( 'SouthernPine' )
 #' SVS_Demo( 'Douglas-fir' )
 #' @export
-SVS_Demo <- function( Stand=NULL ) {
-    SavedDir <- getwd()                                                             # get and save current working directory
-    setwd( path.package("rSVS") )                                                   # set working directory to package location
-    svsexe <- system.file( "bin/svs", "winsvs.exe", package="rSVS" )                # get location of winsvs.exe
-    if( is.null(Stand) ) {                                                          # if no stand type provided, print message and return
+SVS_Example <- function( Example=NULL ) {
+    SavedDir <- getwd()                                                             	# get and save current working directory
+    setwd( path.package("rSVS") )                                                   	# set working directory to package location
+    svsexe <- system.file( "bin/svs", "winsvs.exe", package="rSVS" )                	# get location of winsvs.exe
+    if( is.null(Example) ) {                                                          	# if no stand type provided, print message and return
         print( paste0( "Please pick from: BottomlandHardwood, Douglas-fir, LodgepolePine, MixedConifer, ",
                        "MontaneOak-Hickory, PacificSilverFir-Hemlock, Redwood, SouthernPine, or Spruce-Fir" ) )
         return('SVS_Demo() exited.')
-    } else if( grepl( 'BottomlandHardwood', Stand, ignore.case=TRUE ) ) {           # check, ignoring case to eliminate some case typos
-        svsfile <- system.file( "bin", "BottomlandHardwood.svs", package="rSVS" )   # get location of SVS file
-    } else if( grepl( 'Douglas-fir', Stand, ignore.case=TRUE ) ) {
+    } else if( grepl( 'BottomlandHardwood', Example, ignore.case=TRUE ) ) {            	# check, ignoring case to eliminate some case typos
+        svsfile <- system.file( "bin", "BottomlandHardwood.svs", package="rSVS" )       # get location of SVS file
+    } else if( grepl( 'Douglas-fir', Example, ignore.case=TRUE ) ) {
         svsfile <- system.file( "bin", "Douglas-fir.svs", package="rSVS" )
-    } else if( grepl( 'LodgepolePine', Stand, ignore.case=TRUE ) ) {
+    } else if( grepl( 'LodgepolePine', Example, ignore.case=TRUE ) ) {
         svsfile <- system.file( "bin", "LodgepolePine.svs", package="rSVS" )
-    } else if( grepl( 'MixedConifer', Stand, ignore.case=TRUE ) ) {
+    } else if( grepl( 'MixedConifer', Example, ignore.case=TRUE ) ) {
         svsfile <- system.file( "bin", "MixedConifer.svs", package="rSVS" )
-    } else if( grepl( 'MontaneOak-Hickory', Stand, ignore.case=TRUE ) ) {
+    } else if( grepl( 'MontaneOak-Hickory', Example, ignore.case=TRUE ) ) {
         svsfile <- system.file( "bin", "MontaneOak-Hickory.svs", package="rSVS" )
-    } else if( grepl( 'PacificSilverFir-Hemlock', Stand, ignore.case=TRUE ) ) {
+    } else if( grepl( 'PacificSilverFir-Hemlock', Example, ignore.case=TRUE ) ) {
         svsfile <- system.file( "bin", "PacificSilverFir-Hemlock.svs", package="rSVS" )
-    } else if( grepl( 'Redwood', Stand, ignore.case=TRUE ) ) {
+    } else if( grepl( 'Redwood', Example, ignore.case=TRUE ) ) {
         svsfile <- system.file( "bin", "Redwood.svs", package="rSVS" )
-    } else if( grepl( 'SouthernPine', Stand, ignore.case=TRUE ) ) {
+    } else if( grepl( 'SouthernPine', Example, ignore.case=TRUE ) ) {
         svsfile <- system.file( "bin", "SouthernPine.svs", package="rSVS" )
-    } else if( grepl( 'Spruce-Fir', Stand, ignore.case=TRUE ) ) {
+    } else if( grepl( 'Spruce-Fir', Example, ignore.case=TRUE ) ) {
         svsfile <- system.file( "bin", "Spruce-Fir.svs", package="rSVS" )
-    } else {                                                                        # demo file not found, print message and return
-        print( paste0( "Unknown demo file: '", Stand,"'. Please pick from: BottomlandHardwood, Douglas-fir, LodgepolePine, ",
+    } else {                                                                        	# example file not found, print message and return
+        print( paste0( "Unknown demo file: '", Example,"'. Please pick from: BottomlandHardwood, Douglas-fir, LodgepolePine, ",
                        "MixedConifer, MontaneOak-Hickory, PacificSilverFir-Hemlock, Redwood, SouthernPine, or Spruce-Fir" ) )
         return('SVS_Demo() exited.')
     }
-    cmdline <- paste0( svsexe, " ", svsfile )                                       # create command line
+    cmdline <- paste0( svsexe, " ", svsfile )                                       	# create command line
     #print( cmdline )
-    system( cmdline, invisible=FALSE )                                              # spawn SVS program
-    setwd( SavedDir )                                                               # restore working directory to original
+    system( cmdline, invisible=FALSE )                                              	# spawn SVS program to display file
+    setwd( SavedDir )                                                               	# restore working directory to original
     return( 'SVS existed.' )
 }
 
@@ -134,7 +156,7 @@ SVS <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, ro
         system( cmdline, invisible=FALSE, wait=TRUE )
     } else if( typeof(data) == "list" ) {
         if( verbose ) print( paste0( "Data = \"list\", need to save data or pass through reticulate interface" ) )
-        # if 
+        # if
     } else {
         print( paste0( "Don't know how to handle data or type ", typeof(data) ) )
     }
@@ -150,7 +172,7 @@ SVS <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, ro
     #cmdline <- paste0( ".\\python38\\python.exe ", system.file( "python", "StandViz.py", package="rSVS" ), " -D -v ", system.file( "bin", data, package="rSVS") )
     # if reticulate
     # library(reticulate)
-    # SVS <- import_from_path( "StandViz", path="inst/python" ) 
+    # SVS <- import_from_path( "StandViz", path="inst/python" )
     # else
     # pyexe <- system.file( "bin/python38", "python.exe", package="rSVS" )
     # StandViz <- system.file( "python", "StandViz.py", package="rSVS" )
@@ -204,4 +226,14 @@ FIA2NRCS <- function( DataFrame ) {
 NRCS2FIA <- function( DataFrame ) {
 
 }
+
+# You can learn more about package authoring with RStudio at:
+#
+#   http://r-pkgs.had.co.nz/
+#
+# Some useful keyboard shortcuts for package authoring:
+#
+#   Build and Reload Package:  'Ctrl + Shift + B'
+#   Check Package:             'Ctrl + Shift + E'
+#   Test Package:              'Ctrl + Shift + T'
 

@@ -7,25 +7,21 @@
 # Requirements: Python 3.x, with numpy and pandas available
 #
 
-import argparse             # ArgumentParser()
-import math
-import os                   # os.path.split(), os.path.splitext(), os.system()
-import pandas as pd         # Pandas DataFrame, .read_csv()
-import platform             # platform.system()
-import random
-import re                   # re.search()
-import sys
-import time
+import argparse     # ArgumentParser()
+import math         # math.ceil(), .floor(), .sqrt()
+import os           # os.path.split(), os.path.splitext(), os.system()
+import pandas as pd # Pandas DataFrame, .read_csv()
+import platform     # platform.system()
+import random       # random.seed(), .uniform()
+import re           # re.search(), .sub()
+import sys          # sys.argv, .exc_info(), .exit()
+import time         # time.asctime()
+#import win32com.client, pythoncom, _winreg
 
 (__file_version__, __file_date__) = ( '$Revision: 1.0.1 $', '$Date: 2020/02/12 07:19:00 $' )
 (_MyPath, _MyFile, _MyOS) = (os.path.split(sys.argv[0])[0], os.path.split(sys.argv[0])[1], platform.system())
 (_MyVersion, _MyDate) = ( __file_version__.split()[1], '{} - {}'.format(__file_date__.split()[1], __file_date__.split()[2]) )
 
-#
-# PySvsAddin.py - stand visualization adding implementation in Python
-#
-
-#import ConfigParser, math, os, random, re, sys, time, win32com.client, pythoncom, _winreg
 
 ##################################
 # Begin Global Data Declarations #
@@ -36,10 +32,10 @@ import time
 #global OWNPATH
 VERBOSE = 0
 
-########################################################
-# Begin Main Program - implement command line inferface
-########################################################
-def main():     # implement main scope for handling of command line execution of script
+#########################################################
+# Begin Main Program - implement command line inferface #
+#########################################################
+def main():     # implement __main__ scope for handling of command line execution of script
     global DEBUG, NOTIFY, VERBOSE
     try:
         (DEBUG, NOTIFY, VERBOSE) = (False, False, False)
@@ -377,31 +373,6 @@ def Compare_TreeForm_To_rSVS_Species( SppCodes ):
         else: Have += 1
     print( "{}: Has {}, Missing {}".format(TreeFormFile, Have, len(SPP.index)-Have) )   # report results
 
-def Create_FIA_TreeForm_File():
-    print( "Creating FIA.trf..." )
-    #SppFile = "../bin/rSVS_Species.csv"
-    #SPP = pd.read_csv( SppFile )
-    SppXlsFile = "../bin/rSVS_Species.xlsx"
-    SPPXLS = pd.ExcelFile( SppXlsFile )
-    SPP = SPPXLS.parse( 'rSVS_Species' )                                                    # get tree records from Blackrock worksheet
-    print( "Read {} lines from {}".format(len(SPP.index), SppXlsFile) )
-    TRANSLATE = {}
-    for S in SPP.itertuples():
-        TRANSLATE[S.NRCS] = S.FIA
-    TreeFormFile = "../bin/SVS/{}.trf".format('NRCS')
-    (SpecialForm, SppForm) = SVS_LoadTreeFormFile( TreeFormFile )
-    FIAForm = {}
-    print( "Read {} lines from {}".format(len(SppForm.keys()), TreeFormFile) )
-    # loop through SppForm.keys() and change species to FIA # from SPP
-    for S in sorted(SppForm.keys()):
-        if( not S in TRANSLATE ): print( "No FIA # for {}, skipping.".format(S) )
-        else: 
-            #print("Need to translate {} to {}".format(S,int(TRANSLATE[S])))
-            FIAForm[int(TRANSLATE[S])] = SppForm[S]
-            #input(FIAForm[int(TRANSLATE[S])])
-    NewTreeFormFile = '../bin/SVS/FIA.trf'
-    SVS_Write_TreeFormFile( NewTreeFormFile, SpecialForm, FIAForm )
-
 def Determine_CSV_Format( FileName ):
     FileType = 'Unknown'
     # first make sure file exists
@@ -418,90 +389,10 @@ def Determine_CSV_Format( FileName ):
     return( FileType )
 
 # create SVSTreeForm class and move the SVS_LoadTreeFormFile(), SVS_Write_TreeFormFile(), SVS_WriteHeader() and other appropriate functions into class
-def SVS_LoadTreeFormFile( TreeFormFile ):
-    SppForm = {}
-    SpecialForm = {}
-    SpecialList = [ '--', '@flame.eob', 'CAR', 'CRANEBOOM', 'CRANETOWER', 'CONIFER', 'CUBE', 'DEFAULT', 'DMBROOM', 'HARDWOOD', 'MARKER', 'MISTBROOM', 'OTHER', 'PALM', 
-                    'R6CLUMP',
-                    'R6SHRUB', 'R6SNAG', 'RANGEPOLE', 'ROCK', 'ROOTWAD', 'SEEDLING', 'SHRUB', 'SNAG', 'SNAG2', 'SNAG3', 'SNAG4', 'SNAG5', 'TETRAHEDRON', 'TRUCK' ]
-    TRF = open( TreeFormFile, 'r' )
-    for L in TRF:
-        if( re.search( "^;", L ) != None ): pass    # skip comment/header lines
-        else:
-            (Spp, PlantClass, CrownClass, PlantForm, NoBranch, NoWhorl, BrBase, BrAngle, LowX, LowY, HighX, HighY, BaseUp, TopUp, StemCol, BrCol,
-             Fol1, Fol2, SampHt, SampRat, SampRad, Scale) = L.split()
-            if( Spp in SpecialList ):               # if Spp code in SpedialList save to SpecialForm
-                SpecialForm[Spp] = {}
-                if( not PlantClass in SpecialForm[Spp] ): SpecialForm[Spp][PlantClass] = {}
-                if( not PlantForm in SpecialForm[Spp][PlantClass] ): SpecialForm[Spp][PlantClass][PlantForm] = {}
-                if( not CrownClass in SpecialForm[Spp][PlantClass][PlantForm] ):
-                    SpecialForm[Spp][PlantClass][PlantForm][CrownClass] = (NoBranch,NoWhorl,BrBase,BrAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemCol,BrCol,
-                                                                           Fol1,Fol2,SampHt,SampRat,SampRad,Scale)
-            else:                                   # otherwide handle normal species treeforms
-                if( not Spp in SppForm ): SppForm[Spp] = {}
-                if( not PlantClass in SppForm[Spp] ): SppForm[Spp][PlantClass] = {}
-                if( not PlantForm in SppForm[Spp][PlantClass] ): SppForm[Spp][PlantClass][PlantForm] = {}
-                if( not CrownClass in SppForm[Spp][PlantClass][PlantForm] ):
-                    SppForm[Spp][PlantClass][PlantForm][CrownClass] = (NoBranch,NoWhorl,BrBase,BrAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemCol,BrCol,
-                                                                       Fol1,Fol2,SampHt,SampRat,SampRad,Scale)
-    TRF.close()
-    return( SpecialForm, SppForm )
-
-def SVS_Write_TreeFormFile( TreeFormFile, SpecialForm, SppForm ):
-    TFM = open( TreeFormFile, 'w' )
-    SVS_Write_Header( TFM )
-    for TF in sorted(SpecialForm.keys()):
-        for PC in sorted(SpecialForm[TF].keys()):
-            for PF in sorted(SpecialForm[TF][PC].keys()):
-                for CC in sorted(SpecialForm[TF][PC][PF]):
-                    (NoBranch,NoWhorl,BrBase,BrAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemCol,BrCol,Fol1,Fol2,SampHt,SampRat,SampRad,Scale) = SpecialForm[TF][PC][PF][CC]
-                    SVS_Write_TreeForm( TFM, TF, PC, CC, PF, NoBranch, NoWhorl, BrBase, BrAngle, LowX, LowY, HighX, HighY, BaseUp, TopUp, StemCol, BrCol,
-                                        Fol1, Fol2, SampHt, SampRat, SampRad, Scale )
-    nRec = 0
-    for TF in sorted(SppForm.keys()):
-        for PC in sorted(SppForm[TF].keys()):
-            for PF in sorted(SppForm[TF][PC].keys()):
-                for CC in sorted(SppForm[TF][PC][PF]):
-                    (NoBranch,NoWhorl,BrBase,BrAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemCol,BrCol,Fol1,Fol2,SampHt,SampRat,SampRad,Scale) = SppForm[TF][PC][PF][CC]
-                    SVS_Write_TreeForm( TFM, TF, PC, CC, PF, NoBranch, NoWhorl, BrBase, BrAngle, LowX, LowY, HighX, HighY, BaseUp, TopUp, StemCol, BrCol,
-                                        Fol1, Fol2, SampHt, SampRat, SampRad, Scale )
-                    nRec += 1
-    TFM.close()
-    print( "Should have written {} lines".format(nRec) )
 
 
-def SVS_Write_Header( OUT ):
-    OUT.write( ";Stand Visualization System\n" )
-    OUT.write( ";Plant form definition file\n" )
-    OUT.write( ";File produced by SVS version: 3.24\n" )
-    OUT.write( ";\n" )
-    OUT.write( ";DO NOT EDIT THIS FILE BY HAND!!!!!\n" )
-    OUT.write( ";SVS does not perform rigorous validation of the parameters\n" )
-    OUT.write( ";in this file so any mistakes could cause SVS to crash\n" )
-    OUT.write( ";NOTE: Allow 15 characters for the species code!!\n" )
-    OUT.write( ";              | this marks column 16\n" )
-    OUT.write( ";              |\n" )
-    OUT.write( ";Species       | Plant  Crown  Plant     #        #     Branch  Branch  Low pt  Low pt  High pt  High pt    Base    Top    Stem   Branch  Foliage  " )
-    OUT.write( "Foliage  Sample    Sample    Sample    Scale\n" )
-    OUT.write( "; code         | class  class  form   branches  whorls   base   angle     X       Y        X        Y      uptilt  uptilt  color  " )
-    OUT.write( "color   color 1  color 2  height    cratio    cradius\n" )
-    OUT.write( ";---------------------------------------------------------------------------------------------------------------------------------" )
-    OUT.write( "-------------------------------------------------------------\n" )
-    #OUT.write( "--                99     99      0       190      13     0.00    49     1.00    0.15     0.83     0.55    -2.40    5.00     10     10      " )
-    #OUT.write( "18       18      120.0     0.50      13.00      0\n" )
-    #OUT.write( "@flame.eob        99     99     15       100       0     0.00    47     1.00    0.10     0.60     0.80     0.05    0.05      0      1       " )
-    #OUT.write( "0        0       38.0     0.40      18.00      0\n" )
 
-def SVS_Write_TreeForm( OUT, Spp, PlantClass, CrownClass, PlantForm, NoBranch, NoWhorl, BranchBase, BranchAngle, LowX, LowY, HighX, HighY, BaseUp, TopUp,
-                        StemColor, BranchColor, Foliage1, Foliage2, SampHt, SampRat, SampRad, Scale ):
-    
-    #print( "{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}\n".format(Spp,
-    #           PlantClass,CrownClass,PlantForm,NoBranch,NoWhorl,BranchBase,BranchAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemColor,BranchColor,Foliage1,Foliage2,
-    #           SampHt,SampRat,SampRad,Scale) )
-    #Species = "{:15d}".format(Spp)
-    OUT.write( "{:15s}{:>5s}{:>7s}{:>7s}{:>10s}{:>8s}{:>9s}{:>6s}{:>9s}{:>8s}{:>9s}{:>9s}{:>9s}{:>8s}{:>7s}{:>7s}{:>8s}{:>9s}{:>11s}{:>9s}{:>11s}{:>7s}\n".format(str(Spp),
-               PlantClass,CrownClass,PlantForm,NoBranch,NoWhorl,BranchBase,BranchAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemColor,BranchColor,Foliage1,Foliage2,
-               SampHt,SampRat,SampRad,Scale) )
+
 
 # -B# clump ratio # clumps = (0.01 - 0.5) * TPA
 # -G# clumpiness factor = 1.5-1.4*clumpiness factor)*clump spacing
@@ -613,10 +504,120 @@ class SVS_TreeForm:
         '''Initialze SVS_TreeForm class'''
         pass
 
-    def __del__( self):
+    def __del__( self ):
         '''Destrop SVS_TreeForm class'''
         pass
 
+    def Create_FIA_TreeForm_File():
+        print( "Creating FIA.trf..." )
+        #SppFile = "../bin/rSVS_Species.csv"
+        #SPP = pd.read_csv( SppFile )
+        SppXlsFile = "../bin/rSVS_Species.xlsx"
+        SPPXLS = pd.ExcelFile( SppXlsFile )
+        SPP = SPPXLS.parse( 'rSVS_Species' )                                                    # get tree records from Blackrock worksheet
+        print( "Read {} lines from {}".format(len(SPP.index), SppXlsFile) )
+        TRANSLATE = {}
+        for S in SPP.itertuples():
+            TRANSLATE[S.NRCS] = S.FIA
+        TreeFormFile = "../bin/SVS/{}.trf".format('NRCS')
+        (SpecialForm, SppForm) = SVS_LoadTreeFormFile( TreeFormFile )
+        FIAForm = {}
+        print( "Read {} lines from {}".format(len(SppForm.keys()), TreeFormFile) )
+        # loop through SppForm.keys() and change species to FIA # from SPP
+        for S in sorted(SppForm.keys()):
+            if( not S in TRANSLATE ): print( "No FIA # for {}, skipping.".format(S) )
+            else: 
+                #print("Need to translate {} to {}".format(S,int(TRANSLATE[S])))
+                FIAForm[int(TRANSLATE[S])] = SppForm[S]
+                #input(FIAForm[int(TRANSLATE[S])])
+        NewTreeFormFile = '../bin/SVS/FIA.trf'
+        SVS_Write_TreeFormFile( NewTreeFormFile, SpecialForm, FIAForm )
+
+    def SVS_LoadTreeFormFile( self, TreeFormFile ):
+        SppForm = {}
+        SpecialForm = {}
+        SpecialList = [ '--', '@flame.eob', 'CAR', 'CRANEBOOM', 'CRANETOWER', 'CONIFER', 'CUBE', 'DEFAULT', 'DMBROOM', 'HARDWOOD', 'MARKER', 'MISTBROOM', 'OTHER', 'PALM', 
+                        'R6CLUMP',
+                        'R6SHRUB', 'R6SNAG', 'RANGEPOLE', 'ROCK', 'ROOTWAD', 'SEEDLING', 'SHRUB', 'SNAG', 'SNAG2', 'SNAG3', 'SNAG4', 'SNAG5', 'TETRAHEDRON', 'TRUCK' ]
+        TRF = open( TreeFormFile, 'r' )
+        for L in TRF:
+            if( re.search( "^;", L ) != None ): pass    # skip comment/header lines
+            else:
+                (Spp, PlantClass, CrownClass, PlantForm, NoBranch, NoWhorl, BrBase, BrAngle, LowX, LowY, HighX, HighY, BaseUp, TopUp, StemCol, BrCol,
+                 Fol1, Fol2, SampHt, SampRat, SampRad, Scale) = L.split()
+                if( Spp in SpecialList ):               # if Spp code in SpedialList save to SpecialForm
+                    SpecialForm[Spp] = {}
+                    if( not PlantClass in SpecialForm[Spp] ): SpecialForm[Spp][PlantClass] = {}
+                    if( not PlantForm in SpecialForm[Spp][PlantClass] ): SpecialForm[Spp][PlantClass][PlantForm] = {}
+                    if( not CrownClass in SpecialForm[Spp][PlantClass][PlantForm] ):
+                        SpecialForm[Spp][PlantClass][PlantForm][CrownClass] = (NoBranch,NoWhorl,BrBase,BrAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemCol,BrCol,
+                                                                               Fol1,Fol2,SampHt,SampRat,SampRad,Scale)
+                else:                                   # otherwide handle normal species treeforms
+                    if( not Spp in SppForm ): SppForm[Spp] = {}
+                    if( not PlantClass in SppForm[Spp] ): SppForm[Spp][PlantClass] = {}
+                    if( not PlantForm in SppForm[Spp][PlantClass] ): SppForm[Spp][PlantClass][PlantForm] = {}
+                    if( not CrownClass in SppForm[Spp][PlantClass][PlantForm] ):
+                        SppForm[Spp][PlantClass][PlantForm][CrownClass] = (NoBranch,NoWhorl,BrBase,BrAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemCol,BrCol,
+                                                                           Fol1,Fol2,SampHt,SampRat,SampRad,Scale)
+        TRF.close()
+        return( SpecialForm, SppForm )
+
+    def SVS_Write_Header( self, OUT ):
+        OUT.write( ";Stand Visualization System\n" )
+        OUT.write( ";Plant form definition file\n" )
+        OUT.write( ";File produced by SVS version: 3.24\n" )
+        OUT.write( ";\n" )
+        OUT.write( ";DO NOT EDIT THIS FILE BY HAND!!!!!\n" )
+        OUT.write( ";SVS does not perform rigorous validation of the parameters\n" )
+        OUT.write( ";in this file so any mistakes could cause SVS to crash\n" )
+        OUT.write( ";NOTE: Allow 15 characters for the species code!!\n" )
+        OUT.write( ";              | this marks column 16\n" )
+        OUT.write( ";              |\n" )
+        OUT.write( ";Species       | Plant  Crown  Plant     #        #     Branch  Branch  Low pt  Low pt  High pt  High pt    Base    Top    Stem   Branch  Foliage  " )
+        OUT.write( "Foliage  Sample    Sample    Sample    Scale\n" )
+        OUT.write( "; code         | class  class  form   branches  whorls   base   angle     X       Y        X        Y      uptilt  uptilt  color  " )
+        OUT.write( "color   color 1  color 2  height    cratio    cradius\n" )
+        OUT.write( ";---------------------------------------------------------------------------------------------------------------------------------" )
+        OUT.write( "-------------------------------------------------------------\n" )
+        #OUT.write( "--                99     99      0       190      13     0.00    49     1.00    0.15     0.83     0.55    -2.40    5.00     10     10      " )
+        #OUT.write( "18       18      120.0     0.50      13.00      0\n" )
+        #OUT.write( "@flame.eob        99     99     15       100       0     0.00    47     1.00    0.10     0.60     0.80     0.05    0.05      0      1       " )
+        #OUT.write( "0        0       38.0     0.40      18.00      0\n" )
+
+    def SVS_Write_TreeForm( self, OUT, Spp, PlantClass, CrownClass, PlantForm, NoBranch, NoWhorl, BranchBase, BranchAngle, LowX, LowY, HighX, HighY, BaseUp, TopUp,
+                            StemColor, BranchColor, Foliage1, Foliage2, SampHt, SampRat, SampRad, Scale ):
+
+        #print( "{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}\n".format(Spp,
+        #           PlantClass,CrownClass,PlantForm,NoBranch,NoWhorl,BranchBase,BranchAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemColor,BranchColor,Foliage1,Foliage2,
+        #           SampHt,SampRat,SampRad,Scale) )
+        #Species = "{:15d}".format(Spp)
+        OUT.write( "{:15s}{:>5s}{:>7s}{:>7s}{:>10s}{:>8s}{:>9s}{:>6s}{:>9s}{:>8s}{:>9s}{:>9s}{:>9s}{:>8s}{:>7s}{:>7s}{:>8s}{:>9s}{:>11s}{:>9s}{:>11s}{:>7s}\n".format(str(Spp),
+                   PlantClass,CrownClass,PlantForm,NoBranch,NoWhorl,BranchBase,BranchAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemColor,BranchColor,Foliage1,Foliage2,
+                   SampHt,SampRat,SampRad,Scale) )
+
+    def SVS_Write_TreeFormFile( self, TreeFormFile, SpecialForm, SppForm ):
+        TFM = open( TreeFormFile, 'w' )
+        SVS_Write_Header( TFM )
+        for TF in sorted(SpecialForm.keys()):
+            for PC in sorted(SpecialForm[TF].keys()):
+                for PF in sorted(SpecialForm[TF][PC].keys()):
+                    for CC in sorted(SpecialForm[TF][PC][PF]):
+                        (NoBranch,NoWhorl,BrBase,BrAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemCol,BrCol,Fol1,Fol2,SampHt,SampRat,SampRad,Scale) = SpecialForm[TF][PC][PF][CC]
+                        SVS_Write_TreeForm( TFM, TF, PC, CC, PF, NoBranch, NoWhorl, BrBase, BrAngle, LowX, LowY, HighX, HighY, BaseUp, TopUp, StemCol, BrCol,
+                                            Fol1, Fol2, SampHt, SampRat, SampRad, Scale )
+        nRec = 0
+        for TF in sorted(SppForm.keys()):
+            for PC in sorted(SppForm[TF].keys()):
+                for PF in sorted(SppForm[TF][PC].keys()):
+                    for CC in sorted(SppForm[TF][PC][PF]):
+                        (NoBranch,NoWhorl,BrBase,BrAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemCol,BrCol,Fol1,Fol2,SampHt,SampRat,SampRad,Scale) = SppForm[TF][PC][PF][CC]
+                        SVS_Write_TreeForm( TFM, TF, PC, CC, PF, NoBranch, NoWhorl, BrBase, BrAngle, LowX, LowY, HighX, HighY, BaseUp, TopUp, StemCol, BrCol,
+                                            Fol1, Fol2, SampHt, SampRat, SampRad, Scale )
+                        nRec += 1
+        TFM.close()
+        print( "Should have written {} lines".format(nRec) )
+
+#########################################################################################
 class SVS:
     '''Class to abstract Stand Visualization System (SVS) files'''
     def __init__( self ):
