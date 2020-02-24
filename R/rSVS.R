@@ -32,22 +32,37 @@ NULL
 #' @export
 SVS_Environment <- function(Component='All') {
     MyComponents <- c( 'SVS', 'Python', 'BMP2PNG', 'Zip' )  # list of components that exist
-    if( Sys.which("python") =="" ) {
-        print( "no Sys.which('python)'")
-        if( system.file("bin","python/python.exe",package="rSVS") == "" ) {
-            print( "No python.exe")
-            if( system.file("bin", "python38.zip",package="rSVS") == "" ) {
-                print( "No python38.zip in package, need python to run" )
-                return()
+    if( (Component=='SVS') | (Component=='All') ) {
+        if( system.file( "bin/SVS", "winsvs.exe", package="rSVS" ) == "" ) {
+            print( "Error in package!  Will not be able to visualize stands." )
+        }
+    } else if( (Component=='Python') | (Component=='All') ) {
+        if( Sys.which("python") =="" ) {
+            print( "no Sys.which('python)'")
+            if( system.file("bin","python/python.exe",package="rSVS") == "" ) {
+                print( "No python.exe")
+                if( system.file("bin", "python38.zip",package="rSVS") == "" ) {
+                    print( "No python38.zip in package, need python to run" )
+                    return()
+                }
+                SaveWD = getwd()
+                setwd( system.file("bin","",package="rSVS") ) # set to bin folder in package
+                print( "No python found on system, give me a few moments to install a package internal copy...")
+                Response <- readline( prompt=paste0( "Install package internal copy of phython?  Y/N: " ) )
+                if( Response == 'Y' ) {
+                    system( "unzip.exe python38.zip", invisible=TRUE )
+                }
+                setwd( SaveWD )
             }
-            SaveWD = getwd()
-            setwd( system.file("bin","",package="rSVS") ) # set to bin folder in package
-            print( "No python found on system, give me a few moments to install a package internal copy...")
-            Response <- readline( prompt=paste0( "Install package internal copy of phython?  Y/N: " ) )
-            if( Response == 'Y' ) {
-                system( "unzip.exe python38.zip", invisible=TRUE )
-            }
-            setwd( SaveWD )
+        }
+    } else if( (Component=='BMP2PNG') | (Component=='All') ) {
+        if( system.file( "bin", "BMP2PNG.EXE", package="rSVS" ) == "" ) {
+            print( "Error in package!  Will not be able to convert BMP files to PNG file for web page presentation of visualizations")
+        }
+
+    } else if( (Component=='Zip') | (Component=='All') ) {
+        if( system.file("bin","zip.exe",pacakge="rSVS") == "" ) {
+            print( "Error in package!  Will not be able to extract python38.zip if no system defined python exists." )
         }
     }
 }
