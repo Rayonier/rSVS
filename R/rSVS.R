@@ -134,6 +134,7 @@ SVS <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, ro
         system( cmdline, invisible=FALSE, wait=TRUE )
     } else if( typeof(data) == "list" ) {
         if( verbose ) print( paste0( "Data = \"list\", need to save data or pass through reticulate interface" ) )
+        # if 
     } else {
         print( paste0( "Don't know how to handle data or type ", typeof(data) ) )
     }

@@ -1,10 +1,6 @@
 inst/bin/BMP2PNG.EXE
 inst/bin/bzip2.dll
-inst/bin/python.exe
-inst/bin/python27.dll
-inst/bin/pythoncom27.dll
-inst/bin/pythoncomloader27.dll
-inst/bin/pywintypes27.dll
+inst/bin/python38.zip
 inst/bin/SVS/fvs2svs.dll
 inst/bin/SVS/fvs2svs.exe
 inst/bin/SVS/org2svs.dll

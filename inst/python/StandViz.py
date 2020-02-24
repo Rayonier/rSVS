@@ -4,7 +4,7 @@
 # Description.: Stand level visualzation package using the Stand Visualization System (SVS)
 # Author......: James B. McCarter
 # Copyright...: 2020, Rayonier, Inc
-# Requirements:
+# Requirements: Python 3.x, with numpy and pandas available
 #
 
 import argparse             # ArgumentParser()
@@ -12,6 +12,7 @@ import math
 import os                   # os.path.split(), os.path.splitext(), os.system()
 import pandas as pd         # Pandas DataFrame, .read_csv()
 import platform             # platform.system()
+import random
 import re                   # re.search()
 import sys
 import time
@@ -45,7 +46,7 @@ def main():     # implement main scope for handling of command line execution of
         # do everything relative to this script's path
         # ..C.E.GHIJKLMNOPQR.TU...YZ .b..e.g.ijk.m.o.q.st..wxyz 0123456789
         SARG = argparse.ArgumentParser( add_help=False, usage=" %(prog)s [-B|-W|-S|-X] [-c|-f|-r|-u] [dDhnv] [-a #] [-l #] [-p #] [-w worksheet] file [file [...]]\n" +
-                                                              "\t%(prog)s [-v] [-A [FIA|NRCS]] [-F]" )
+                                                             "\t%(prog)s [-v] [-A [FIA|NRCS]] [-F]" )
 
         SARGO = SARG.add_argument_group( "Output arguments" )
         SARGO.add_argument( "-B", action="store_true", help="output to Bitmap (capture .bmp, convert to .png)" )
@@ -94,102 +95,16 @@ def main():     # implement main scope for handling of command line execution of
         #os.chdir( ScriptPath )
 
         if( SOPT.A ):
-            # move to function
-            print( "Performing audit of rSVS_Species.csv file" )
-            #SppFile = "../bin/rSVS_Species.csv"
-            #SPP = pd.read_csv( SppFile )
-            SppXlsFile = "{}/rSVS_Species.xlsx".format(os.path.realpath("{}/bin".format(os.path.split(ScriptPath)[0])))
-            print(SppXlsFile)
-            SPPXLS = pd.ExcelFile( SppXlsFile )
-            SPP = SPPXLS.parse( 'rSVS_Species' )                                                    # get tree records from Blackrock worksheet
-            print( "Read {} lines from {}".format(len(SPP.index), SppXlsFile) )
-            DUP = {'FIA':{}, 'NRCS':{}}
-            (nMissF, nMissN, nMissG, nMissS, nMissC) = (0, 0, 0, 0, 0)
-            (nDupF, nDupN) = (0,0)
-            for S in SPP.itertuples():      # loop across species codes
-                (FIA, NRCS, Genus, Species, Common, Comment, NRCSTRF, FVSVar, FVSSpp) = (S.FIA, S.NRCS, S.Genus, S.Species, S.Common, S.Comment, S._7, S._8, S.SpCode)
-                if( pd.isna(FIA) ): nMissF += 1
-                else:
-                    FIA = int(FIA)
-                    if( not FIA in DUP['FIA'] ): DUP['FIA'][FIA] = 1
-                    else:
-                        print( "Duplicate FIA #{}".format(FIA) )
-                        nDupF += 1
-                if( pd.isna(NRCS) ): nMissN += 1
-                else:
-                    if( not NRCS in DUP['NRCS'] ): DUP['NRCS'][NRCS] = 1
-                    else:
-                        print( "Duplcate NRCS code: {}".format(NRCS) )
-                        nDupN += 1
-                if( pd.isna(Genus) ): nMissG += 1
-                if( pd.isna(Species) ): nMissS += 1
-                if( pd.isna(Common) ): nMissC += 1
-                #print( "{}, {}, {} {}, {}, {}, {}, {}, {}".format(FIA, NRCS, Genus, Species, Common, Comment, NRCSTRF, FVSVar, FVSSpp) )
-            print( "Total Species {}: ".format( len(SPP.index) ) )
-            print( "    FIA: Have {}, Missing {}, Dup {}".format( len(DUP['FIA'].keys()), nMissF, nDupF) )
-            print( "    NRCS Have {}, Missing {}, Dup {}".format( len(DUP['NRCS'].keys()), nMissN, nDupN ) )
-            print( "    Genus (Missing {}), Species (Missing  {}), Common (Missing {})".format( nMissG, nMissS, nMissC) )
-            #os.chdir( OriginalWindowsPath )
+            Audit_rSVS_Species_File()
             sys.exit( "audited rSVS_Species.csv" )
 
-        if( SOPT.C ):           # audit TreeForm file against rSVS_Species.csv
-            # move to function
-            print( "Performing audit of {}.trf against rSVS_Species.csv".format(SOPT.A[0]) )
-            #SppFile = "../bin/rSVS_Species.csv"
-            #SPP = pd.read_csv( SppFile )
-            SppXlsFile = "../bin/rSVS_Species.xlsx"
-            SPPXLS = pd.ExcelFile( SppXlsFile )
-            SPP = SPPXLS.parse( 'rSVS_Species' )                                                    # get tree records from Blackrock worksheet
-            print( "Read {} lines from {}".format(len(SPP.index), SppXlsFile) )
-            SppCodes = SOPT.A[0]
-            TreeFormFile = "../bin/SVS/{}.trf".format(SppCodes)
-            (SpecialForm, SppForm) = SVS_LoadTreeFormFile( TreeFormFile )
-            print( "Read {} lines from {}".format(len(SppForm.keys()), TreeFormFile) )
-            AUDIT = {}
-            for S in SPP.itertuples():
-                (FIA, NRCS, Genus, Species) = (S.FIA, S.NRCS, S.Genus, S.Species)
-                if( SppCodes == 'NRCS' ):
-                    if( not NRCS in AUDIT ): AUDIT[NRCS] = 1
-                elif( SppCodes == 'FIA' ):
-                    if( pd.isna(FIA) ): continue
-                    else: FIA = "{}".format(int(FIA))
-                    if( not FIA in AUDIT ): AUDIT[FIA] = 1
-            #print(sorted(AUDIT.keys()))
-            (Have, Missing) = (0, 0)
-            for S in sorted(SppForm.keys()):
-                #print("'{}'".format(S))
-                if( not S in AUDIT ): Missing += 1
-                else: Have += 1
-            print( "{}: Has {}, Missing {}".format(TreeFormFile, Have, len(SPP.index)-Have) )
+        if( SOPT.C ):                                           # Compare TreeForm file against rSVS_Species.csv
+            Compare_TreeForm_To_rSVS_Species( SOPT.A[0] )       # pass TreeForm file basename to function
             sys.exit("performed audit")
 
         if( SOPT.F ):       # create FIA.trf from NCRS.trf
-            # move to function
-            print( "Creating FIA.trf..." )
-            #SppFile = "../bin/rSVS_Species.csv"
-            #SPP = pd.read_csv( SppFile )
-            SppXlsFile = "../bin/rSVS_Species.xlsx"
-            SPPXLS = pd.ExcelFile( SppXlsFile )
-            SPP = SPPXLS.parse( 'rSVS_Species' )                                                    # get tree records from Blackrock worksheet
-            print( "Read {} lines from {}".format(len(SPP.index), SppXlsFile) )
-            TRANSLATE = {}
-            for S in SPP.itertuples():
-                TRANSLATE[S.NRCS] = S.FIA
-            TreeFormFile = "../bin/SVS/{}.trf".format('NRCS')
-            (SpecialForm, SppForm) = SVS_LoadTreeFormFile( TreeFormFile )
-            FIAForm = {}
-            print( "Read {} lines from {}".format(len(SppForm.keys()), TreeFormFile) )
-            # loop through SppForm.keys() and change species to FIA # from SPP
-            for S in sorted(SppForm.keys()):
-                if( not S in TRANSLATE ): print( "No FIA # for {}, skipping.".format(S) )
-                else: 
-                    #print("Need to translate {} to {}".format(S,int(TRANSLATE[S])))
-                    FIAForm[int(TRANSLATE[S])] = SppForm[S]
-                    #input(FIAForm[int(TRANSLATE[S])])
-            NewTreeFormFile = '../bin/SVS/FIA.trf'
-            SVS_Write_TreeFormFile( NewTreeFormFile, SpecialForm, FIAForm )
+            Create_FIA_TreeForm_File()
             sys.exit( "created FIA.trf" )
-
 
         if( SOPT.t ):
             print( "No testing function currently defined!")
@@ -198,7 +113,6 @@ def main():     # implement main scope for handling of command line execution of
             #os.system(CMDLINE)
             sys.exit()
         
-        #nfiles = len(cmdline)
         if( (nFile==0) | SOPT.h ):
             SARG.print_help()
             sys.exit( "help printed" )
@@ -216,11 +130,9 @@ def main():     # implement main scope for handling of command line execution of
         for FILE in SOPT.FILELIST:
         #for f in cmdline:
             #D = {}              # create data dictionary
-            print( FILE )
-            #if( DEBUG ): print( "File: {}.format(FILE) )
-            #if( DEBUG ): print( 'dirname={} filename={} % (dirname, filename) )
-            (dirname, filename) = os.path.split( FILE )
-            (basename, ext) = os.path.splitext( filename )
+            #print( FILE )
+            (dirname, filename) = os.path.split( FILE )             # get path and filename for file from command line
+            (basename, ext) = os.path.splitext( filename )          # get filebase and extension
             if( DEBUG ): print( "File: {}, dirname={} filename={} basename={} ext={}".format(FILE, dirname, filename, basename, ext) )
             #DataSet = 'None'
             if( re.search( '.svs', filename ) != None ):            # process .svs files, just pass through to winsvs.exe if the file exists
@@ -231,6 +143,8 @@ def main():     # implement main scope for handling of command line execution of
                 os.system(CMDLINE)
             elif( re.search( '.csv', filename ) != None ):          # process .csv files
                 DataSet = re.sub( '.csv', '', filename )
+                FileType = Determine_CSV_Format( FILE )
+                print( "{}: FileType={}".format(FILE,FileType) )
             elif( re.search( '.xlsx', filename ) != None ):         # process .xlsx or .xlx files
                 DataSet = re.sub( '.xlsx', '', filename )
             elif( re.search( '.xls', filename ) != None ):
@@ -239,6 +153,71 @@ def main():     # implement main scope for handling of command line execution of
             # data loader for Postex plots: Plot, Plot_Radius, Nr, Tree_Spc, Tree_Dia(.1 in), Tree_Hgt(ft), Tree_Postex1, Tree_Poste2, Tree_Postx3,
             # Tree_Local_x, Tree_Local_y, Tree_Local_Dist, Tree_Local_Angle, Tree_Angle_ToPlotCenter, Latitude, Longitude, Tree_Nr
             # TreeSpc: 1=Unforked pine, 2=hardwood, 3=dead tree (pine or hardwood), 4=forked pine
+            #if( re.search( 'Postex_016.csv', FILE ) !=None ):
+            if( FileType == 'PosTex' ):
+                CsvFileName = "{}".format(FILE )
+                print( "Processing {}...".format(CsvFileName))
+                # check that it exists
+                D = pd.read_csv( CsvFileName )
+                SVS = StandViz( 'Postex_016' )
+                year = 2020
+                SvsFilename = "Postex_016_{}.svs".format(year)
+                SVS.SVF = open( SvsFilename, 'w' )
+                SVS.SVS_Write_Header()
+                for L in D.itertuples():
+                    standname = L.Plot
+                    SVS.Data.Stand[standname] = StandData(standname)
+                    (TreeNo, Species, DBH, Ht, X, Y) = (L.Nr, L.Tree_Spc, L.Tree_Dia, L.Tree_Hgt, L.Tree_Local_x, L.Tree_Local_y)
+                    X = (208.71 / 2.0 ) + ((float(X)*3.28084)) * 2.0
+                    Y = (208.71 / 2.0 ) + ((float(Y)*3.28084)) * 2.0
+                    if( Species == 1 ): (Species, Status) = ('PITA', 1)
+                    elif( Species == 2 ): (Species, Status) = ('HARDWOOD', 1)
+                    elif( Species == 3 ): (Species, Status) = ('SNAG', 2)
+                    elif( Species == 4 ): (Species, Status) = ('PITA', 2)
+                    nTree = len(SVS.Data.Stand[standname].Tree) + 1
+                    SVS.Data.Stand[standname].Tree[nTree] = TreeData(Species,TreeNumber=TreeNo, X=X, Y=Y)
+                    SVS.Data.Stand[standname].Tree[nTree].Year[year] = MeasurementData( DBH, Ht, '', 1, 0, Status )
+                    #print("{},{},{},{},{},{},{},{}".format(standname,TreeNo,Species,DBH,Ht,X,Y,nTree))
+                    (LAng, Bearing, EDia, Mark, Z) = (0,0,0,0,0)
+                    TPA = 1
+                    DBH /= 10
+                    PClass = 0
+                    CClass = 1
+                    CR = 0.45
+                    CW = 10
+                    SVS.SVS_Write_Tree_Live( Species, TreeNo, PClass, CClass, Status, DBH, Ht, LAng, Bearing, EDia, CW, CR, TPA, Mark, X,Y, Z)
+                #print("Stand.keys()={}".format(SVS.Data.Stand.keys()))
+                SVSEXE = "inst\\bin\SVS\winsvs.exe"
+                CMDLINE = "{} -A 180 -D 325 {}".format(SVSEXE, SvsFilename)
+                print(CMDLINE)
+                os.system(CMDLINE)
+                #for S in SVS.Data.Stand.keys():
+                #    Trees = SVS.Data.Stand[S].Tree.keys()
+                #    print("Trees.keys()={}".format(SVS.Data.Stand[S].Tree.keys()))
+                #    #YMin = 9999
+                #    #YMax = 0
+                #    #for T in Trees:
+                #    #    Years = SVS.Data.Stand[S].Tree[T].Year.keys()
+                #    #    for Y in Years:
+                #    #        if( Y < YMin ): YMin = Y
+                #    #        if( Y > YMax ): YMax = Y
+                #    #    Years = range( YMin, YMax+1, 5 )
+                #    #    for Y in Years:
+                #    #        #SvsFilename = "Potex_016_{}.svs".format(Y)
+                #    #        #SVS.SVF = open( SvsFilename, 'w' )
+                #    #        #print( "Creating {}".format(SvsFilename))
+                    #        #SVS.SVS_Write_Header()
+                    #        Trees2 = SVS.Data.Stand[S].Tree.keys()
+                    #        for T2 in Trees2:
+                    #            print( "{},{},{}".format(S,Y,T2))
+                    #        #    if( not SVS.Data.Stand[S].Tree.has_key(T) ): continue
+                    #        #    if( not SVS.Data.Stand[S].Tree[T].has_key(Y) ): continue
+                    #        #    (Species, DBH, Ht, TPA, TreeNo, Live, CClass, Status) = ( SVS.Data.Stand[S].Tree[T].Species, SVS.Data.Stand[S].Tree[T].Year[Y].DBH,
+                    #        #        SVS.Data.Stand[S].Tree[T].Year[Y].Height, SVS.Data.Stand[S].Tree[T].Year[Y].TPA, SVS.Data.Stand[S].Tree[T].Year[Y].TreeNumber,
+                    #        #        SVS.Data.Stand[S].Tree[T].Year[Y].Live, SVS.Data.Stand[S].Tree[T].Year[Y].Condition, SVS.Data.Stand[S].Tree[T].Year[Y].Status )
+                    #        #    print( "{},{},{},{},{},{},{},{}".format(Species,DBH,Ht,TPA,TreeNo,Live,CClass,Status) )
+
+
             #print 'DataSet = %s' % (DataSet)
             #SVS = StandViz( DataSet )                 # create class/dataset for input file
 
@@ -335,6 +314,108 @@ def StandViz_ReportError( errorobj, args, Header = None ):              # error 
     ERRFILE.write( "Calling Argument Vector: {}\n".format(args) )       # write calling arguments
     ERRFILE.close()                                                     # close text file with error stack trace
     os.system( "notepad.exe {}".format(errorfilename) )                 # display error log file with notepad.exe
+
+def Audit_rSVS_Species_File():
+    print( "Performing audit of rSVS_Species.csv file" )
+    SppXlsFile = "{}/rSVS_Species.xlsx".format(os.path.realpath("{}/bin".format(os.path.split(ScriptPath)[0])))
+    print(SppXlsFile)
+    SPPXLS = pd.ExcelFile( SppXlsFile )
+    SPP = SPPXLS.parse( 'rSVS_Species' )                                                    # get species list from rSVS_Species sheet
+    print( "Read {} lines from {}".format(len(SPP.index), SppXlsFile) )
+    DUP = {'FIA':{}, 'NRCS':{}}
+    (nMissF, nMissN, nMissG, nMissS, nMissC) = (0, 0, 0, 0, 0)          # set missing counters
+    (nDupF, nDupN) = (0,0)                                              # set duplicate counters
+    for S in SPP.itertuples():                                          # loop across rows in file
+        (FIA, NRCS, Genus, Species, Common, Comment, NRCSTRF, FVSVar, FVSSpp) = (S.FIA, S.NRCS, S.Genus, S.Species, S.Common, S.Comment, S._7, S._8, S.SpCode)
+        if( pd.isna(FIA) ): nMissF += 1                                 # FIA # missing
+        else:
+            FIA = int(FIA)                                              # have FIA, convert to integer
+            if( not FIA in DUP['FIA'] ): DUP['FIA'][FIA] = 1            # if not seen before, store number
+            else:                                                       # else already have, duplicate
+                print( "Duplicate FIA #{}".format(FIA) )                # output message
+                nDupF += 1                                              # increment duplicate counter for FIA
+        if( pd.isna(NRCS) ): nMissN += 1                                # NRCS code missing
+        else:
+            if( not NRCS in DUP['NRCS'] ): DUP['NRCS'][NRCS] = 1        # if not seen before, store code
+            else:                                                       # else already have, duplicate
+                print( "Duplcate NRCS code: {}".format(NRCS) )          # output message
+                nDupN += 1                                              # increment duplicate counter for NRCS
+        if( pd.isna(Genus) ): nMissG += 1                               # Genus missing
+        if( pd.isna(Species) ): nMissS += 1                             # Species missing
+        if( pd.isna(Common) ): nMissC += 1                              # Common name missing
+        #print( "{}, {}, {} {}, {}, {}, {}, {}, {}".format(FIA, NRCS, Genus, Species, Common, Comment, NRCSTRF, FVSVar, FVSSpp) )
+    print( "Total Species {}: ".format( len(SPP.index) ) )              # output audit
+    print( "    FIA: Have {}, Missing {}, Dup {}".format( len(DUP['FIA'].keys()), nMissF, nDupF) )
+    print( "    NRCS Have {}, Missing {}, Dup {}".format( len(DUP['NRCS'].keys()), nMissN, nDupN ) )
+    print( "    Genus (Missing {}), Species (Missing  {}), Common (Missing {})".format( nMissG, nMissS, nMissC) )
+    #os.chdir( OriginalWindowsPath )
+
+def Compare_TreeForm_To_rSVS_Species( SppCodes ):
+    print( "Performing audit of {}.trf against rSVS_Species.csv".format(SppCodes) )
+    SppXlsFile = "../bin/rSVS_Species.xlsx"                             # set path to rSVS_Species.xlsx
+    SPPXLS = pd.ExcelFile( SppXlsFile )                                 # open excel file
+    SPP = SPPXLS.parse( 'rSVS_Species' )                                # parse rSVS_Species worksheet
+    print( "Read {} lines from {}".format(len(SPP.index), SppXlsFile) ) # output message
+    TreeFormFile = "../bin/SVS/{}.trf".format(SppCodes)                 # make path to appropriate TreeForm file
+    # should test for existance of file
+    (SpecialForm, SppForm) = SVS_LoadTreeFormFile( TreeFormFile )       # load TreeFormFile
+    print( "Read {} lines from {}".format(len(SppForm.keys()), TreeFormFile) )  # output status message
+    AUDIT = {}                                                          # create dictionary to compare
+    for S in SPP.itertuples():                                          # loop across rows in spreadsheet (rSVS_Species)
+        (FIA, NRCS, Genus, Species) = (S.FIA, S.NRCS, S.Genus, S.Species)   # get columns of interest
+        if( SppCodes == 'NRCS' ):                                       # if NRCS
+            if( not NRCS in AUDIT ): AUDIT[NRCS] = 1
+        elif( SppCodes == 'FIA' ):                                      # if FIA
+            if( pd.isna(FIA) ): continue                                # if missing, skip
+            else: FIA = "{}".format(int(FIA))
+            if( not FIA in AUDIT ): AUDIT[FIA] = 1
+    #print(sorted(AUDIT.keys()))
+    (Have, Missing) = (0, 0)                                            # initialize counters
+    for S in sorted(SppForm.keys()):                                    # loop across TreeForms
+        #print("'{}'".format(S))
+        if( not S in AUDIT ): Missing += 1
+        else: Have += 1
+    print( "{}: Has {}, Missing {}".format(TreeFormFile, Have, len(SPP.index)-Have) )   # report results
+
+def Create_FIA_TreeForm_File():
+    print( "Creating FIA.trf..." )
+    #SppFile = "../bin/rSVS_Species.csv"
+    #SPP = pd.read_csv( SppFile )
+    SppXlsFile = "../bin/rSVS_Species.xlsx"
+    SPPXLS = pd.ExcelFile( SppXlsFile )
+    SPP = SPPXLS.parse( 'rSVS_Species' )                                                    # get tree records from Blackrock worksheet
+    print( "Read {} lines from {}".format(len(SPP.index), SppXlsFile) )
+    TRANSLATE = {}
+    for S in SPP.itertuples():
+        TRANSLATE[S.NRCS] = S.FIA
+    TreeFormFile = "../bin/SVS/{}.trf".format('NRCS')
+    (SpecialForm, SppForm) = SVS_LoadTreeFormFile( TreeFormFile )
+    FIAForm = {}
+    print( "Read {} lines from {}".format(len(SppForm.keys()), TreeFormFile) )
+    # loop through SppForm.keys() and change species to FIA # from SPP
+    for S in sorted(SppForm.keys()):
+        if( not S in TRANSLATE ): print( "No FIA # for {}, skipping.".format(S) )
+        else: 
+            #print("Need to translate {} to {}".format(S,int(TRANSLATE[S])))
+            FIAForm[int(TRANSLATE[S])] = SppForm[S]
+            #input(FIAForm[int(TRANSLATE[S])])
+    NewTreeFormFile = '../bin/SVS/FIA.trf'
+    SVS_Write_TreeFormFile( NewTreeFormFile, SpecialForm, FIAForm )
+
+def Determine_CSV_Format( FileName ):
+    FileType = 'Unknown'
+    # first make sure file exists
+    if( os.path.exists( FileName ) ):
+        print( "{} exists".format(FileName) )
+        F = pd.read_csv( FileName )                                             # read with pd.read_csv()
+        #print( list(F.columns) )                                                # print column names
+        if( 'Tree_PosTex1' in F.columns ): FileType = 'PosTex'
+        elif( 'Year/Age' in F.columns ):
+            if( 'RootWad' in F.columns ): FileType = 'StandVizExtended'
+            else: FileType = 'StandViz'
+    else:
+        print( "{} does not exist!".format(FileName) )
+    return( FileType )
 
 # create SVSTreeForm class and move the SVS_LoadTreeFormFile(), SVS_Write_TreeFormFile(), SVS_WriteHeader() and other appropriate functions into class
 def SVS_LoadTreeFormFile( TreeFormFile ):
@@ -446,9 +527,8 @@ class MeasurementData:
     # D.STand['StandName'].Plot[0] = PlotData( 0, Size=1.0 )
     #D.Stand['StandName'].Plot[0].Tree[1] = TreeData( Species, TreeNumber, X, Y )
     #D.Stand['StandName'].Plot[0].Tree[1].Year[1] = (DBH, Height, CrownRatio, TPA, Live, Status, Condition, ... )
-    def __init__( self, DBH=None, Height=None, CrownRatio=None, TPA=None, Live=None, Status=None,
-                  Condition=None, Bearing=None, BrokenHeight=None, BrokenOffset=None,
-                  CrownRadius=None, DMR=None, LeanAngle=None, RootWad=None ):
+    def __init__( self, DBH=None, Height=None, CrownRatio=None, TPA=None, Live=None, Status=None, Condition=None,
+                  Bearing=None, BrokenHeight=None, BrokenOffset=None, CrownRadius=None, DMR=None, LeanAngle=None, RootWad=None ):
         self.DBH = DBH                      # Diameter at Breat Height
         self.Height = Height                # Height
         self.CrownRatio = CrownRatio        # Crown Ratio
@@ -469,6 +549,8 @@ class MeasurementData:
         self.LeanAngle = LeanAngle          # Angle tree leaning (not implemented yet)
         self.RootWad = RootWad              # Radius of root wad
 
+#########################################################################################
+# The TreeData class hold tree information (what does not change) and a dictionary of MeasurementData by year/age (changes with time)
 class TreeData:
     """class for holding tree information"""
     # D = ForestData( 'Forest' )
@@ -525,7 +607,27 @@ class ForestData:
 #         for t in D.Stand[s].Plot[p].Tree.keys()
 #             (Spp, Dbh, Ht, Cr, TPA) = D.Stand[s].Plot[p].Tree[t]
 
+class SVS_TreeForm:
+    """class to abstract and provide interface to SVS treeform files"""
+    def __init__( self ):
+        '''Initialze SVS_TreeForm class'''
+        pass
+
+    def __del__( self):
+        '''Destrop SVS_TreeForm class'''
+        pass
+
 class SVS:
+    '''Class to abstract Stand Visualization System (SVS) files'''
+    def __init__( self ):
+        '''Contructor/Initialize SVS class'''
+        pass
+
+    def __del__( self ):
+        '''Destructor for SVS class'''
+        pass
+
+class StandViz:
     """class to handle interface to Stand Visualization System (SVS)"""
     def __init__( self, DataSetName ):
         self.ResolutionLow = '1024x768'
@@ -627,6 +729,11 @@ class SVS:
                     self.SVF.write( '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s\n' % \
                                (s, y, t, treeno, species, dbh, ht, live, status, cclass, tpa ) )
         self.SVF.close()
+
+    def Determin_Excel_Format( self, ExcelFileName ):
+        # determine if StandViz, StandVizExtended, OTIS, or other
+        pass
+    
 
     def Excel_Load_Data( self, ExcelFilename ):
         """Load tree records from Excel file"""
@@ -1121,8 +1228,8 @@ class SVS:
         #self.SVF.write( '#TREEFORM PLANTS-SvAddin.trf\n' )
         #self.SVF.write( '#PALETTE %s\SvsAddin\TIR-BLUE.pal\n' % (OWNPATH) )
         #self.SVF.write( '#TREEFORM %s\SvsAddin\TIR-SvAddin.trf\n' % (OWNPATH) )
-        self.SVF.write( '#PALETTE TIR-BLUE.pal\n' )
-        self.SVF.write( '#TREEFORM TIR-SvAddin.trf\n' )
+        #self.SVF.write( '#PALETTE TIR-BLUE.pal\n' )
+        self.SVF.write( '#TREEFORM inst\\bin\\SVS\\NRCS.trf\n' )
         self.SVF.write( ';              |                                                           Crown       Crown       Crown       Crown\n' )
         self.SVF.write( ';              |    Plant        Class   Tree                            end  RadiusRatio RadiusRatio RadiusRatio ' )
         self.SVF.write( 'RadiusRatio' )

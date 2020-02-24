@@ -1,4 +1,4 @@
-Stand,Year/Age,Species,TreeNo,Live/Dead,TreeStat,CrwnClass,DBH,Height,CRadius1,CRatio1,TPA,X,Y
+Stand,Year/Age,Species,TreeNo,Live/Dead,TreeStat,CrwnClass,DBH,Height,Cradius,Cratio,TPA,X,Y
 SouthernPine,2000,PITA,100,0,1,1,12,60,7.5,0.45,1,190.67,42.36
 SouthernPine,2000,PITA,101,0,1,1,12,60,7.5,0.45,1,206.6,18.56
 SouthernPine,2000,PITA,102,0,1,1,12,60,7.5,0.45,1,22.53,0.22
