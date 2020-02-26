@@ -86,16 +86,17 @@ def main():     # implement __main__ scope for handling of command line executio
 
         OriginalWindowsPath = os.getcwd()
         ScriptPath = _MyPath
+        if( ScriptPath == '' ): ScriptPath = OriginalWindowsPath
         if( DEBUG ): print( "OriginalPath={}, ScriptPath={}, os.path.realpath()={}".format(OriginalWindowsPath, ScriptPath, os.path.realpath(ScriptPath)) )
 
         #os.chdir( ScriptPath )
 
         if( SOPT.A ):
-            Audit_rSVS_Species_File()
+            Audit_rSVS_Species_File(ScriptPath)
             sys.exit( "audited rSVS_Species.csv" )
 
         if( SOPT.C ):                                           # Compare TreeForm file against rSVS_Species.csv
-            Compare_TreeForm_To_rSVS_Species( SOPT.A[0] )       # pass TreeForm file basename to function
+            Compare_TreeForm_To_rSVS_Species( SOPT.C[0], SOPT.v )       # pass TreeForm file basename to function
             sys.exit("performed audit")
 
         if( SOPT.F ):       # create FIA.trf from NCRS.trf
@@ -311,9 +312,10 @@ def StandViz_ReportError( errorobj, args, Header = None ):              # error 
     ERRFILE.close()                                                     # close text file with error stack trace
     os.system( "notepad.exe {}".format(errorfilename) )                 # display error log file with notepad.exe
 
-def Audit_rSVS_Species_File():
+def Audit_rSVS_Species_File( ScriptPath ):
     print( "Performing audit of rSVS_Species.csv file" )
     SppXlsFile = "{}/rSVS_Species.xlsx".format(os.path.realpath("{}/bin".format(os.path.split(ScriptPath)[0])))
+    print( "ScriptPath={}, SppXlsFile={}".format(ScriptPath,SppXlsFile) )
     print(SppXlsFile)
     SPPXLS = pd.ExcelFile( SppXlsFile )
     SPP = SPPXLS.parse( 'rSVS_Species' )                                                    # get species list from rSVS_Species sheet
@@ -346,7 +348,7 @@ def Audit_rSVS_Species_File():
     print( "    Genus (Missing {}), Species (Missing  {}), Common (Missing {})".format( nMissG, nMissS, nMissC) )
     #os.chdir( OriginalWindowsPath )
 
-def Compare_TreeForm_To_rSVS_Species( SppCodes ):
+def Compare_TreeForm_To_rSVS_Species( SppCodes, Verbose=False ):
     print( "Performing audit of {}.trf against rSVS_Species.csv".format(SppCodes) )
     SppXlsFile = "../bin/rSVS_Species.xlsx"                             # set path to rSVS_Species.xlsx
     SPPXLS = pd.ExcelFile( SppXlsFile )                                 # open excel file
@@ -354,8 +356,9 @@ def Compare_TreeForm_To_rSVS_Species( SppCodes ):
     print( "Read {} lines from {}".format(len(SPP.index), SppXlsFile) ) # output message
     TreeFormFile = "../bin/SVS/{}.trf".format(SppCodes)                 # make path to appropriate TreeForm file
     # should test for existance of file
-    (SpecialForm, SppForm) = SVS_LoadTreeFormFile( TreeFormFile )       # load TreeFormFile
-    print( "Read {} lines from {}".format(len(SppForm.keys()), TreeFormFile) )  # output status message
+    SVSTF = SVS_TreeForm()
+    (SpecialForm, SppForm) = SVSTF.SVS_LoadTreeFormFile( TreeFormFile )       # load TreeFormFile
+    print( "Read {} species and {} species treeforms from {}".format(len(SppForm.keys()), len(SpecialForm.keys()), TreeFormFile) )  # output status message
     AUDIT = {}                                                          # create dictionary to compare
     for S in SPP.itertuples():                                          # loop across rows in spreadsheet (rSVS_Species)
         (FIA, NRCS, Genus, Species) = (S.FIA, S.NRCS, S.Genus, S.Species)   # get columns of interest
@@ -367,10 +370,14 @@ def Compare_TreeForm_To_rSVS_Species( SppCodes ):
             if( not FIA in AUDIT ): AUDIT[FIA] = 1
     #print(sorted(AUDIT.keys()))
     (Have, Missing) = (0, 0)                                            # initialize counters
+    if( Verbose ): print( "Species Codes: " )
     for S in sorted(SppForm.keys()):                                    # loop across TreeForms
         #print("'{}'".format(S))
         if( not S in AUDIT ): Missing += 1
-        else: Have += 1
+        else: 
+            Have += 1
+            if( Verbose ): print( " {}".format(S), end='' )
+    if( Verbose ): print("")
     print( "{}: Has {}, Missing {}".format(TreeFormFile, Have, len(SPP.index)-Have) )   # report results
 
 def Determine_CSV_Format( FileName ):

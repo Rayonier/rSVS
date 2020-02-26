@@ -18,25 +18,40 @@
 #' @name rSVS
 NULL
 
-#' Check SVS environment
+#' Check SVS environment and return path to components
 #'
 #' SVS_Enviroment() checks the package enviroment and alternatively will install a python distribution
 #'
 #' Details go here
 #'
 #' @param Component which part of the enviroment to check, default all
+#' @param Verbose echo status messages as environment is being examined
 #' @return Messasge messages return and echoed on console
 #' @author Jim McCarter \email{jim.mccarter@@rayonier.com}
 #' @examples
-#' SVS_Check()
+#' SVS_Environment( 'Python' )
 #' @export
-SVS_Environment <- function(Component='All') {
+SVS_Environment <- function( Component='All', Verbose=FALSE ) {
     MyComponents <- c( 'SVS', 'Python', 'BMP2PNG', 'Zip' )  # list of components that exist
     if( (Component=='SVS') | (Component=='All') ) {
         if( system.file( "bin/SVS", "winsvs.exe", package="rSVS" ) == "" ) {
             print( "Error in package!  Will not be able to visualize stands." )
-        }
-    } else if( (Component=='Python') | (Component=='All') ) {
+        } else {
+			FILELIST = c('DEFAULT.TRF', 'FIA.TRF', 'fvs2svs.dll', 'fvs2svs.hlp', 'NRCS.TRF', 'org2svs.dll', 'svslib.hlp', 'svslib.ini',
+			             'tbl2svs.dll', 'tbl2svs.exe', 'tbl2svs.hlp', 'winsvs.exe', 'winsvs.hlp', 'winsvs.ini')
+			FileMissing = FALSE
+			for( F in FILELIST ) {
+				FileTest = system.file( "bin/SVS", F, package="rSVS" )
+				#print( FileTest )
+				if( FileTest == "" ) FileMissing = TRUE
+			}
+			if( FileMissing ) print( "One or more files missing from SVS program filder!" )
+			else print( "SVS and support files are available." )
+		}
+	}
+    if( (Component=='Python') | (Component=='All') ) {
+		print('Testing for Python')
+		print( Sys.which("python") )
         if( Sys.which("python") =="" ) {
             print( "no Sys.which('python)'")
             if( system.file("bin","python/python.exe",package="rSVS") == "" ) {
@@ -55,22 +70,28 @@ SVS_Environment <- function(Component='All') {
                 setwd( SaveWD )
             }
         }
-    } else if( (Component=='BMP2PNG') | (Component=='All') ) {
+	}
+    if( (Component=='BMP2PNG') | (Component=='All') ) {
         if( system.file( "bin", "BMP2PNG.EXE", package="rSVS" ) == "" ) {
             print( "Error in package!  Will not be able to convert BMP files to PNG file for web page presentation of visualizations")
-        }
+        } else {
+			print( 'BMP2PNG.EXE, used to convert bitmap files to web friendly PNG graphics files, is available.' )
+		}
 
-    } else if( (Component=='Zip') | (Component=='All') ) {
-        if( system.file("bin","zip.exe",pacakge="rSVS") == "" ) {
+	}
+    if( (Component=='Zip') | (Component=='All') ) {
+        if( system.file( "bin", "zip.exe", package="rSVS" ) == "" ) {
             print( "Error in package!  Will not be able to extract python38.zip if no system defined python exists." )
-        }
+        } else {
+			print( 'Info-Zip zip.exe and unzip.exe are available.' )
+		  }
     }
 }
 #' Demonstrate Stand Visualiztion on several stand types
 #'
-#' Display one of several stand types using example SVS files includes with the package.
+#' Display one of several stand types using example SVS files included with package.
 #'
-#' The list of stand type examples includes:
+#' The list of availabel stand type examples include:
 #' \itemize{
 #'    \item BottomlandHardwood
 #'    \item Douglas-fir
@@ -88,6 +109,7 @@ SVS_Environment <- function(Component='All') {
 #' @examples
 #' SVS_Demo( 'SouthernPine' )
 #' SVS_Demo( 'Douglas-fir' )
+#' SVS_Demo()                   # gives list of possible options
 #' @export
 SVS_Example <- function( Example=NULL ) {
     SavedDir <- getwd()                                                             	# get and save current working directory
@@ -97,34 +119,34 @@ SVS_Example <- function( Example=NULL ) {
         print( paste0( "Please pick from: BottomlandHardwood, Douglas-fir, LodgepolePine, MixedConifer, ",
                        "MontaneOak-Hickory, PacificSilverFir-Hemlock, Redwood, SouthernPine, or Spruce-Fir" ) )
         return('SVS_Demo() exited.')
-    } else if( grepl( 'BottomlandHardwood', Example, ignore.case=TRUE ) ) {            	# check, ignoring case to eliminate some case typos
-        svsfile <- system.file( "bin", "BottomlandHardwood.svs", package="rSVS" )       # get location of SVS file
+    } else if( grepl( 'BottomlandHardwood', Example, ignore.case=TRUE ) ) {            	# check, ignoring case to eliminate typos or case
+        svsfile <- system.file( "extdata", "BottomlandHardwood.svs", package="rSVS" )   # get location of SVS file
     } else if( grepl( 'Douglas-fir', Example, ignore.case=TRUE ) ) {
-        svsfile <- system.file( "bin", "Douglas-fir.svs", package="rSVS" )
+        svsfile <- system.file( "extdata", "Douglas-fir.svs", package="rSVS" )
     } else if( grepl( 'LodgepolePine', Example, ignore.case=TRUE ) ) {
-        svsfile <- system.file( "bin", "LodgepolePine.svs", package="rSVS" )
+        svsfile <- system.file( "extdata", "LodgepolePine.svs", package="rSVS" )
     } else if( grepl( 'MixedConifer', Example, ignore.case=TRUE ) ) {
-        svsfile <- system.file( "bin", "MixedConifer.svs", package="rSVS" )
+        svsfile <- system.file( "extdata", "MixedConifer.svs", package="rSVS" )
     } else if( grepl( 'MontaneOak-Hickory', Example, ignore.case=TRUE ) ) {
-        svsfile <- system.file( "bin", "MontaneOak-Hickory.svs", package="rSVS" )
+        svsfile <- system.file( "extdata", "MontaneOak-Hickory.svs", package="rSVS" )
     } else if( grepl( 'PacificSilverFir-Hemlock', Example, ignore.case=TRUE ) ) {
-        svsfile <- system.file( "bin", "PacificSilverFir-Hemlock.svs", package="rSVS" )
+        svsfile <- system.file( "extdata", "PacificSilverFir-Hemlock.svs", package="rSVS" )
     } else if( grepl( 'Redwood', Example, ignore.case=TRUE ) ) {
-        svsfile <- system.file( "bin", "Redwood.svs", package="rSVS" )
+        svsfile <- system.file( "extdata", "Redwood.svs", package="rSVS" )
     } else if( grepl( 'SouthernPine', Example, ignore.case=TRUE ) ) {
-        svsfile <- system.file( "bin", "SouthernPine.svs", package="rSVS" )
+        svsfile <- system.file( "extdata", "SouthernPine.svs", package="rSVS" )
     } else if( grepl( 'Spruce-Fir', Example, ignore.case=TRUE ) ) {
-        svsfile <- system.file( "bin", "Spruce-Fir.svs", package="rSVS" )
+        svsfile <- system.file( "extdata", "Spruce-Fir.svs", package="rSVS" )
     } else {                                                                        	# example file not found, print message and return
         print( paste0( "Unknown demo file: '", Example,"'. Please pick from: BottomlandHardwood, Douglas-fir, LodgepolePine, ",
                        "MixedConifer, MontaneOak-Hickory, PacificSilverFir-Hemlock, Redwood, SouthernPine, or Spruce-Fir" ) )
-        return('SVS_Demo() exited.')
+        return('SVS_Example() exited.')
     }
     cmdline <- paste0( svsexe, " ", svsfile )                                       	# create command line
     #print( cmdline )
     system( cmdline, invisible=FALSE )                                              	# spawn SVS program to display file
     setwd( SavedDir )                                                               	# restore working directory to original
-    return( 'SVS existed.' )
+    return( 'SVS_Example() existed.' )
 }
 
 #' Visualize stand using the Stand Visualization System (SVS)
@@ -205,13 +227,17 @@ SVS <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, ro
 #' this is not guaranteed.
 #'
 #' The rSVS package supports FIA number and NRCS alphabetic codes.  The displayed table will include FIA, NRCS, Genus,
-#' Species, Common, and Comment columns.
+#' Species, Common, and Comment, NRCS.trf, FVS columns.
 #'
 #' @return DataFrame with species names and codes
 #' @examples
-#' SVS_Species()
-#' head(SVS_Species())
-#' length(SVS_Species()$FIA)
+#' Species <- SVS_Species()            # store species list to Species
+#' names(SVS_Species)                  # column names in returned species list
+#' head(SVS_Species())                 # first 6 species records
+#' length(SVS_Species()$FIA)           # number of species records
+#' length(unique(SVS_Species()$FIA))   # number of FIA # known
+#' sort(unique(SVS_Species()$FIA))     # list of FIA #'s known
+#' length(unique(SVS_Species()$NRCS))  # number of NRCS codes known
 #' @export
 SVS_Species <- function() {
     Species <- read.csv( system.file( "bin", "rSVS_Species.csv", package="rSVS" ) )     # read rSVS_Species.csv

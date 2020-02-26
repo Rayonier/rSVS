@@ -19,10 +19,14 @@ NRCS2FIA() funtions.  The file should be syncronized with the FIA.TFM and NRCS.T
 this is not guaranteed.
 
 The rSVS package supports FIA number and NRCS alphabetic codes.  The displayed table will include FIA, NRCS, Genus,
-Species, Common, and Comment columns.
+Species, Common, and Comment, NRCS.trf, FVS columns.
 }
 \examples{
-SVS_Species()
-head(SVS_Species())
-length(SVS_Species()$FIA)
+Species <- SVS_Species()            # store species list to Species
+names(SVS_Species)                  # column names in returned species list
+head(SVS_Species())                 # first 6 species records
+length(SVS_Species()$FIA)           # number of species records
+length(unique(SVS_Species()$FIA))   # number of FIA # known
+sort(unique(SVS_Species()$FIA))     # list of FIA #'s known
+length(unique(SVS_Species()$NRCS))  # number of NRCS codes known
 }
