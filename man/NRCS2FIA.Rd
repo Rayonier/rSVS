@@ -15,3 +15,6 @@ Details
 \examples{
 NRCS2FIA( MyData )
 }
+\author{
+Jim McCarter \email{jim.mccarter@rayonier.com}
+}

@@ -4,24 +4,44 @@
 \alias{SVS_Environment}
 \title{Check SVS environment and return path to components}
 \usage{
-SVS_Environment(Component = "All", Verbose = FALSE)
+SVS_Environment(component = "all", verbose = FALSE, debug = FALSE)
 }
 \arguments{
-\item{Component}{which part of the enviroment to check, default all}
+\item{component}{which part of the enviroment to check, default all}
 
-\item{Verbose}{echo status messages as environment is being examined}
+\item{verbose}{echo status messages as environment is being examined}
+
+\item{debug}{toggle to turn on extra output while function is running}
 }
 \value{
-Messasge messages return and echoed on console
+path path to individual component returned and messages printed on console
 }
 \description{
 SVS_Enviroment() checks the package enviroment and alternatively will install a python distribution
 }
 \details{
-Details go here
+Possible package components to investigate include:
+\itemize{
+  \item All
+  \item SVS
+  \item Python
+  \item BMP2PNG
+  \item Zip
+}
+
+When testing for one component the path to the relavant executable will be returned. When testing
+for All paths to each component will be provided.
+
+When testing for Python the function will first test to see if a copy of Python is available on
+the PATH. If there is not a system wide copy of Python available the function will check for a
+package #' internal copy. The first time SVS_Environment('Python') is run, the user will be
+prompted to allow the unzipping of the required python files (the package includes a zipped copy of
+Python 3.8 that can be installed into the package). Subsequent calls to SVS_Enviroment('Python')
+will located the "python.exe" in the package and return that path.
 }
 \examples{
-SVS_Environment( 'Python' )
+SVS_Environment( 'python' )  # investigate Python environment for running backend code
+SVS_Environment( 'svs' )     # make sure all SVS components are available to run program
 }
 \author{
 Jim McCarter \email{jim.mccarter@rayonier.com}

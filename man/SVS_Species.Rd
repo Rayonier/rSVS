@@ -2,7 +2,7 @@
 % Please edit documentation in R/rSVS.R
 \name{SVS_Species}
 \alias{SVS_Species}
-\title{List known species codes}
+\title{List species codes}
 \usage{
 SVS_Species()
 }
@@ -14,12 +14,21 @@ List known species codes.
 }
 \details{
 This function simply reads and returns the list of known species codes distributed with the rSVS
-package (rSVS_Species.csv). This file is also used as the basis for species translation by the FIA2NRCS() and
-NRCS2FIA() funtions.  The file should be syncronized with the FIA.TFM and NRCS.TFM files, but
-this is not guaranteed.
+package (rSVS_Species.csv). This file is also used as the basis for species translation by the
+FIA2NRCS() and #' NRCS2FIA() funtions.
 
-The rSVS package supports FIA number and NRCS alphabetic codes.  The displayed table will include FIA, NRCS, Genus,
-Species, Common, and Comment, NRCS.trf, FVS columns.
+The rSVS package supports FIA number and NRCS alphabetic codes. The displayed table will include
+FIA, NRCS, Genus, Species, Common, and Comment, FIA.trf, NRCS.trf, FVS.trf, FVSSpCode, FVS.East,
+and FVS.West.
+
+The FIA.trf and NRCS.trf columns should list the species that currently exist in each SVS tree
+form file (NOTE: this species list should be synchronized with FIA.trf and NRCS.trf, but this is
+not guaranteed).
+
+The FVS.trf, FVSSpCode, FVS.East, and FVS.West columns are used for species audits and keeping
+track of the source of tree form definitions (largely from FIA variant tree form files from the
+original SVS distribution) before the tree form definitions were exanded to handle more live and
+dead classes.
 }
 \examples{
 Species <- SVS_Species()            # store species list to Species

@@ -17,4 +17,10 @@ The package includes the following functions:
     \item FIA2NRCS()        - convert species codes from FIA # to NRCS code
     \item NRCS2FIA()        - convert species codes from NRCS code to FIA #
 }
+
+This package includes a number of executable programs that will be run as part of the package.
+This limits where the package can be hosted (e.g not on CRAN).
+
+NOTE: SVS is a Windows only program, therefor limiting this package to only work on Windows
+computers.
 }
