@@ -4,7 +4,7 @@
 \alias{FIA2NRCS}
 \title{Convert species codes from FIA number to NRCS code}
 \usage{
-FIA2NRCS(DataFrame)
+FIA2NRCS(Data)
 }
 \arguments{
 \item{MyData}{DataFrame with tree information}

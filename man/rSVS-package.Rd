@@ -5,7 +5,7 @@
 \alias{rSVS-package}
 \title{A package for stand level visualization using the Stand Visualization System (SVS, Robert J. McGaughey, USDA Forest Service, PNW Research Station).}
 \description{
-This rSVS package provides and interface to perform SVS visualiations from R.
+This rSVS package provides an interface to perform SVS visualiations from R.
 }
 \details{
 The package includes the following functions:
@@ -20,42 +20,46 @@ The package includes the following functions:
     \item NRCS2FIA()        - convert species codes from NRCS code to FIA #
 }
 
-The SVS() function supports multple data format types, including:
+The package supports either species identified by FIA # or NRCS Plants Database code. The default 
+behavior can be configured by setting either the .UseFIA or .UseNRCS hidden variables to TRUE. 
+NOTE: Depending on the source data, setting the incorrect treeform file will cause trees to be 
+displayed as an Unknown tree species (e.g. red) 
 
+The SVS() function supports multple data format types, including:
 \itemize{
-    \item FMD data frame - list of header, measurement, and treelist slots
-    \item LMS Object - list of stand, measurement, and treelist slots
-    \item StandObject - list of header, treelist, and management slots
-    \item SVScsv - data frame or .csv file containing: Species, PlantID, PlntClass, CrwnClass, TreeStat, DBH, Height, LAng, FAng, EndDia, CRad1, CRat1,
+    \item FMD data frame - a list with header, measurement, and treelist slots
+    \item LMS Object - a list with stand, measurement, and treelist slots
+    \item StandObject - a list with header, treelist, and management slots
+    \item SVScsv - a data frame or .csv file containing: Species, PlantID, PlntClass, CrwnClass, TreeStat, DBH, Height, LAng, FAng, EndDia, CRad1, CRat1,
                    CRad2, CRat2, CRad3, CRat3, CRad4, CRat4, TPA, MarkCode, X, Y, Z
-    \item StandViz - data frame or .csv file containing: Stand, Year/Age, Species, TreeNo, Live/Dead, Status, Condition, DBH, Height, CrownRatio, CrownRadius, TPA
-    \item StandVizExtended - data frame or .csv file containing: Stand, Year/Age, Species, TreeNo, Live/Dead, Status, Condition, DBH, Height, CrownRatio,
+    \item StandViz - a data frame or .csv file containing: Stand, Year/Age, Species, TreeNo, Live/Dead, Status, Condition, DBH, Height, CrownRatio, CrownRadius, TPA
+    \item StandVizExtended - a data frame or .csv file containing: Stand, Year/Age, Species, TreeNo, Live/Dead, Status, Condition, DBH, Height, CrownRatio,
                              CrownRadius, TPA, BrokenHt, Offset, Bearing, Lean, RootWad, X, Y
-    \item TBL2SVS data frame - data frame or .csv file containing: Species, DBH, Height, CrownRatio, CrownRadius, Status, PlantClass, CrownClass, TPA
+    \item TBL2SVS data frame - a data frame or .csv file containing: Species, DBH, Height, CrownRatio, CrownRadius, Status, PlantClass, CrownClass, TPA
 }
 
-FMD data frame:
+FMD data frame details:
 
 A FMD data frame contains PlotName in column 3, TreeNo, Species, MeasDate, MeasAge in columns 9-12, and Status, Condition, Damage,
 Screen, DBH, Height, CrownRatio in columns 14-21.
 
-LMS object:
+LMS object details:
 
 A LMS object is a list with $stand, $measurement, and $treelist slots.  The $stand slot must contain $STANDNAME, the $measurement must
 contain $MEASDATA where year can be extracted from the first 4 character positions.  The $treelist slot must contain tree, species,
 tpa, dbh, height, and cr columns in that order.
 
-StandObject:
+StandObject details:
 
 A StandObject is a list that contains at a minimum $header and #treelist slots.  The $header slot must contain $standid and
 $ysp (years since planting) fields.  The $treelist slopt must contain treeid, species, tpa, dbh, height, and cr columns in
 that order.
 
-StandViz:
+StandViz details:
 
 A data frame or .csv file containing: Stand, Year/Age, Species, TreeNo, Live/Dead, Status, Condition, DBH, Height, CrownRatio, CrownRadius, TPA
 
-StandVizExtended:
+StandVizExtended details:
 
 A data frame or .csv file containing: Stand, Year/Age, Species, TreeNo, Live/Dead, Status, Condition, DBH, Height, CrownRatio, CrownRadius, TPA,
 BrokenHt, Offset, Bearing, Lean, RootWad, X, Y.
@@ -64,7 +68,7 @@ This format can be used for visualizing mapped stand data and supports a variety
 forest health conditions, including broken trees (BrokenHt, Offset, Bearing), dead top trees(Condition, BrokenHt), blown down trees (RootWad).
 If TPA > 1 then coordinates are generated for the stand.  To provide a mapped stand all TPA values must be 1.0 and X,Y locations filled in.
 
-TBL2SVS:
+TBL2SVS details:
 
 A data frame or .csv file containing: Species, DBH, Height, CrownRatio, CrownRadius, Status, PlantClass, CrownClass, TPA [, X, Y, MarkCode, FAng, SDia]
 
@@ -76,14 +80,30 @@ Status Codes:
   \tab 3 or 13 \tab plant is cut, has no branches, on ground \cr
 }
 
-This package includes a number of executable programs that will be run as part of the package.
-This limits where the package can be hosted (e.g NOT on CRAN).
+The following example input files are provided:
+\tabular{lcl}{
+  - BottomlandHardwood.svs   \tab - \tab SVS format file of mixed bottomland hardwood from southeast \cr
+  - Douglas-fir.svs          \tab - \tab SVS format file of Douglas-fir from Pacfic Northwest \cr
+  - LodgepolePine.svs        \tab - \tab SVS format file of Lodgepole pine from Rocky Mountains \cr
+  - MixedConifer.svs         \tab - \tab SVS format file of Mixed conifer stand from California \cr
+  - MontaneOak-Hickory.svs   \tab - \tab SVS format file of Oak/Hickory forest \cr
+  - SilverFir-Hemlock.svs    \tab - \tab SVS format file of Pacific silver fir/hemlock stand from Pacfic Northest \cr
+  - Redwood.svs              \tab - \tab SVS format file of Redwood stand from Calinornia \cr
+  - SouthernPine.svs         \tab - \tab SVS format file of Southern pine stand from southeast \cr
+  - SouthernPine.csv         \tab - \tab Same as above, but in SVScsv format \cr
+  - SouthernPine2.csv        \tab - \tab Abreviated version of SouthernPine without 4 crown dimensions, but including X,Y coordinates \cr
+  - SouthernPine3.csv        \tab - \tab Abreviated version of SouthernPine without X, Y coordinates \cr
+  - Spruce-Fir.csv           \tab - \tab SVS format file of Spruce/Fir from Rocky Mountains \cr
+}
+
+NOTE: This package includes a number of executable programs that will be run as part of the package,
+limiting where the package can be hosted (e.g NOT on CRAN).
 
 The package understands a number of data formats and can create visualizaions for single or multiple
 stands and years based on what information is contained in the specific data format. Files for
 visualzations are created in the svsfiles folder in the current working directory for R. These
 temporary files (*.asc, *.bmp, *.csv, *.png, *.SVS, *.opt) are intermediate files used for creating
-the visualizations. This folder can be cleaned out using the \strong{clean_svsfiles()} function.
+the visualizations. This folder can be cleaned out using the \strong{svsfiles_clean()} function.
 
 NOTE: SVS is a Windows only program, therefor limiting this package to only work on Windows
 computers.

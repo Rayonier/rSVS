@@ -5,7 +5,7 @@
 \title{Create SVS example data}
 \usage{
 SVS_ExampleData(
-  datatype = NULL,
+  datatype = "TBL2SVS",
   species,
   dbh,
   tpa,
@@ -54,7 +54,8 @@ This function will return data data frame in one of the following formats:
 }
 }
 \examples{
-SV <- SVS_ExampleData( datatype='StandViz', species=c(202,263), tpa=c(300,275) )
+SV <- SVS_ExampleData( species=c(202,263), tpa=c(300,275), dbh=c(7.8,4.7) )
+SVS_ExampleData( datatype=NULL )     # force function to return known data types
 }
 \author{
 James McCarter \email{jim.mccarter@rayonier.com}

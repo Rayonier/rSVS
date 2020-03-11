@@ -70,9 +70,10 @@ def main():     # implement __main__ scope for handling of command line executio
         SARGG.add_argument( "-t", action="store_true", help="Test and debugging option" )
 
         SARGT = SARG.add_argument_group( "Treeform arguments" )
+        SARGT.add_argument( "-A", action="store_true", help="Audit rSVS_Species.csv file" )
         SARGT.add_argument( "-C", action="store", nargs=1, metavar="TRFile", help="Compare treeform file versus rSVS_Species.xlsx" )
         SARGT.add_argument( "-F", action="store_true", help="create FIA.TRF from NRCS.trf" )
-        SARGT.add_argument( "-A", action="store_true", help="Audit rSVS_Species.csv file" )
+        SARGT.add_argument( "-N", action="store_true", help="Use NRCS treeform file (default FIA)" )
 
 
         SARG.add_argument( "FILELIST", nargs="*", help="Files [File [...]]")
@@ -131,10 +132,11 @@ def main():     # implement __main__ scope for handling of command line executio
             #DataSet = 'None'
             # determine file format from filename provided on command line
             if( re.search( '.svs', filename ) != None ):            # process .svs files, just pass through to winsvs.exe if the file exists
-                SVSEXE = "..\\bin\SVS\winsvs.exe"                   # path to winsvs.exe
-                CMDLINE = "{} {}".format(SVSEXE, FILE)              # build command line
+                #SVSEXE = "..\\bin\SVS\winsvs.exe"                   # path to winsvs.exe
+                CMDLINE = "{} {}".format(SVSPath, FILE)              # build command line
                 if( VERBOSE ): print(CMDLINE)                       # echo command line
                 os.system(CMDLINE)                                  # execute command line
+                return
             elif( re.search( '.csv', filename ) != None ):          # process .csv files
                 DataSet = re.sub( '.csv', '', filename )            # name dataset from base filename
                 FileType = Determine_CSV_Format( FILE )
@@ -149,7 +151,7 @@ def main():     # implement __main__ scope for handling of command line executio
             # TreeSpc: 1=Unforked pine, 2=hardwood, 3=dead tree (pine or hardwood), 4=forked pine
             #if( re.search( 'Postex_016.csv', FILE ) !=None ):
             if( FileType == 'PosTex' ):
-                CsvFileName = "{}".format(FILE )
+                CsvFileName = "{}".format(FILE)
                 print( "Processing {}...".format(CsvFileName))
                 # check that it exists
                 D = pd.read_csv( CsvFileName )
@@ -181,6 +183,7 @@ def main():     # implement __main__ scope for handling of command line executio
                     CW = 10
                     SVS.SVS_Write_Tree_Live( Species, TreeNo, PClass, CClass, Status, DBH, Ht, LAng, Bearing, EDia, CW, CR, TPA, Mark, X,Y, Z)
                 #print("Stand.keys()={}".format(SVS.Data.Stand.keys()))
+                SVS.SVS_Write_Footer()
                 SVSEXE = "inst\\bin\SVS\winsvs.exe"
                 CMDLINE = "{} -A 180 -D 325 {}".format(SVSEXE, SvsFilename)
                 print(CMDLINE)
@@ -216,21 +219,50 @@ def main():     # implement __main__ scope for handling of command line executio
                 print( "{} lines read".format(len(D.index)))
                 OutFilename = "{}/{}.asc".format(dirname,basename)
                 SvsFilename = "{}/{}.svs".format(dirname,basename)
+                OptFilename = "{}/{}.opt".format(dirname,basename)
                 print( "OutFilename={}".format(OutFilename))
                 OUT = open( OutFilename, 'w' )
                 OUT.write( ";species dbh height crat crad status pclass cclass tpa\n")
                 for d in D.itertuples():
                     OUT.write( "{} {} {} {} {} {} {} {} {}\n".format(d.species,d.dbh,d.height,d.cr,d.crad,d.status,d.pc,d.cc,d.tpa))
                 OUT.close()
-                OUT = open("{}/tbl2svs.opt".format(dirname), 'w')
-                OUT.write( "-P1 -N 0 -H 0.33 -T..\inst\\bin\SVS\FIA.trf {} {}".format(OutFilename,SvsFilename) )
+                OUT = open( OptFilename, 'w')
+                if( SOPT.N ): OUT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\SVS\\NRCS.trf {} {}".format(OutFilename,SvsFilename) )
+                else: OUT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\SVS\\FIA.trf {} {}".format(OutFilename,SvsFilename) )
                 OUT.close()
                 #SVS = StandViz( basename )
                 SVSEXE = "inst\\bin\SVS\winsvs.exe"
                 if( not os.path.exists( SVSEXE ) ): print( "This command will fail!: {}".format(SVSEXE))
-                cmdline = "{} -G -X{}/tbl2svs.opt {}".format(SVSEXE,dirname,SvsFilename)
+                cmdline = "{} -G -X{} {}".format(SVSEXE,OptFilename,SvsFilename)
                 print( "cmdline={}".format(cmdline) )
                 os.system(cmdline)
+            elif( FileType == 'StandViz' ):
+                D = pd.read_csv( FILE )
+                print( "{} lines read".format(len(D.index)))
+                OutFilename = "{}/{}.asc".format(dirname,basename)
+                SvsFilename = "{}/{}.svs".format(dirname,basename)
+            elif( FileType == 'TBL2SVSObject' ):
+                print( "visualizing {}".format(FILE))
+                D = pd.read_csv( FILE )
+                print( "{} lines read".format(len(D.index)))
+                OutFilename = "{}/{}.asc".format(dirname,basename)
+                SvsFilename = "{}/{}.svs".format(dirname,basename)
+                OptFilename = "{}/{}.opt".format(dirname,basename)
+                print( "OutFilename={}".format(OutFilename))
+                OUT = open( OutFilename, 'w' )
+                OUT.write( ";species dbh height crat crad status pclass cclass tpa\n")
+                for d in D.itertuples():
+                    OUT.write( "{} {} {} {} {} {} {} {} {}\n".format(d.Species,d.DBH,d.Height,d.CrownRatio,d.CrownRadius,d.Status,d.PlantClass,d.CrownClass,d.TPA))
+                OUT.close()
+                OUT = open( OptFilename, 'w')
+                if( SOPT.N ): OUT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\SVS\\NRCS.trf {} {}".format(OutFilename,SvsFilename) )
+                else: OUT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\SVS\\FIA.trf {} {}".format(OutFilename,SvsFilename) )
+                OUT.close()
+                if( not os.path.exists( SVSPath ) ): print( "This command will fail!: {}".format(SVSEXE))
+                cmdline = "{} -G -X{} {}".format(SVSPath,OptFilename,SvsFilename)
+                print( "cmdline={}".format(cmdline) )
+                os.system(cmdline)
+
             elif( FileType == 'FMDObject' ):
                 print( "Creating FDM visualizations..." )
                 D = pd.read_csv( FILE )     # read .csv file
@@ -451,11 +483,12 @@ def Determine_CSV_Format( FileName ):
         F = pd.read_csv( FileName )                                             # read with pd.read_csv()
         #print( list(F.columns) )                                                # print column names
         if( 'Tree_PosTex1' in F.columns ): FileType = 'PosTex'
-        elif( 'Year/Age' in F.columns ):
+        elif( ('Year/Age' in F.columns) | ('Year.Age' in F.columns) ):
             if( 'RootWad' in F.columns ): FileType = 'StandVizExtended'
             else: FileType = 'StandViz'
         elif( ("species" in F.columns) & ("dbh" in F.columns) ): FileType = 'StandObject'
         elif( ('PlotKey' in F.columns) & ('TreeKey' in F.columns) & ('CrownRatio' in F.columns) ): FileType = 'FMDObject'
+        elif( ('Species' in F.columns) & ('PlantClass' in F.columns) & ('CrownClass' in F.columns) ): FileType = 'TBL2SVSObject'
         else: print( "Unknown filetype: columns = {}".format(F.columns) )
     else:
         print( "{} does not exist!".format(FileName) )
@@ -1291,7 +1324,7 @@ class StandViz:
         os.chdir( OWNPATH )
 
     def SVS_Write_Footer( self ):
-        self.SVF.write( '; SVS file created by PyStandViz 1.0\n' )
+        self.SVF.write( '; SVS file created by StandViz.py {}\n'.format(__file_version__[11:len(__file_version__)-1]) )
 
     def SVS_Write_Header( self ):
         """ """

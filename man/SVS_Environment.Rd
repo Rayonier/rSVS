@@ -27,6 +27,7 @@ Possible package components to investigate include:
   \item Python
   \item BMP2PNG
   \item Zip
+  \item Defaults
 }
 
 When testing for one component, the path to the relavant executable will be returned. When testing

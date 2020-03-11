@@ -2,7 +2,7 @@
 #
 #' A package for stand level visualization using the Stand Visualization System (SVS, Robert J. McGaughey, USDA Forest Service, PNW Research Station).
 #'
-#' This rSVS package provides and interface to perform SVS visualiations from R.
+#' This rSVS package provides an interface to perform SVS visualiations from R.
 #'
 #' The package includes the following functions:
 #' \itemize{
@@ -16,42 +16,46 @@
 #'     \item NRCS2FIA()        - convert species codes from NRCS code to FIA #
 #' }
 #'
-#' The SVS() function supports multple data format types, including:
+#' The package supports either species identified by FIA # or NRCS Plants Database code. The default 
+#' behavior can be configured by setting either the .UseFIA or .UseNRCS hidden variables to TRUE. 
+#' NOTE: Depending on the source data, setting the incorrect treeform file will cause trees to be 
+#' displayed as an Unknown tree species (e.g. red) 
 #'
+#' The SVS() function supports multple data format types, including:
 #' \itemize{
-#'     \item FMD data frame - list with header, measurement, and treelist slots
-#'     \item LMS Object - list with stand, measurement, and treelist slots
-#'     \item StandObject - list with header, treelist, and management slots
-#'     \item SVScsv - data frame or .csv file containing: Species, PlantID, PlntClass, CrwnClass, TreeStat, DBH, Height, LAng, FAng, EndDia, CRad1, CRat1,
+#'     \item FMD data frame - a list with header, measurement, and treelist slots
+#'     \item LMS Object - a list with stand, measurement, and treelist slots
+#'     \item StandObject - a list with header, treelist, and management slots
+#'     \item SVScsv - a data frame or .csv file containing: Species, PlantID, PlntClass, CrwnClass, TreeStat, DBH, Height, LAng, FAng, EndDia, CRad1, CRat1,
 #'                    CRad2, CRat2, CRad3, CRat3, CRad4, CRat4, TPA, MarkCode, X, Y, Z
-#'     \item StandViz - data frame or .csv file containing: Stand, Year/Age, Species, TreeNo, Live/Dead, Status, Condition, DBH, Height, CrownRatio, CrownRadius, TPA
-#'     \item StandVizExtended - data frame or .csv file containing: Stand, Year/Age, Species, TreeNo, Live/Dead, Status, Condition, DBH, Height, CrownRatio,
+#'     \item StandViz - a data frame or .csv file containing: Stand, Year/Age, Species, TreeNo, Live/Dead, Status, Condition, DBH, Height, CrownRatio, CrownRadius, TPA
+#'     \item StandVizExtended - a data frame or .csv file containing: Stand, Year/Age, Species, TreeNo, Live/Dead, Status, Condition, DBH, Height, CrownRatio,
 #'                              CrownRadius, TPA, BrokenHt, Offset, Bearing, Lean, RootWad, X, Y
-#'     \item TBL2SVS data frame - data frame or .csv file containing: Species, DBH, Height, CrownRatio, CrownRadius, Status, PlantClass, CrownClass, TPA
+#'     \item TBL2SVS data frame - a data frame or .csv file containing: Species, DBH, Height, CrownRatio, CrownRadius, Status, PlantClass, CrownClass, TPA
 #' }
 #'
-#' FMD data frame:
+#' FMD data frame details:
 #'
 #' A FMD data frame contains PlotName in column 3, TreeNo, Species, MeasDate, MeasAge in columns 9-12, and Status, Condition, Damage,
 #' Screen, DBH, Height, CrownRatio in columns 14-21.
 #'
-#' LMS object:
+#' LMS object details:
 #'
 #' A LMS object is a list with $stand, $measurement, and $treelist slots.  The $stand slot must contain $STANDNAME, the $measurement must
 #' contain $MEASDATA where year can be extracted from the first 4 character positions.  The $treelist slot must contain tree, species,
 #' tpa, dbh, height, and cr columns in that order.
 #'
-#' StandObject:
+#' StandObject details:
 #'
 #' A StandObject is a list that contains at a minimum $header and #treelist slots.  The $header slot must contain $standid and
 #' $ysp (years since planting) fields.  The $treelist slopt must contain treeid, species, tpa, dbh, height, and cr columns in
 #' that order.
 #'
-#' StandViz:
+#' StandViz details:
 #'
 #' A data frame or .csv file containing: Stand, Year/Age, Species, TreeNo, Live/Dead, Status, Condition, DBH, Height, CrownRatio, CrownRadius, TPA
 #'
-#' StandVizExtended:
+#' StandVizExtended details:
 #'
 #' A data frame or .csv file containing: Stand, Year/Age, Species, TreeNo, Live/Dead, Status, Condition, DBH, Height, CrownRatio, CrownRadius, TPA,
 #' BrokenHt, Offset, Bearing, Lean, RootWad, X, Y.
@@ -60,7 +64,7 @@
 #' forest health conditions, including broken trees (BrokenHt, Offset, Bearing), dead top trees(Condition, BrokenHt), blown down trees (RootWad).
 #' If TPA > 1 then coordinates are generated for the stand.  To provide a mapped stand all TPA values must be 1.0 and X,Y locations filled in.
 #'
-#' TBL2SVS:
+#' TBL2SVS details:
 #'
 #' A data frame or .csv file containing: Species, DBH, Height, CrownRatio, CrownRadius, Status, PlantClass, CrownClass, TPA [, X, Y, MarkCode, FAng, SDia]
 #'
@@ -72,14 +76,30 @@
 #'   \tab 3 or 13 \tab plant is cut, has no branches, on ground \cr
 #' }
 #'
-#' This package includes a number of executable programs that will be run as part of the package.
-#' This limits where the package can be hosted (e.g NOT on CRAN).
+#' The following example input files are provided:
+#' \tabular{lcl}{
+#'   - BottomlandHardwood.svs   \tab - \tab SVS format file of mixed bottomland hardwood from southeast \cr
+#'   - Douglas-fir.svs          \tab - \tab SVS format file of Douglas-fir from Pacfic Northwest \cr
+#'   - LodgepolePine.svs        \tab - \tab SVS format file of Lodgepole pine from Rocky Mountains \cr
+#'   - MixedConifer.svs         \tab - \tab SVS format file of Mixed conifer stand from California \cr
+#'   - MontaneOak-Hickory.svs   \tab - \tab SVS format file of Oak/Hickory forest \cr
+#'   - SilverFir-Hemlock.svs    \tab - \tab SVS format file of Pacific silver fir/hemlock stand from Pacfic Northest \cr
+#'   - Redwood.svs              \tab - \tab SVS format file of Redwood stand from Calinornia \cr
+#'   - SouthernPine.svs         \tab - \tab SVS format file of Southern pine stand from southeast \cr
+#'   - SouthernPine.csv         \tab - \tab Same as above, but in SVScsv format \cr
+#'   - SouthernPine2.csv        \tab - \tab Abreviated version of SouthernPine without 4 crown dimensions, but including X,Y coordinates \cr
+#'   - SouthernPine3.csv        \tab - \tab Abreviated version of SouthernPine without X, Y coordinates \cr
+#'   - Spruce-Fir.csv           \tab - \tab SVS format file of Spruce/Fir from Rocky Mountains \cr
+#' }
+#'
+#' NOTE: This package includes a number of executable programs that will be run as part of the package,
+#' limiting where the package can be hosted (e.g NOT on CRAN).
 #'
 #' The package understands a number of data formats and can create visualizaions for single or multiple
 #' stands and years based on what information is contained in the specific data format. Files for
 #' visualzations are created in the svsfiles folder in the current working directory for R. These
 #' temporary files (*.asc, *.bmp, *.csv, *.png, *.SVS, *.opt) are intermediate files used for creating
-#' the visualizations. This folder can be cleaned out using the \strong{clean_svsfiles()} function.
+#' the visualizations. This folder can be cleaned out using the \strong{svsfiles_clean()} function.
 #'
 #' NOTE: SVS is a Windows only program, therefor limiting this package to only work on Windows
 #' computers.
@@ -115,34 +135,49 @@ StandObject2CSV <- function( data ) {                                           
     return( CSVFilename )                                                               # return filename written
 }
 
-Detect_Data_Type <- function( data, verbose=FALSE ) {
+# @export       # turn comment into #' to export and make available to user
+Detect_DataType <- function( data, verbose=FALSE ) {                                    # hidden function to detect data type of object or file
+    DataType <- NULL                                                                    # start with data type not known
     if( verbose ) print( paste0( "class(data) = ", class(data) ) )                      # echo what type of data we have
     if( class(data) == "character" ) {                                                  # have a string which is a filename
         if( verbose ) print( paste0( "Data = \"character\"" ) )                         # echo if verbose
-        return( 'FileName' )
+        if( grepl( ".svs", data ) ) DataType <- 'SVSFile'                               # have a .svs file
+        else if( grepl( '.csv', data ) ) {                                              # have a .csv file
+            if( file.exists( data ) ) {                                                 # make sure file exists
+                tf <- read.csv( data )                                                  # read file to check format
+                if( length(attributes(tf)$names) < 14 ) DataType <- 'TBL2SVSFile'       # TBL2SVS format file
+                else if( attributes(tf)$names[12]=="CRat1") DataType <- 'SVScsvFile'    # SVScsv format file
+                else if( (length(attributes(tf)$names)>=19) & (attributes(tf)$names[17]=="RootWad") ) DataType <- 'StandVizExtendedFile'
+                else if( (length(attributes(tf)$names)>=14) & (attributes(tf)$names[2]=="Year.Age") ) DataType <- 'StandVizFile'
+                else DataType <- 'CSVFile'                                              # some other .csv format
+            }
+        }
+        if( ! file.exists( data ) ) print( paste0( "Error: File '", data, "' does not exist!" ) )   # warn if file does not exist
     } else if( class(data) == "list" ) {                                                # have a list, now test of what type of data
         if( (attributes(data)$names[1]=="header") & (attributes(data)$names[2]=="treelist"))  {     # should be organon/cipsanon/ryn.c2g stand object
-            if( verbose ) print( "Pretty sure we have a organon/cips/c2g stand object" )
-            return( 'StandObject' )
+            if( verbose ) print( "Detected organon/cips/c2g stand object" )                      # echo verbose
+            DataType <- 'StandObject'                                                   # set DataType to StandObject type
         } else if( (attributes(data)$names[1]=="stand") & (attributes(data)$names[2]=="measurement") & (attributes(data)$names[3]=="treelist") )  {
-            if( verbose ) print( "Pretty sure we have a LMS stand object" )             # echo if verbose
-            return( 'LMSObject' )
+            if( verbose ) print( "Detected LMS stand object" )                          # echo if verbose
+            DataType <- 'LMSObject'                                                     # set DataType to LMSObject type
         } else {
-            print( paste0( "Not sure what object type we have here: ", attributes(data)$names, str(data) ) )
+            print( paste0( "Not sure what object type we have here: ", attributes(data)$names, str(data) ) )    # don't know format
         }
-    } else if( class(data) == "data.frame" ) {
-        # handle TBL2SVS format, StandViz format, StandVizExtended format, LMS data format
+    } else if( class(data) == "data.frame" ) {                                          # have a data frame
         if( (attributes(data)$names[1]=="DataSource") & (attributes(data)$names[3]=="PlotKey") ) {       # have FMD treelist for plots
-            # attributes(data)$class = "data.frame"
-            if( verbose ) print( "Pretty sure we have an FMD tree data frame")
-            #print( attributes(data)$names )
-            return( 'FMDObject' )
-        } else {            # should support LMS data pull here also
-            print( "Some unknown data.frame format:" )
+            if( verbose ) print( "Detected FMD tree data frame")                        # if verbose, echo type detected
+            DataType <- 'FMDObject'                                                     # set DataType to FMDObject
+        } else if( length(attributes(data)$names)<14 ) { DataType <- 'TBL2SVSObject'    # TBL2SVS format object
+        } else if( (length(attributes(data)$names)>=19) & (attributes(data)$names[17]=='RootWad') ) { DataType <- 'StandVizExtendedObject'
+        } else if( (length(attributes(data)$names)>=14) & (attributes(data)$names[2]=='Year.Age') ) { DataType <- 'StandVizObject'
+        } else if( attributes(data)$names[12]=='CRat1' ) { DataType <- 'SVScsvObject'   # SVScsv format object
+        } else {
+            print( "Some unknown data.frame format:" )                                  # don't know this format
             print(str(data))
             print(attributes(data)$names)
         }
     }
+    return( DataType )                                                                  # return detected data type
 }
 
 #' Visualize stand using the Stand Visualization System (SVS)
@@ -186,16 +221,18 @@ SVS <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, ro
                  verbose=FALSE ) {
     if( exists(".Development") ) PyExePath <- ".\\python38\\python.exe"                 # if under development use local copy of python
     else PyExePath <- SVS_Environment('python')                                         # else test for and optionally install package copy of python
-    DataType <- Detect_Data_Type( data, verbose )
-    if( DataType == "FileName" ) {                                                      # have a string which is a filename
-        cmdline <- paste0( PyExePath, " ", system.file( "python", "StandViz.py", package="rSVS" ), " -D -v ", data )    # create path to StandViz.py program
+    DataType <- Detect_DataType( data, verbose )
+    StandVizOpt <- " -v -D "
+    if( exists(".UseNRCS") ) if( .UseNRCS ) StandVizOpt <- paste0( StandVizOpt, "-N " ) # tell StandViz.py to use NRCS treeform file
+    if( DataType %in% c('SVSFile', 'SVScsvFile', 'StandVizFile', 'StandVizExtendedFile', 'CSVFile') ) { # have a string which is a filename
+        cmdline <- paste0( PyExePath, " ", system.file( "python", "StandViz.py", package="rSVS" ), StandVizOpt, data )    # create path to StandViz.py program
         if( verbose ) print( cmdline )                                                  # echo command line if verbose
         RetValue <- system( cmdline, invisible=FALSE, wait=TRUE )                       # execute and save return value
         if( RetValue == 0 ) return( "SVS() completed" )                                 # return success
         else print( paste0( "Error running command!  Error = ", RetValue, " for command: ", cmdline ) ) # return error number and commmand line that failed
     } else if( DataType == "StandObject" ) {                                            # have a organon/cips/c2g stand object
         CsvFile <- StandObject2CSV(data)                                            # convert data to .csv file
-        cmdline <- paste0( PyExePath, " \"", system.file( "python", "StandViz.py", package="rSVS" ), "\" -D -v ", CsvFile ) # command line for running StandViz.py
+        cmdline <- paste0( PyExePath, " \"", system.file( "python", "StandViz.py", package="rSVS" ), "\"", StandVizOpt, CsvFile ) # command line for running StandViz.py
         if( verbose ) print( cmdline )                                              # echo command line if verbose
         RetValue <- system( cmdline, invisible=FALSE, wait=TRUE )                   # execute and save return value
         if( RetValue == 0 ) return( "SVS() completed" )                             # report success
@@ -203,7 +240,7 @@ SVS <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, ro
     } else if( DataType == "LMSObject" ) {
         # Need to recognize LMS formats and pull data at better resolution than lms.tools
         CsvFile <- LMSObject2CSV(data)                                              # convert data from LMS object to .csv file
-        cmdline <- paste0( PyExePath, " \"", system.file( "python", "StandViz.py", package="rSVS" ), "\" -D -v ", CsvFile ) # command line for running StandViz.py
+        cmdline <- paste0( PyExePath, " \"", system.file( "python", "StandViz.py", package="rSVS" ), "\"", StandVizOpt, CsvFile ) # command line for running StandViz.py
         if( verbose ) print( cmdline )                                              # echo command line if verbose
         RetValue <- system( cmdline, invisible=FALSE, wait=TRUE )                   # execute and save return value
         if( RetValue == 0 ) return( "SVS() completed" )                             # report success
@@ -211,8 +248,25 @@ SVS <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, ro
     } else if( DataType=="FMDObject" ) {
         print( paste0( "Will create visualizations for: ", paste(unique(data$PlotKey),collapse=' ') ) )
         CsvFile <- FMD2CSV(data)
-        cmdline <- paste0( PyExePath, " \"", system.file( "python", "StandViz.py", package="rSVS" ), "\" -D -v ", CsvFile )
+        cmdline <- paste0( PyExePath, " \"", system.file( "python", "StandViz.py", package="rSVS" ), "\"", StandVizOpt, CsvFile )
         if( verbose ) print( cmdline )
+        RetValue <- system( cmdline, invisible=FALSE, wait=TRUE )
+        if( RetValue == 0 ) return( "SVS() completed" )
+        else print( paste0( "Error running command!  Error = ", RetValue, " for command: ", cmdline ) )
+    } else if( DataType=="StandVizObject" ) {
+        CsvFile <- paste0( "svsfiles/", bquote(data), ".csv" ) # format filename from object name
+        write.csv( data, CSVFilename, row.names=FALSE )                                       # write .csv file
+        cmdline <- paste0( PyExePath, " \"", system.file( "python", "StandViz.py", package="rSVS" ), "\"", StandVizOpt, CsvFile )
+        if( verbose ) print( cmdline )
+        RetValue <- system( cmdline, invisible=FALSE, wait=TRUE )
+        if( RetValue == 0 ) return( "SVS() completed" )
+        else print( paste0( "Error running command!  Error = ", RetValue, " for command: ", cmdline ) )
+    } else if( DataType=="TBL2SVSObject" ) {
+        print( "Processing TBLS2SVSObject..." )
+        CsvFilename <- paste0( "svsfiles/", deparse(substitute(data)), ".csv" ) # format filename from object name
+        write.csv( data, CsvFilename, row.names=FALSE )
+        cmdline <- paste0( PyExePath, " ", system.file( "python", "StandViz.py", package="rSVS" ), StandVizOpt, CsvFilename )
+        if( verbose ) print( paste0( "cmdline: ", cmdline )  )
         RetValue <- system( cmdline, invisible=FALSE, wait=TRUE )
         if( RetValue == 0 ) return( "SVS() completed" )
         else print( paste0( "Error running command!  Error = ", RetValue, " for command: ", cmdline ) )
@@ -238,6 +292,7 @@ SVS <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, ro
 #'   \item Python
 #'   \item BMP2PNG
 #'   \item Zip
+#'   \item Defaults
 #' }
 #'
 #' When testing for one component, the path to the relavant executable will be returned. When testing
@@ -265,6 +320,7 @@ SVS_Environment <- function( component='all', verbose=FALSE, debug=FALSE ) {
         PyPath <- SVS_Environment( 'python', verbose, debug )                   # call ourselves to get Python path
         BmpPath <- SVS_Environment( 'bmp2png', verbose, debug )                 # call ourselves to get BMP2PNG path
         ZipPath <- SVS_Environment( 'zip', verbose, debug )                     # call ourselfes to get Zip path
+        SVS_Environment( 'defaults', verbose, debug )                           # call ourselfes to check defaults defined by hidden variables
         return( c(SvsPath, PyPath, BmpPath, ZipPath) )                          # return paths
     } else if( tolower(component)=='svs' ) {                                    # handle SVS component
         SvsExePath <- system.file( "bin/SVS", "winsvs.exe", package="rSVS" )    # check for winsvs.exe
@@ -342,6 +398,10 @@ SVS_Environment <- function( component='all', verbose=FALSE, debug=FALSE ) {
 			if( verbose ) print( 'Info-Zip zip.exe and unzip.exe are available.' )  # echo if verbose
 		}
         return( ZipExe )                                                        # return path to zip.exe
+    } else if( tolower(component)=='defaults' ) {                               # check for default behaviors set by hidden variables
+        if( exists( ".UseFIA" ) ) print( paste0( ".UseFIA = ", .UseFIA ) )
+        if( exists( ".UseNRCS" ) ) print( paste0( ".UseNRCS = ", .UseNRCS ) )
+        if( exists( ".Development" ) ) print( paste0( ".Development = ", .Development ) )
     }
 }
 
@@ -408,7 +468,8 @@ SVS_Example <- function( Example=NULL ) {
 }
 
 # hidden treelist function for use by SVS_ExampleData()
-treelist <- function( species, dbh, tpa, scale, shape, n=30, dmin=0.0001, dmax=100, incr=0.1  ) {
+# @export
+treelist <- function( species, dbh, tpa, scale=4, shape=2, n=30, dmin=0.0001, dmax=100, incr=0.1  ) {
     # exponential decrease (scale=2.5, shape=1); left skew(scale=4, shape=2); normal(scale=10, shape=3.6); right skew(scale=15, shape=10)
     d = data.frame( scale, shape, species, dbh, tpa)                     # create data frame of inputs
     tr = list()                                                     # create empty list for the returned treelist
@@ -461,22 +522,40 @@ treelist <- function( species, dbh, tpa, scale, shape, n=30, dmin=0.0001, dmax=1
 #' @param hd height to diameter ratio for height dubbing (default 7)
 #' @return data frame of list with example data for use with SVS()
 #' @examples
-#' SV <- SVS_ExampleData( datatype='StandViz', species=c(202,263), tpa=c(300,275) )
+#' SV <- SVS_ExampleData( species=c(202,263), tpa=c(300,275), dbh=c(7.8,4.7) )
+#' SVS_ExampleData( datatype=NULL )     # force function to return known data types
 #' @author James McCarter \email{jim.mccarter@@rayonier.com}
 #' @export
-SVS_ExampleData <- function( datatype=NULL, species, dbh, tpa, scale=4, shape=2, n=30, dmin=0.001, dmax=100, incr=0.1, hd=7 ) {
+SVS_ExampleData <- function( datatype='TBL2SVS', species, dbh, tpa, scale=4, shape=2, n=30, dmin=0.001, dmax=100, incr=0.1, hd=7 ) {
     tr <- treelist( species, dbh, tpa, scale, shape, n, dmin, dmax, incr )
-    tr2 <- tr[c(3,2,5)]
-    tr2$ht <- tr2$dbh * rnorm(n,hd)
-    tr2$dbh[tr2$ht<4.5] <- 0.01
+    tr2 <- tr[c(3,2,5)]                                                     # get subset of columns we want: species, dbh, tpa
+    tr2$ht <- tr2$dbh * rnorm(n,hd)                                         # dib in ht scaled from dbh with random normal noise around hd factor
+    tr2$dbh[tr2$ht<4.5] <- 0.01                                             # if ht < 4.5, reset dbh to very small
     if( is.null(datatype) ) {
-        print( "No example data type given, return list of types:" )
+        print( "Known data types are: StandViz (default) and TBL2SVS." )
     } else if( datatype=='TBL2SVS' ) {
-        print( "Return TBL2SVS format data" )
+        # Species, DBH, Height, CRat, Crad, Status, PlantClass, CrownClass, TPA
+        tr2$CrownRatio <- 0.45                      # add CrownRatio
+        tr2$CrownRadius <- tr2$ht * tr2$CrownRatio * 0.33 / 2.0     # add CrownRadius
+        tr2$Status <- 1
+        tr2$PlantClass <- 1
+        tr2$CrownClass <- 1
+        tr2 <- tr2[,c(1,2,4,5,6,7,8,9,3)]
+        names(tr2) <- c("Species", "DBH", "Height", "CrownRatio", "CrownRadius", "Status", "PlantClass", "CrownClass", "TPA")
     } else if( datatype=='StandViz' ) {
-        print( "Return StandViz format example data" )
-    } else if( datatype=='StandVizExtended' ) {
-        print( "Return StandViz Extended format example data" )
+        # Stand, Year/Age, Species, TreeNo, Live/Dead, Status, Condiiion, DBH, Height, CrowRat, CrownRad, TPA
+        tr2$Stand <- 'Stand'                        # and stand name
+        tr2$Year.Age <- substr( Sys.time(), 1, 4 )      # add year
+        tr2$TreeNo <- seq.int(nrow(tr2) )           # add TreeNo
+        tr2$CrownRatio <- 0.45                      # add CrownRatio
+        tr2$CrownRadius <- tr2$ht * tr2$CrownRatio * 0.33 / 2.0     # add CrownRadius
+        tr2$Live.Dead <- NA
+        tr2$Status <- NA
+        tr2$Condition <- NA
+        tr2 <- tr2[,c(5,6,1,7,10,11,12,2,4,8,9,3)]
+        names(tr2) <- c("Stand", "Year.Age", "Species", "TreeNo", "Live.Dead", "Status", "Condition", "DBH", "Height", "CrownRatio", "CrownRadius", "TPA")
+    #} else if( datatype=='StandVizExtended' ) {
+    #    print( "Return StandViz Extended format example data" )
     }
     return( tr2 )
 }
@@ -540,8 +619,19 @@ svsfiles_clean <- function() {
 #' @examples
 #' FIA2NRCS( MyData )
 #' @export
-FIA2NRCS <- function( DataFrame ) {
-    print( "FIA2NRCS() not implemented yet!")
+FIA2NRCS <- function( Data ) {
+    DataType <- Detect_DataType( Data )
+    SppRef <- read.csv( system.file( "bin", "rSVS_Species.csv", package="rSVS" ) )[,c(1,2)] # read rSVS_Species.csv and get just FIA and NRCS fields
+    if( DataType %in% c('StandVizObject','StandVizExtendedObject','SVScsvObject','TBL2SVSObject') ) {
+        Data$Species <- as.character( Data$Species )                                        # coerce Species to character from factor
+        Data2 <- dplyr::left_join( Data, SppRef, by=c("Species" = "FIA") )                  # join original data with species code map
+        Data2$FIA <- Data2$Species                                                          # copy original Species to FIA
+        Data2$Species <- Data2$NRCS                                                         # copy NRCS over Species
+        Data2$NRCS <- NULL                                                                  # remove NRCS column
+        return( Data2 )
+    } else {
+        print( paste0( "FIA2NRCS(): Don't know how to convert ", DataType, " object yet!") )
+    }
 }
 
 #' Convert species codes from NRCS code to FIA number
@@ -554,8 +644,20 @@ FIA2NRCS <- function( DataFrame ) {
 #' @examples
 #' NRCS2FIA( MyData )
 #' @export
-NRCS2FIA <- function( DataFrame ) {
-    print( "NRCS2FIA() not implemented yet!")
+NRCS2FIA <- function( Data ) {
+    DataType <- Detect_DataType( Data )
+    SppRef <- read.csv( system.file( "bin", "rSVS_Species.csv", package="rSVS" ) )[,c(1,2)] # read rSVS_Species.csv and get just FIA and NRCS fields
+    if( DataType %in% c('StandVizObject','StandVizExtendedObject','SVScsvObject','TBL2SVSObject') ) {
+        Data$Species <- as.character( Data$Species )                                        # coerce Species to character from factor
+        SppRef$NRCS <- as.character( SppRef$NRCS )                                          # coerce NRCS to character from factor
+        Data2 <- dplyr::left_join( Data, SppRef, by=c("Species" = "NRCS") )                 # join original data with species code map
+        Data2$NRCS <- Data2$Species                                                         # copy original Species to NRCS
+        Data2$Species <- Data2$FIA                                                          # copy FIA over Species
+        Data2$FIA <- NULL                                                                   # remove FIA column
+        return( Data2 )
+    } else {
+        print( paste0( "NCRS2FIA(): Don't know how to convert ", DataType, " object yet!") )
+    }
 }
 
 # You can learn more about package authoring with RStudio at:
