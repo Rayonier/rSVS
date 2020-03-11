@@ -9,8 +9,11 @@ NRCS2FIA(DataFrame)
 \arguments{
 \item{MyData}{DataFrame with tree information}
 }
+\value{
+Data frame with converted species codes
+}
 \description{
-Details
+Function not implemented yet.
 }
 \examples{
 NRCS2FIA( MyData )

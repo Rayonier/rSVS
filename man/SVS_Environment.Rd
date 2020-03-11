@@ -14,7 +14,7 @@ SVS_Environment(component = "all", verbose = FALSE, debug = FALSE)
 \item{debug}{toggle to turn on extra output while function is running}
 }
 \value{
-path path to individual component returned and messages printed on console
+path of primary executable for the individual component returned and messages printed on console
 }
 \description{
 SVS_Enviroment() checks the package enviroment and alternatively will install a python distribution
@@ -29,15 +29,15 @@ Possible package components to investigate include:
   \item Zip
 }
 
-When testing for one component the path to the relavant executable will be returned. When testing
-for All paths to each component will be provided.
+When testing for one component, the path to the relavant executable will be returned. When testing
+for All paths, a path to each component will be provided as a list.
 
 When testing for Python the function will first test to see if a copy of Python is available on
-the PATH. If there is not a system wide copy of Python available the function will check for a
-package #' internal copy. The first time SVS_Environment('Python') is run, the user will be
-prompted to allow the unzipping of the required python files (the package includes a zipped copy of
+the system PATH. If there is no a system wide copy of Python available the function will check for a
+package internal copy. The first time SVS_Environment('Python') is run, the user will be
+prompted to allow the installation (unzipping) of the required python files (the package includes a zipped copy of
 Python 3.8 that can be installed into the package). Subsequent calls to SVS_Enviroment('Python')
-will located the "python.exe" in the package and return that path.
+will located "python.exe" in the package and return the path.
 }
 \examples{
 SVS_Environment( 'python' )  # investigate Python environment for running backend code

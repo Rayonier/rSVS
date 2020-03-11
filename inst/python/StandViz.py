@@ -22,7 +22,6 @@ import time         # time.asctime()
 (_MyPath, _MyFile, _MyOS) = (os.path.split(sys.argv[0])[0], os.path.split(sys.argv[0])[1], platform.system())
 (_MyVersion, _MyDate) = ( __file_version__.split()[1], '{} - {}'.format(__file_date__.split()[1], __file_date__.split()[2]) )
 
-
 ##################################
 # Begin Global Data Declarations #
 ##################################
@@ -30,7 +29,7 @@ import time         # time.asctime()
 #OWNPATH = os.getcwd()
 (OWNPATH, file) = os.path.split(sys.argv[0])
 #global OWNPATH
-VERBOSE = 0
+#VERBOSE = 0
 
 #########################################################
 # Begin Main Program - implement command line inferface #
@@ -43,16 +42,14 @@ def main():     # implement __main__ scope for handling of command line executio
         # ..C.E.GHIJKLMNOPQR.TU...YZ .b..e.g.ijk.m.o.q.st..wxyz 0123456789
         SARG = argparse.ArgumentParser( add_help=False, usage=" %(prog)s [-B|-W|-S|-X] [-c|-f|-r|-u] [dDhnv] [-a #] [-l #] [-p #] [-w worksheet] file [file [...]]\n" +
                                                              "\t%(prog)s [-v] [-A [FIA|NRCS]] [-F]" )
-
         SARGO = SARG.add_argument_group( "Output arguments" )
         SARGO.add_argument( "-B", action="store_true", help="output to Bitmap (capture .bmp, convert to .png)" )
         SARGO.add_argument( "-D", action="store_true", help="Debug output" )
         SARGO.add_argument( "-W", action="store_true", help="output to HTML (create .png, generate .html page)" )
         SARGO.add_argument( "-S", action="store_true", help="output to SVS (default)" )
         SARGO.add_argument( "-X", action="store_true", help="output to eXcel (.csv file)" )
-
-        SARGC = SARG.add_argument_group( "Coordiante arguments" )
-        SARGC.add_argument( "-c", action="store_true", help="generate clumped coordinates" )
+        SARGC = SARG.add_argument_group( "Coordinate arguments" )
+        SARGC.add_argument( "-c", action="store_true", help="generate clumped coordinates" )    # or -c Clumped|c|Fixed|f|Random|r|Uniform|u
         SARGC.add_argument( "-f", action="store_true", help="generate fixed coordinates" )
         SARGC.add_argument( "-r", action="store_true", help="generate random coordinates" )
         SARGC.add_argument( "-u", action="store_true", help="generate Uniform coordinates" )
@@ -63,6 +60,8 @@ def main():     # implement __main__ scope for handling of command line executio
 
         SARGG = SARG.add_argument_group( "General arguments" )
         SARGG.add_argument( "-d", action="store_true", help="scale Diameter: dbh>10*1.25; dbh>15*1.50" )
+        # or -s Diameter|d|XY|xy
+        # or -e expand XY to fit into acre (e.g. for Postex plots)
         SARGG.add_argument( "-h", action="store_true", help="display help" )
         SARGG.add_argument( "-n", action="store_true", help="Notify progress in DOS window" )
         SARGG.add_argument( "-v", action="store_true", help="Verbose output" )
@@ -124,24 +123,20 @@ def main():     # implement __main__ scope for handling of command line executio
         #if( DEBUG ): print( 'nFile={}, FILELIST={}' % (nFile, SOPT.FILELIST) )
         #if( DEBUG ): print( 'Using Python {} on {} from {}'.format(sys.version, sys.platform, sys.prefix) )
 
-
-
         for FILE in SOPT.FILELIST:
-        #for f in cmdline:
             #D = {}              # create data dictionary
-            #print( FILE )
             (dirname, filename) = os.path.split( FILE )             # get path and filename for file from command line
             (basename, ext) = os.path.splitext( filename )          # get filebase and extension
             if( DEBUG ): print( "File: {}, dirname={} filename={} basename={} ext={}".format(FILE, dirname, filename, basename, ext) )
             #DataSet = 'None'
+            # determine file format from filename provided on command line
             if( re.search( '.svs', filename ) != None ):            # process .svs files, just pass through to winsvs.exe if the file exists
-                # just load .svs file
-                SVSEXE = "..\\bin\SVS\winsvs.exe"
-                CMDLINE = "{} {}".format(SVSEXE, FILE)
-                print(CMDLINE)
-                os.system(CMDLINE)
+                SVSEXE = "..\\bin\SVS\winsvs.exe"                   # path to winsvs.exe
+                CMDLINE = "{} {}".format(SVSEXE, FILE)              # build command line
+                if( VERBOSE ): print(CMDLINE)                       # echo command line
+                os.system(CMDLINE)                                  # execute command line
             elif( re.search( '.csv', filename ) != None ):          # process .csv files
-                DataSet = re.sub( '.csv', '', filename )
+                DataSet = re.sub( '.csv', '', filename )            # name dataset from base filename
                 FileType = Determine_CSV_Format( FILE )
                 print( "{}: FileType={}".format(FILE,FileType) )
             elif( re.search( '.xlsx', filename ) != None ):         # process .xlsx or .xlx files

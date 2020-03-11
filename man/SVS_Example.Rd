@@ -7,13 +7,13 @@
 SVS_Example(Example = NULL)
 }
 \arguments{
-\item{Example}{Name of stand/stand type example to display}
+\item{Example}{Name of stand/stand type to display}
 }
 \description{
 Display one of several stand types using example SVS files included with package.
 }
 \details{
-The list of availabel stand type examples include:
+The list of available stand types include:
 \itemize{
    \item BottomlandHardwood
    \item Douglas-fir
@@ -27,9 +27,9 @@ The list of availabel stand type examples include:
 }
 }
 \examples{
-SVS_Demo( 'SouthernPine' )
-SVS_Demo( 'Douglas-fir' )
-SVS_Demo()                   # gives list of possible options
+SVS_Example( 'SouthernPine' )
+SVS_Example( 'Douglas-fir' )
+SVS_Example()                   # gives list of possible options
 }
 \author{
 Jim McCarter \email{jim.mccarter@rayonier.com}

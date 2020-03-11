@@ -15,7 +15,7 @@ List known species codes.
 \details{
 This function simply reads and returns the list of known species codes distributed with the rSVS
 package (rSVS_Species.csv). This file is also used as the basis for species translation by the
-FIA2NRCS() and #' NRCS2FIA() funtions.
+FIA2NRCS() and NRCS2FIA() funtions.
 
 The rSVS package supports FIA number and NRCS alphabetic codes. The displayed table will include
 FIA, NRCS, Genus, Species, Common, and Comment, FIA.trf, NRCS.trf, FVS.trf, FVSSpCode, FVS.East,
@@ -27,8 +27,8 @@ not guaranteed).
 
 The FVS.trf, FVSSpCode, FVS.East, and FVS.West columns are used for species audits and keeping
 track of the source of tree form definitions (largely from FIA variant tree form files from the
-original SVS distribution) before the tree form definitions were exanded to handle more live and
-dead classes.
+original SVS distribution).  Note that the tree form definitions have been exanded to handle more
+live and dead classes for improved visualizations of forest health conditions.
 }
 \examples{
 Species <- SVS_Species()            # store species list to Species
