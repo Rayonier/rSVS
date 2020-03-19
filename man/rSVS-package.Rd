@@ -20,14 +20,14 @@ The package includes the following functions:
     \item NRCS2FIA()        - convert species codes from NRCS code to FIA #
 }
 
-The package supports either species identified by FIA # or NRCS Plants Database code. The default 
-behavior can be configured by setting either the .UseFIA or .UseNRCS hidden variables to TRUE. 
-NOTE: Depending on the source data, setting the incorrect treeform file will cause trees to be 
-displayed as an Unknown tree species (e.g. red) 
+The package supports either species identified by FIA # or NRCS Plants Database code. The default
+behavior can be configured by setting either hidden variable ".UseFIA <- TRUE" or ".UseNRCS <- TRUE".
+NOTE: Depending on the source data, setting the incorrect treeform file will cause trees to be
+displayed as an Unknown tree species (e.g. red)
 
-The SVS() function supports multple data format types, including:
+The SVS() function supports multiple data format types, including:
 \itemize{
-    \item FMD data frame - a list with header, measurement, and treelist slots
+    \item FMD data frame - a data frame with at least TreeKey, Species, MeasDate, Status, DBH, Height, CrownRatio, TPA
     \item LMS Object - a list with stand, measurement, and treelist slots
     \item StandObject - a list with header, treelist, and management slots
     \item SVScsv - a data frame or .csv file containing: Species, PlantID, PlntClass, CrwnClass, TreeStat, DBH, Height, LAng, FAng, EndDia, CRad1, CRat1,
@@ -99,9 +99,9 @@ The following example input files are provided:
 NOTE: This package includes a number of executable programs that will be run as part of the package,
 limiting where the package can be hosted (e.g NOT on CRAN).
 
-The package understands a number of data formats and can create visualizaions for single or multiple
+The package understands a number of data formats and can create visualizations for single or multiple
 stands and years based on what information is contained in the specific data format. Files for
-visualzations are created in the svsfiles folder in the current working directory for R. These
+visualizations are created in the svsfiles folder in the current working directory for R. These
 temporary files (*.asc, *.bmp, *.csv, *.png, *.SVS, *.opt) are intermediate files used for creating
 the visualizations. This folder can be cleaned out using the \strong{svsfiles_clean()} function.
 

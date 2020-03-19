@@ -1353,174 +1353,174 @@ class StandViz:
         #self.SVF.write( '0.88    1.0   0      12.8   201.91        0\n' )
 
 
-def TIR_Expand_Treelist( D, SVS ):
-    """expand treelist to whole tree records"""
-    #
-    stands = D.Stand.keys()
-    stands.sort()
-    for s in stands:
-        mtpa = 0
-        ymin = 9999
-        ymax = 0
-        trees = D.Stand[s].Tree.keys()
-        cyears = []
-        for t in trees:
-            years = D.Stand[s].Tree[t].Year.keys()
-            for y in years:
-                if( y < ymin ): ymin = y
-                if( y > ymax ): ymax = y
-
-        # need maxtpa and tpa after thinning to compute spacing after thinning
-
-        years = range( ymin, ymax+1, 5 )
-        if( not SVS.Data.Stand.has_key( s ) ): SVS.Data.Stand[s] = StandData( s )
-        trees = D.Stand[s].Tree.keys()
-        trees.sort()
-        for t in trees:
-            y = years[0]
-            #print s, y, t
-            if( not D.Stand[s].Tree.has_key(t) ): continue
-            if( not D.Stand[s].Tree[t].Year.has_key(y) ): continue
-            #print 'Looking for %s, %s, %s' % (s,t,y)
-            (species, dbh, ht, live, status, cclass, tpa) = (D.Stand[s].Tree[t].Species, D.Stand[s].Tree[t].Year[y].DBH,
-                D.Stand[s].Tree[t].Year[y].Height, D.Stand[s].Tree[t].Year[y].Live, D.Stand[s].Tree[t].Year[y].Status,
-                D.Stand[s].Tree[t].Year[y].Condition, D.Stand[s].Tree[t].Year[y].TPA)
-            for n in range( 1, int( math.ceil( tpa ) )+1, 1 ):
-                ntree = len( SVS.Data.Stand[s].Tree ) + 1
-                SVS.Data.Stand[s].Tree[ntree] = TreeData( species, TreeNumber=t )
-                SVS.Data.Stand[s].Tree[ntree].Year[y] = MeasurementData( dbh, ht, '', 1, live, status, cclass )
-        #print 'years=%s' % (years)
-        #for y in years:
-        #    SVS.Data.Stand[s].Year[y] = D.Stand[s].Year[y]
-        for y in years[1:]:
-            for t in trees:
-                if( not D.Stand[s].Tree.has_key(t) ): continue
-                if( not D.Stand[s].Tree[t].Year.has_key(y) ): continue
-                #print y, t
-                (species, dbh, ht, live, status, cclass, tpa) = (D.Stand[s].Tree[t].Species, D.Stand[s].Tree[t].Year[y].DBH,
-                    D.Stand[s].Tree[t].Year[y].Height, D.Stand[s].Tree[t].Year[y].Live, D.Stand[s].Tree[t].Year[y].Status,
-                    D.Stand[s].Tree[t].Year[y].Condition, D.Stand[s].Tree[t].Year[y].TPA)
-                ntree = 0
-                for n in range( 1, int( math.ceil( tpa ) )+1, 1 ):
-                    ntree = len( SVS.Data.Stand[s].Tree ) + 1
-                    #ntree += n
-                    SVS.Data.Stand[s].Tree[ntree] = TreeData( species, TreeNumber=t )
-                    SVS.Data.Stand[s].Tree[ntree].Year[y] = MeasurementData( dbh, ht, '', 1, live, status, cclass )
-
-def TIR_Load_Data( DataSet, filename ):
-    """"""
-    IN = open( filename, 'r' )
-    (dirname, file) = os.path.split( filename )
-    laststand = None
-    TD = {}                         # create temporary dictionary for storing tree records
-    D = ForestData( DataSet )       # create data structure for final treelist
-    for L in IN:
-        if( L[0:9] == 'Site/Plot' ): continue
-        col = L.split( ',' )
-        standname = col[0]
-        year = int(col[1])
-        (treeno, species, dbh, ht, live, status, cclass, tpa) = \
-            (int(col[2]), col[3], float(col[4]), float(col[5]), col[6], col[7], int(float(col[8])), float(col[9]))
-        if( status == '' ): status = 's'
-        #print standname, year, treeno, species
-        if( not TD.has_key( standname ) ): TD[standname] = {}
-        if( not TD[standname].has_key( year ) ): TD[standname][year] = {}
-        if( not TD[standname][year].has_key( treeno ) ): TD[standname][year][treeno] = {}
-        #print 'status="%s"' % (status)
-        if( status == 's' ):
-            if( not TD[standname][year][treeno].has_key( 'Live' ) ):
-                TD[standname][year][treeno]['Live'] = (species, dbh, ht, tpa, live, status, cclass)
-            else: print( 'error, already have tree record' )
-        elif( status == 'Cut' ):
-            if( not TD[standname][year][treeno].has_key( 'Cut' ) ):
-                TD[standname][year][treeno]['Cut'] = (species, dbh, ht, tpa, live, status, cclass)
-            else: print( 'error, already have cut record' )
-        else:
-            print( 'error storing %s' % (L) )
-    IN.close()
-
-    stands = TD.keys()
-    stands.sort()
-
-    for s in stands:
-        years = TD[s].keys()
-        years.sort()
-        cyears = []     # list of years with thinnings
-        TPA = {}
-        CTPA = {}
-        for y in years:
-            raw_input( "Looking at year %s" % (y) )
-            #trees = TD[s][y]['Live'].keys()
-
-
-    for s in stands:
-        if( not D.Stand.has_key( s ) ):
-            D.Stand[s] = StandData( s)     # initialize data structure for treelist
-            D.Stand[s].Cut = {}                     # add dictionary for cut trees
-        years = TD[s].keys()
-        years.sort()
-        print( 'Stand %s has inventory for years %s' % (s, years) )
-        for y in years:
-            trees = TD[s][y].keys()
-            trees.sort()
-            trees.reverse()
-            print( '%s at %s: %s' % (s, y, trees) )
-            for t in trees:
-                #print 'Tree %s, Live=%s' % (t, TD[s][y][t]['Live'])
-                if( TD[s][y][t].has_key('Live')):
-                    (species, dbh, ht, tpa, live, status, cclass) = TD[s][y][t]['Live']
-                    if( not D.Stand[s].Tree.has_key(t) ): D.Stand[s].Tree[t] = TreeData( species, TreeNumber=t )
-                    D.Stand[s].Tree[t].Year[y] = MeasurementData( dbh, ht, '', tpa, live, status, cclass)
-                if( TD[s][y][t].has_key('Cut')):
-                    (species, dbh, ht, tpa, live, status, cclass) = TD[s][y][t]['Cut']
-                    if( not D.Stand[s].Cut.has_key(t) ): D.Stand[s].Cut[t] = TreeData( species, TreeNumber=t )
-                    D.Stand[s].Cut[t].Year[y] = MeasurementData( dbh, ht, '', tpa, live, status, cclass)
-    #raw_input("paused")
-
-
-    #stands = D.Stand.keys()
-    #print 'stands=%s' % (stands)
-    #stands.sort()
-    #for s in stands:
-    #    tyears = D.Stand[s].Tree.keys()
-    #    tyears.sort()
-    #    cyears = D.Stand[s].Cut.keys()
-    #    cyears.sort()
-    #    print '%s has Trees for %s and Cut for %s' % (s, tyears, cyears)
-
-    #raw_input( "Pause after D creation")
-
-    #sumtpa = sumctpa = 0
-    #stands = D.Stand.keys()
-    #stands.sort()
-    #for s in stands:
-    #    ymin = 9999
-    #    ymax = 0
-    #    trees = D.Stand[s].Tree.keys()
-    #    for t in trees:
-    #        years = D.Stand[s].Tree[t].Year.keys()
-    #        for y in years:
-    #            if( y < ymin ): ymin = y
-    #            if( y > ymax ): ymax = y
-    #        years = range( ymin, ymax+1, 5 )
-    #        sumpta = sumctpa = 0
-    #    for y in years:
-    #        trees = D.Stand[s].Tree.keys()
-    #        trees.sort()
-    #        for t in trees:
-    #            if( not D.Stand[s].Tree.has_key(t) ): continue
-    #            if( not D.Stand[s].Tree[t].Year.has_key(y) ): continue
-    #            sumtpa += D.Stand[s].Tree[t].Year[y].TPA
-    #        ctrees = D.Stand[s].Cut.keys()
-    #        ctrees.sort()
-    #        for c in ctrees:
-    #            if( not D.Stand[s].Cut.has_key(c) ): continue
-    #            if( not D.Stand[s].Cut[c].Year.has_key(y) ): continue
-    #            sumctpa += D.Stand[s].Cut[c].Year[y].TPA
-    #        D.Stand[s].Year[y] = MeasurementData( 0.0, 0.0, '', sumtpa, '', '', '' )
-    #        D.Stand[s].Year[y].CutTPA = sumctpa
-    #        sumtpa = sumctpa = 0
-    return( D )
+#def TIR_Expand_Treelist( D, SVS ):
+#    """expand treelist to whole tree records"""
+#    #
+#    stands = D.Stand.keys()
+#    stands.sort()
+#    for s in stands:
+#        mtpa = 0
+#        ymin = 9999
+#        ymax = 0
+#        trees = D.Stand[s].Tree.keys()
+#        cyears = []
+#        for t in trees:
+#            years = D.Stand[s].Tree[t].Year.keys()
+#            for y in years:
+#                if( y < ymin ): ymin = y
+#                if( y > ymax ): ymax = y
+#
+#        # need maxtpa and tpa after thinning to compute spacing after thinning
+#
+#        years = range( ymin, ymax+1, 5 )
+#        if( not SVS.Data.Stand.has_key( s ) ): SVS.Data.Stand[s] = StandData( s )
+#        trees = D.Stand[s].Tree.keys()
+#        trees.sort()
+#        for t in trees:
+#            y = years[0]
+#            #print s, y, t
+#            if( not D.Stand[s].Tree.has_key(t) ): continue
+#            if( not D.Stand[s].Tree[t].Year.has_key(y) ): continue
+#            #print 'Looking for %s, %s, %s' % (s,t,y)
+#            (species, dbh, ht, live, status, cclass, tpa) = (D.Stand[s].Tree[t].Species, D.Stand[s].Tree[t].Year[y].DBH,
+#                D.Stand[s].Tree[t].Year[y].Height, D.Stand[s].Tree[t].Year[y].Live, D.Stand[s].Tree[t].Year[y].Status,
+#                D.Stand[s].Tree[t].Year[y].Condition, D.Stand[s].Tree[t].Year[y].TPA)
+#            for n in range( 1, int( math.ceil( tpa ) )+1, 1 ):
+#                ntree = len( SVS.Data.Stand[s].Tree ) + 1
+#                SVS.Data.Stand[s].Tree[ntree] = TreeData( species, TreeNumber=t )
+#                SVS.Data.Stand[s].Tree[ntree].Year[y] = MeasurementData( dbh, ht, '', 1, live, status, cclass )
+#        #print 'years=%s' % (years)
+#        #for y in years:
+#        #    SVS.Data.Stand[s].Year[y] = D.Stand[s].Year[y]
+#        for y in years[1:]:
+#            for t in trees:
+#                if( not D.Stand[s].Tree.has_key(t) ): continue
+#                if( not D.Stand[s].Tree[t].Year.has_key(y) ): continue
+#                #print y, t
+#                (species, dbh, ht, live, status, cclass, tpa) = (D.Stand[s].Tree[t].Species, D.Stand[s].Tree[t].Year[y].DBH,
+#                    D.Stand[s].Tree[t].Year[y].Height, D.Stand[s].Tree[t].Year[y].Live, D.Stand[s].Tree[t].Year[y].Status,
+#                    D.Stand[s].Tree[t].Year[y].Condition, D.Stand[s].Tree[t].Year[y].TPA)
+#                ntree = 0
+#                for n in range( 1, int( math.ceil( tpa ) )+1, 1 ):
+#                    ntree = len( SVS.Data.Stand[s].Tree ) + 1
+#                    #ntree += n
+#                    SVS.Data.Stand[s].Tree[ntree] = TreeData( species, TreeNumber=t )
+#                    SVS.Data.Stand[s].Tree[ntree].Year[y] = MeasurementData( dbh, ht, '', 1, live, status, cclass )
+#
+#def TIR_Load_Data( DataSet, filename ):
+#    """"""
+#    IN = open( filename, 'r' )
+#    (dirname, file) = os.path.split( filename )
+#    laststand = None
+#    TD = {}                         # create temporary dictionary for storing tree records
+#    D = ForestData( DataSet )       # create data structure for final treelist
+#    for L in IN:
+#        if( L[0:9] == 'Site/Plot' ): continue
+#        col = L.split( ',' )
+#        standname = col[0]
+#        year = int(col[1])
+#        (treeno, species, dbh, ht, live, status, cclass, tpa) = \
+#            (int(col[2]), col[3], float(col[4]), float(col[5]), col[6], col[7], int(float(col[8])), float(col[9]))
+#        if( status == '' ): status = 's'
+#        #print standname, year, treeno, species
+#        if( not TD.has_key( standname ) ): TD[standname] = {}
+#        if( not TD[standname].has_key( year ) ): TD[standname][year] = {}
+#        if( not TD[standname][year].has_key( treeno ) ): TD[standname][year][treeno] = {}
+#        #print 'status="%s"' % (status)
+#        if( status == 's' ):
+#            if( not TD[standname][year][treeno].has_key( 'Live' ) ):
+#                TD[standname][year][treeno]['Live'] = (species, dbh, ht, tpa, live, status, cclass)
+#            else: print( 'error, already have tree record' )
+#        elif( status == 'Cut' ):
+#            if( not TD[standname][year][treeno].has_key( 'Cut' ) ):
+#                TD[standname][year][treeno]['Cut'] = (species, dbh, ht, tpa, live, status, cclass)
+#            else: print( 'error, already have cut record' )
+#        else:
+#            print( 'error storing %s' % (L) )
+#    IN.close()
+#
+#    stands = TD.keys()
+#    stands.sort()
+#
+#    for s in stands:
+#        years = TD[s].keys()
+#        years.sort()
+#        cyears = []     # list of years with thinnings
+#        TPA = {}
+#        CTPA = {}
+#        for y in years:
+#            raw_input( "Looking at year %s" % (y) )
+#            #trees = TD[s][y]['Live'].keys()
+#
+#
+#    for s in stands:
+#        if( not D.Stand.has_key( s ) ):
+#            D.Stand[s] = StandData( s)     # initialize data structure for treelist
+#            D.Stand[s].Cut = {}                     # add dictionary for cut trees
+#        years = TD[s].keys()
+#        years.sort()
+#        print( 'Stand %s has inventory for years %s' % (s, years) )
+#        for y in years:
+#            trees = TD[s][y].keys()
+#            trees.sort()
+#            trees.reverse()
+#            print( '%s at %s: %s' % (s, y, trees) )
+#            for t in trees:
+#                #print 'Tree %s, Live=%s' % (t, TD[s][y][t]['Live'])
+#                if( TD[s][y][t].has_key('Live')):
+#                    (species, dbh, ht, tpa, live, status, cclass) = TD[s][y][t]['Live']
+#                    if( not D.Stand[s].Tree.has_key(t) ): D.Stand[s].Tree[t] = TreeData( species, TreeNumber=t )
+#                    D.Stand[s].Tree[t].Year[y] = MeasurementData( dbh, ht, '', tpa, live, status, cclass)
+#                if( TD[s][y][t].has_key('Cut')):
+#                    (species, dbh, ht, tpa, live, status, cclass) = TD[s][y][t]['Cut']
+#                    if( not D.Stand[s].Cut.has_key(t) ): D.Stand[s].Cut[t] = TreeData( species, TreeNumber=t )
+#                    D.Stand[s].Cut[t].Year[y] = MeasurementData( dbh, ht, '', tpa, live, status, cclass)
+#    #raw_input("paused")
+#
+#
+#   #stands = D.Stand.keys()
+#   #print 'stands=%s' % (stands)
+#   #stands.sort()
+#   #for s in stands:
+#   #    tyears = D.Stand[s].Tree.keys()
+#   #    tyears.sort()
+#   #    cyears = D.Stand[s].Cut.keys()
+#   #    cyears.sort()
+#   #    print '%s has Trees for %s and Cut for %s' % (s, tyears, cyears)
+#
+#   #raw_input( "Pause after D creation")
+#
+#   #sumtpa = sumctpa = 0
+#   #stands = D.Stand.keys()
+#   #stands.sort()
+#   #for s in stands:
+#   #    ymin = 9999
+#   #    ymax = 0
+#   #    trees = D.Stand[s].Tree.keys()
+#   #    for t in trees:
+#   #        years = D.Stand[s].Tree[t].Year.keys()
+#   #        for y in years:
+#   #            if( y < ymin ): ymin = y
+#   #            if( y > ymax ): ymax = y
+#   #        years = range( ymin, ymax+1, 5 )
+#   #        sumpta = sumctpa = 0
+#   #    for y in years:
+#   #        trees = D.Stand[s].Tree.keys()
+#   #        trees.sort()
+#   #        for t in trees:
+#   #            if( not D.Stand[s].Tree.has_key(t) ): continue
+#   #            if( not D.Stand[s].Tree[t].Year.has_key(y) ): continue
+#   #            sumtpa += D.Stand[s].Tree[t].Year[y].TPA
+#   #        ctrees = D.Stand[s].Cut.keys()
+#   #        ctrees.sort()
+#   #        for c in ctrees:
+#   #            if( not D.Stand[s].Cut.has_key(c) ): continue
+#   #            if( not D.Stand[s].Cut[c].Year.has_key(y) ): continue
+#   #            sumctpa += D.Stand[s].Cut[c].Year[y].TPA
+#   #        D.Stand[s].Year[y] = MeasurementData( 0.0, 0.0, '', sumtpa, '', '', '' )
+#   #        D.Stand[s].Year[y].CutTPA = sumctpa
+#   #        sumtpa = sumctpa = 0
+#   return( D )
 
 def Test_Excel_Format( filename ):
     FileFormat = 'Unknown'

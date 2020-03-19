@@ -16,14 +16,14 @@
 #'     \item NRCS2FIA()        - convert species codes from NRCS code to FIA #
 #' }
 #'
-#' The package supports either species identified by FIA # or NRCS Plants Database code. The default 
-#' behavior can be configured by setting either the .UseFIA or .UseNRCS hidden variables to TRUE. 
-#' NOTE: Depending on the source data, setting the incorrect treeform file will cause trees to be 
-#' displayed as an Unknown tree species (e.g. red) 
+#' The package supports either species identified by FIA # or NRCS Plants Database code. The default
+#' behavior can be configured by setting either hidden variable ".UseFIA <- TRUE" or ".UseNRCS <- TRUE".
+#' NOTE: Depending on the source data, setting the incorrect treeform file will cause trees to be
+#' displayed as an Unknown tree species (e.g. red)
 #'
-#' The SVS() function supports multple data format types, including:
+#' The SVS() function supports multiple data format types, including:
 #' \itemize{
-#'     \item FMD data frame - a list with header, measurement, and treelist slots
+#'     \item FMD data frame - a data frame with at least TreeKey, Species, MeasDate, Status, DBH, Height, CrownRatio, TPA
 #'     \item LMS Object - a list with stand, measurement, and treelist slots
 #'     \item StandObject - a list with header, treelist, and management slots
 #'     \item SVScsv - a data frame or .csv file containing: Species, PlantID, PlntClass, CrwnClass, TreeStat, DBH, Height, LAng, FAng, EndDia, CRad1, CRat1,
@@ -95,9 +95,9 @@
 #' NOTE: This package includes a number of executable programs that will be run as part of the package,
 #' limiting where the package can be hosted (e.g NOT on CRAN).
 #'
-#' The package understands a number of data formats and can create visualizaions for single or multiple
+#' The package understands a number of data formats and can create visualizations for single or multiple
 #' stands and years based on what information is contained in the specific data format. Files for
-#' visualzations are created in the svsfiles folder in the current working directory for R. These
+#' visualizations are created in the svsfiles folder in the current working directory for R. These
 #' temporary files (*.asc, *.bmp, *.csv, *.png, *.SVS, *.opt) are intermediate files used for creating
 #' the visualizations. This folder can be cleaned out using the \strong{svsfiles_clean()} function.
 #'
@@ -135,14 +135,15 @@ StandObject2CSV <- function( data ) {                                           
     return( CSVFilename )                                                               # return filename written
 }
 
-# @export       # turn comment into #' to export and make available to user
+# turn comment into #' to export and make available to user
+#' @export
 Detect_DataType <- function( data, verbose=FALSE ) {                                    # hidden function to detect data type of object or file
     DataType <- NULL                                                                    # start with data type not known
     if( verbose ) print( paste0( "class(data) = ", class(data) ) )                      # echo what type of data we have
     if( class(data) == "character" ) {                                                  # have a string which is a filename
         if( verbose ) print( paste0( "Data = \"character\"" ) )                         # echo if verbose
-        if( grepl( ".svs", data ) ) DataType <- 'SVSFile'                               # have a .svs file
-        else if( grepl( '.csv', data ) ) {                                              # have a .csv file
+        if( grepl( ".svs", tolower(data) ) ) DataType <- 'SVSFile'                               # have a .svs file
+        else if( grepl( '.csv', tolower(data) ) ) {                                              # have a .csv file
             if( file.exists( data ) ) {                                                 # make sure file exists
                 tf <- read.csv( data )                                                  # read file to check format
                 if( length(attributes(tf)$names) < 14 ) DataType <- 'TBL2SVSFile'       # TBL2SVS format file
@@ -222,6 +223,7 @@ SVS <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, ro
     if( exists(".Development") ) PyExePath <- ".\\python38\\python.exe"                 # if under development use local copy of python
     else PyExePath <- SVS_Environment('python')                                         # else test for and optionally install package copy of python
     DataType <- Detect_DataType( data, verbose )
+    print( paste0( "DataType=", DataType ))
     StandVizOpt <- " -v -D "
     if( exists(".UseNRCS") ) if( .UseNRCS ) StandVizOpt <- paste0( StandVizOpt, "-N " ) # tell StandViz.py to use NRCS treeform file
     if( DataType %in% c('SVSFile', 'SVScsvFile', 'StandVizFile', 'StandVizExtendedFile', 'CSVFile') ) { # have a string which is a filename
@@ -435,7 +437,7 @@ SVS_Example <- function( Example=NULL ) {
     svsexe <- SVS_Environment( "svs" )                	                                # get location of winsvs.exe
     if( is.null(Example) ) {                                                          	# if no stand type provided, print message and return
         print( paste0( "Please pick from: BottomlandHardwood, Douglas-fir, LodgepolePine, MixedConifer, ",
-                       "MontaneOak-Hickory, PacificSilverFir-Hemlock, Redwood, SouthernPine, or Spruce-Fir" ) )
+                       "MontaneOak-Hickory, SilverFir-Hemlock, Redwood, SouthernPine, or Spruce-Fir" ) )
         return('SVS_Demo() exited.')
     } else if( grepl( 'BottomlandHardwood', Example, ignore.case=TRUE ) ) {            	# check, ignoring case to eliminate typos or case
         svsfile <- system.file( "extdata", "BottomlandHardwood.svs", package="rSVS" )   # get location of SVS file
@@ -447,8 +449,8 @@ SVS_Example <- function( Example=NULL ) {
         svsfile <- system.file( "extdata", "MixedConifer.svs", package="rSVS" )
     } else if( grepl( 'MontaneOak-Hickory', Example, ignore.case=TRUE ) ) {
         svsfile <- system.file( "extdata", "MontaneOak-Hickory.svs", package="rSVS" )
-    } else if( grepl( 'PacificSilverFir-Hemlock', Example, ignore.case=TRUE ) ) {
-        svsfile <- system.file( "extdata", "PacificSilverFir-Hemlock.svs", package="rSVS" )
+    } else if( grepl( 'SilverFir-Hemlock', Example, ignore.case=TRUE ) ) {
+        svsfile <- system.file( "extdata", "SilverFir-Hemlock.svs", package="rSVS" )
     } else if( grepl( 'Redwood', Example, ignore.case=TRUE ) ) {
         svsfile <- system.file( "extdata", "Redwood.svs", package="rSVS" )
     } else if( grepl( 'SouthernPine', Example, ignore.case=TRUE ) ) {
@@ -527,13 +529,14 @@ treelist <- function( species, dbh, tpa, scale=4, shape=2, n=30, dmin=0.0001, dm
 #' @author James McCarter \email{jim.mccarter@@rayonier.com}
 #' @export
 SVS_ExampleData <- function( datatype='TBL2SVS', species, dbh, tpa, scale=4, shape=2, n=30, dmin=0.001, dmax=100, incr=0.1, hd=7 ) {
+    if( is.null(datatype) ) {
+        return( "Known data types are: StandViz (default) and TBL2SVS." )
+    }
     tr <- treelist( species, dbh, tpa, scale, shape, n, dmin, dmax, incr )
     tr2 <- tr[c(3,2,5)]                                                     # get subset of columns we want: species, dbh, tpa
     tr2$ht <- tr2$dbh * rnorm(n,hd)                                         # dib in ht scaled from dbh with random normal noise around hd factor
     tr2$dbh[tr2$ht<4.5] <- 0.01                                             # if ht < 4.5, reset dbh to very small
-    if( is.null(datatype) ) {
-        print( "Known data types are: StandViz (default) and TBL2SVS." )
-    } else if( datatype=='TBL2SVS' ) {
+    if( datatype=='TBL2SVS' ) {
         # Species, DBH, Height, CRat, Crad, Status, PlantClass, CrownClass, TPA
         tr2$CrownRatio <- 0.45                      # add CrownRatio
         tr2$CrownRadius <- tr2$ht * tr2$CrownRatio * 0.33 / 2.0     # add CrownRadius
@@ -609,6 +612,17 @@ svsfiles_clean <- function() {
     }
 }
 
+#' List files in svsfiles folder
+#'
+#' @author James McCarter \email{jim.mccarter@rayonier.com}
+#' @examples
+#' svsfiles_list()
+#' @export
+svsfiles_list <- function() {
+    if( file.exists( 'svsfiles' ) ) return( dir( 'svsfiles' ) )
+    else return( "'svsfiles' folder does not exist")
+}
+
 #' Convert species codes from FIA number to NRCS code
 #'
 #' Function not implemented yet.
@@ -624,10 +638,12 @@ FIA2NRCS <- function( Data ) {
     SppRef <- read.csv( system.file( "bin", "rSVS_Species.csv", package="rSVS" ) )[,c(1,2)] # read rSVS_Species.csv and get just FIA and NRCS fields
     if( DataType %in% c('StandVizObject','StandVizExtendedObject','SVScsvObject','TBL2SVSObject') ) {
         Data$Species <- as.character( Data$Species )                                        # coerce Species to character from factor
+        SppRef$FIA <- as.character( SppRef$FIA )                                                # coerce Species to character from factor
         Data2 <- dplyr::left_join( Data, SppRef, by=c("Species" = "FIA") )                  # join original data with species code map
         Data2$FIA <- Data2$Species                                                          # copy original Species to FIA
         Data2$Species <- Data2$NRCS                                                         # copy NRCS over Species
         Data2$NRCS <- NULL                                                                  # remove NRCS column
+        Data2$FIA <- NULL                                                                  # remove NRCS column
         return( Data2 )
     } else {
         print( paste0( "FIA2NRCS(): Don't know how to convert ", DataType, " object yet!") )
@@ -654,6 +670,7 @@ NRCS2FIA <- function( Data ) {
         Data2$NRCS <- Data2$Species                                                         # copy original Species to NRCS
         Data2$Species <- Data2$FIA                                                          # copy FIA over Species
         Data2$FIA <- NULL                                                                   # remove FIA column
+        Data2$NRCS <- NULL                                                                   # remove FIA column
         return( Data2 )
     } else {
         print( paste0( "NCRS2FIA(): Don't know how to convert ", DataType, " object yet!") )
