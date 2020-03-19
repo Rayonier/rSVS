@@ -8,11 +8,17 @@ You can either download the binary package installation file from the dist folde
 
 Check the dist folder in the rSVS repository for the most recent version, click on the link and then use the download button.
 
-The easiest way to install the binary distribution is to use the Install button on the Packages tab in RStudio.  On the Install Packages dialog change Install from: to "Packagee Archive File (.zip; .tar.gz)" and browse to where you saved the download .zip file.
+![rSVS/dist](images/rSVS-Binary-Release-small.png)
+
+The easiest way to install the binary distribution is to use the Install button on the Packages tab in RStudio.  On the Install Packages dialog change Install from: to "Package Archive File (.zip; .tar.gz)" and browse to where you saved the download .zip file, confirm Install to library, and click the Install button.
+
+![RStudio Install](images/RStudio-Install-From-File-small.png)
 
 Use "Install package(s) from local files" on the Packages menu if you are using RGui.
 
 ## Installing from downloaded repository
+
+![Download Repository](images/rSVS-Download-Repo-small.png)
 
 NOTE: You will need devtools and dependencies to build the package from the repository.
 
