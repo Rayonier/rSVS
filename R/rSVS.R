@@ -112,7 +112,7 @@ NULL
 FMD2CSV <- function( data ) {                                                           # hidden function to convert FMD plot data in R to .csv file
     if( ! file.exists('svsfiles') ) dir.create( 'svsfiles' )                            # if svsfiles does not exist, create it
     CSVFilename <- paste0( "svsfiles/FMD_data.csv"  )                                   # create filename
-    tl <- data[,c(3,9:12,14:21)]                                                        # select columns
+    tl <- data[,c(3,9:11,14:16,18:21)]                                                        # select columns
     write.csv( tl, CSVFilename, row.names=FALSE )                                       # write .csv file
     return( CSVFilename )                                                               # return filename written
 }
