@@ -8,8 +8,8 @@
 #' \itemize{
 #'     \item SVS()             - main function for performing visualziations
 #'     \item SVS_Environment() - check package environment and returns path to components
-#'     \item SVS_Example()     - show reginal example visulizations
-#'     \item SVS_ExampleData() - generate stand data for visulizations
+#'     \item SVS_Example()     - show reginal example visualizations
+#'     \item SVS_ExampleData() - generate stand data for visualizations
 #'     \item SVS_Species()     - list known species
 #'     \item svsfiles_clean()  - clean out svsfiles folder containing temporary files for visualizations
 #'     \item FIA2NRCS()        - convert species codes from FIA # to NRCS code
@@ -219,12 +219,14 @@ Detect_DataType <- function( data, verbose=FALSE ) {                            
 #' SVS( d, row=true )       # visualize stand in svs using rows
 #' @export
 SVS <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, row=FALSE, uniform=FALSE, randomness=NULL, clumpiness=NULL, clumpratio=NULL,
-                 verbose=FALSE ) {
+                 verbose=FALSE, debug=FALSE ) {
     if( exists(".Development") ) PyExePath <- ".\\python38\\python.exe"                 # if under development use local copy of python
     else PyExePath <- SVS_Environment('python')                                         # else test for and optionally install package copy of python
     DataType <- Detect_DataType( data, verbose )
     print( paste0( "DataType=", DataType ))
-    StandVizOpt <- " -v -D "
+    StandVizOpt <- " "
+    if( verbose ) StandVizOpt <- paste0( StandVizOpt, " -v" )
+    if( debug ) StandVizOpt <- paste0( StandVizOpt, " -D" )
     if( exists(".UseNRCS") ) if( .UseNRCS ) StandVizOpt <- paste0( StandVizOpt, "-N " ) # tell StandViz.py to use NRCS treeform file
     if( DataType %in% c('SVSFile', 'SVScsvFile', 'StandVizFile', 'StandVizExtendedFile', 'CSVFile') ) { # have a string which is a filename
         cmdline <- paste0( PyExePath, " ", system.file( "python", "StandViz.py", package="rSVS" ), StandVizOpt, data )    # create path to StandViz.py program
@@ -541,8 +543,8 @@ SVS_ExampleData <- function( datatype='TBL2SVS', species, dbh, tpa, scale=4, sha
         tr2$CrownRatio <- 0.45                      # add CrownRatio
         tr2$CrownRadius <- tr2$ht * tr2$CrownRatio * 0.33 / 2.0     # add CrownRadius
         tr2$Status <- 1
-        tr2$PlantClass <- 1
-        tr2$CrownClass <- 1
+        tr2$PlantClass <- 0
+        tr2$CrownClass <- 0
         tr2 <- tr2[,c(1,2,4,5,6,7,8,9,3)]
         names(tr2) <- c("Species", "DBH", "Height", "CrownRatio", "CrownRadius", "Status", "PlantClass", "CrownClass", "TPA")
     } else if( datatype=='StandViz' ) {

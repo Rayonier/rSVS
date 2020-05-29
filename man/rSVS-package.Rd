@@ -12,8 +12,8 @@ The package includes the following functions:
 \itemize{
     \item SVS()             - main function for performing visualziations
     \item SVS_Environment() - check package environment and returns path to components
-    \item SVS_Example()     - show reginal example visulizations
-    \item SVS_ExampleData() - generate stand data for visulizations
+    \item SVS_Example()     - show reginal example visualizations
+    \item SVS_ExampleData() - generate stand data for visualizations
     \item SVS_Species()     - list known species
     \item svsfiles_clean()  - clean out svsfiles folder containing temporary files for visualizations
     \item FIA2NRCS()        - convert species codes from FIA # to NRCS code

@@ -15,7 +15,8 @@ SVS(
   randomness = NULL,
   clumpiness = NULL,
   clumpratio = NULL,
-  verbose = FALSE
+  verbose = FALSE,
+  debug = FALSE
 )
 }
 \arguments{

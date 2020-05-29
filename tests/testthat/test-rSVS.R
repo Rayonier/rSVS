@@ -78,3 +78,5 @@ test_that( "Python component StandViz.py exists", {
 })
 
 # tests to make sure parts of package are working correctly
+
+
