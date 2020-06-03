@@ -18,7 +18,7 @@ import sys          # sys.argv, .exc_info(), .exit()
 import time         # time.asctime()
 #import win32com.client, pythoncom, _winreg
 
-(__file_version__, __file_date__) = ( '$Revision: 1.0.1 $', '$Date: 2020/02/12 07:19:00 $' )
+(__file_version__, __file_date__) = ( '$Revision: 1.0.5 $', '$Date: 2020/05/31 17:39:00 $' )
 (_MyPath, _MyFile, _MyOS) = (os.path.split(sys.argv[0])[0], os.path.split(sys.argv[0])[1], platform.system())
 (_MyVersion, _MyDate) = ( __file_version__.split()[1], '{} - {}'.format(__file_date__.split()[1], __file_date__.split()[2]) )
 
@@ -38,43 +38,48 @@ def main():     # implement __main__ scope for handling of command line executio
     global DEBUG, NOTIFY, VERBOSE
     try:
         (DEBUG, NOTIFY, VERBOSE) = (False, False, False)
-        # do everything relative to this script's path
-        # ..C.E.GHIJKLMNOPQR.TU...YZ .b..e.g.ijk.m.o.q.st..wxyz 0123456789
-        SARG = argparse.ArgumentParser( add_help=False, usage=" %(prog)s [-B|-W|-S|-X] [-c|-f|-r|-u] [dDhnv] [-a #] [-l #] [-p #] [-w worksheet] file [file [...]]\n" +
-                                                             "\t%(prog)s [-v] [-A [FIA|NRCS]] [-F]" )
+        # ABC.E.GHIJKLM.OPQRSTUVWXYZ abcdef..ijklm..pqrs.u..xyz 0123456789
+        SARG = argparse.ArgumentParser( add_help=False, usage=" %(prog)s [-o bitmap|csv|svs|web] [-g clumped|fixed|random|uniform] [-cf #] [-cr #] [-rf #] file [file [...]]\n" +
+                                                             "\t%(prog)s [-v] [-F|-N] [-w worksheet] excelfile [excelfile [...]]\n"
+                                                             "\t%(prog)s [-v] [-ta] [-tc FIA|NRCS] [-CF]" )
         SARGO = SARG.add_argument_group( "Output arguments" )
-        SARGO.add_argument( "-B", action="store_true", help="output to Bitmap (capture .bmp, convert to .png)" )
         SARGO.add_argument( "-D", action="store_true", help="Debug output" )
-        SARGO.add_argument( "-W", action="store_true", help="output to HTML (create .png, generate .html page)" )
-        SARGO.add_argument( "-S", action="store_true", help="output to SVS (default)" )
-        SARGO.add_argument( "-X", action="store_true", help="output to eXcel (.csv file)" )
-        SARGC = SARG.add_argument_group( "Coordinate arguments" )
-        SARGC.add_argument( "-c", action="store_true", help="generate clumped coordinates" )    # or -c Clumped|c|Fixed|f|Random|r|Uniform|u
-        SARGC.add_argument( "-f", action="store_true", help="generate fixed coordinates" )
-        SARGC.add_argument( "-r", action="store_true", help="generate random coordinates" )
-        SARGC.add_argument( "-u", action="store_true", help="generate Uniform coordinates" )
-        SARGC.add_argument( "-a", action="store", nargs=1, metavar="#", help="rAndomness factor (0=perf rows, 0.4-0.8=plantation, <.8=clumps)" )
-        SARGC.add_argument( "-l", action="store", nargs=1, metavar="#", help="cLumpiness factor (default 0.75)" )
-        #SARGC.add_argument( "-w", action="store", nargs=1, metavar="name", help="worksheet name for Excel input" )
-        SARGC.add_argument( "-p", action="store", nargs=1, metavar="#", help="clumP ratio (n clumps = (0.01-0.5)*TPA)" )
+        SARGO.add_argument( "-n", action="store_true", help="Notify progress in DOS window" )
+        SARGO.add_argument( "-o", action="store", nargs=1, metavar="format", help="Output format (bitmap|csv|svs(default)|web)" )
+        SARGO.add_argument( "-v", action="store_true", help="Verbose output" )
+        #SARGO.add_argument( "-os", action="store_true", help="Output to SVS (default)" )
+        #SARGO.add_argument( "-ow", action="store_true", help="Output to HTML (create .png, generate .html page)" )
+        #SARGO.add_argument( "-ox", action="store_true", help="Output to eXcel (.csv file)" )
 
-        SARGG = SARG.add_argument_group( "General arguments" )
-        SARGG.add_argument( "-d", action="store_true", help="scale Diameter: dbh>10*1.25; dbh>15*1.50" )
-        # or -s Diameter|d|XY|xy
-        # or -e expand XY to fit into acre (e.g. for Postex plots)
-        SARGG.add_argument( "-h", action="store_true", help="display help" )
-        SARGG.add_argument( "-n", action="store_true", help="Notify progress in DOS window" )
-        SARGG.add_argument( "-v", action="store_true", help="Verbose output" )
-        #SARGG.add_argument( "-z", action="store_true", help="zip file for transfer" )
-        #SARGG.add_argument( "-m", action="store_true", help="Mechanical (row) thinning (only for Fixed coordinates)" )
-        SARGG.add_argument( "-t", action="store_true", help="Test and debugging option" )
+        SARGC = SARG.add_argument_group( "Coordinate generation arguments" )
+        SARGC.add_argument( "-cf", action="store", nargs=1, metavar="#", help="Clumpiness Factor (default 0.75)" )
+        SARGC.add_argument( "-cr", action="store", nargs=1, metavar="#", help="Clump Ratio (n clumps = (0.01-0.5)*TPA)" )
+        SARGC.add_argument( "-g", action="store", nargs=1, metavar="method", help="generate [clumped|fixe|random|uniform] coordinates" )    # or -c Clumped|c|Fixed|f|Random|r|Uniform|u
+        #SARGC.add_argument( "-gc", action="store_true", help="generate clumped coordinates" )    # or -c Clumped|c|Fixed|f|Random|r|Uniform|u
+        #SARGC.add_argument( "-gf", action="store_true", help="generate fixed coordinates" )
+        #SARGC.add_argument( "-gr", action="store_true", help="generate random coordinates" )
+        #SARGC.add_argument( "-gu", action="store_true", help="generate Uniform coordinates" )
+        SARGC.add_argument( "-rf", action="store", nargs=1, metavar="#", help="Randomness Factor (0=perf rows, 0.4-0.8=plantation, <.8=clumps)" )
 
         SARGT = SARG.add_argument_group( "Treeform arguments" )
-        SARGT.add_argument( "-A", action="store_true", help="Audit rSVS_Species.csv file" )
-        SARGT.add_argument( "-C", action="store", nargs=1, metavar="TRFile", help="Compare treeform file versus rSVS_Species.xlsx" )
-        SARGT.add_argument( "-F", action="store_true", help="create FIA.TRF from NRCS.trf" )
+        SARGT.add_argument( "-CF", action="store_true", help="Create FIA.TRF from rSVS_Species.csv" )
+        SARGT.add_argument( "-F", action="store_true", help="Use FIA treeform file" )
         SARGT.add_argument( "-N", action="store_true", help="Use NRCS treeform file (default FIA)" )
+        SARGT.add_argument( "-ta", action="store_true", help="Audit rSVS_Species.xlsx file" )
+        SARGT.add_argument( "-tc", action="store", nargs=1, metavar="TRFile", help="Compare treeform file versus rSVS_Species.xlsx" )
 
+        SARGG = SARG.add_argument_group( "General arguments" )
+        SARGG.add_argument( "-cd", action="store", nargs=1, metavar="factor", help="Crown Dubbing from height: CR=Height*Factor" )
+        SARGG.add_argument( "-ds", action="store", nargs=1, metavar="factor", help="Diameter scaling: dbh*factor; 25:50 dbh>10*1.25, dbh>20*1.50" )
+        SARGG.add_argument( "-e", action="store", nargs='?', metavar="factor", help="Expand coordinates by factor (default 2.0)", type=float, const=2.0, default=2.0 )
+        SARGG.add_argument( "-h", action="store_true", help="display help" )
+        SARGG.add_argument( "-hd", action="store", nargs=1, metavar="factor", help="Height Dubbing from DBH: Height(ft)=DBH(in)*Factor" )
+        # or -s Diameter|d|XY|xy
+        # or -e expand XY to fit into acre (e.g. for Postex plots)
+        #SARGG.add_argument( "-m", action="store_true", help="Mechanical (row) thinning (only for Fixed coordinates)" )
+        SARGG.add_argument( "-t", action="store_true", help="Test and debugging option" )
+        SARGG.add_argument( "-w", action="store", nargs=1, metavar="name", help="worksheet name for Excel input" )
+        #SARGG.add_argument( "-z", action="store_true", help="zip file for transfer" )
 
         SARG.add_argument( "FILELIST", nargs="*", help="Files [File [...]]")
         SOPT = SARG.parse_args()
@@ -89,19 +94,20 @@ def main():     # implement __main__ scope for handling of command line executio
         if( ScriptPath == '' ): ScriptPath = OriginalWindowsPath
         if( DEBUG ): print( "OriginalPath={}, ScriptPath={}, os.path.realpath()={}".format(OriginalWindowsPath, ScriptPath, os.path.realpath(ScriptPath)) )
         SVSPath = os.path.normpath( os.path.split(ScriptPath)[0] + '/bin/SVS/winsvs.exe' )
+        if( not os.path.exists( SVSPath ) ): print( "This command will fail!: {}".format(SVSPath) )
         if( DEBUG ): print( "SVSPath = {}".format(SVSPath))
 
         #os.chdir( ScriptPath )
 
-        if( SOPT.A ):
+        if( SOPT.ta ):
             Audit_rSVS_Species_File(ScriptPath)
             sys.exit( "audited rSVS_Species.csv" )
 
-        if( SOPT.C ):                                           # Compare TreeForm file against rSVS_Species.csv
+        if( SOPT.tc ):                                           # Compare TreeForm file against rSVS_Species.csv
             Compare_TreeForm_To_rSVS_Species( SOPT.C[0], SOPT.v )       # pass TreeForm file basename to function
             sys.exit("performed audit")
 
-        if( SOPT.F ):       # create FIA.trf from NCRS.trf
+        if( SOPT.CF ):       # create FIA.trf from NCRS.trf
             Create_FIA_TreeForm_File()
             sys.exit( "created FIA.trf" )
 
@@ -116,8 +122,28 @@ def main():     # implement __main__ scope for handling of command line executio
             SARG.print_help()
             sys.exit( "help printed" )
 
-        if( (SOPT.c==0) & (SOPT.f==0) & (SOPT.r==0) & (SOPT.u==0) ): SOPT.r = True   # random is default coordinate generation
-        if( (SOPT.B==0) & (SOPT.W==0) & (SOPT.S==0) & (SOPT.X==0) ): SOPT.S = 1   # SVS is default output
+        ExpandCoord = SOPT.e                                                    # if specified, copy, otherwise copy default value of 2.0
+
+        if( SOPT.o ):                                                           # if -o specified, copy to OutFormat
+            OutFormat = SOPT.o[0].lower()                                           # store as lower case string
+            if( OutFormat in ['b','bit','bitmap','bmp','png','bmp'] ): OutFormat = 'bitmap'     # output BMP file and convert to .PNG
+            if( OutFormat in ['c','csv','x','e','excel'] ): OutFormat = 'csv'       # output .csv file (excel) format
+            if( OutFormat in ['s','svs'] ): OutFormat = 'svs'                       # output .svs for loading SVS program
+            if( OutFormat in ['w','web','h','html'] ): OutFormat = 'web'            # output html web page with imbedded .png graphics
+        else: OutFormat = 'svs'                                                 # else, default OutFormat='svs'
+
+        if( SOPT.g ):                                                           # if -g specified, copy to GenMethod
+            GenMethod = SOPT.g[0].lower()                                           # store as lower case string
+            if( GenMethod in ['c','clump','clumped'] ): GenMethod = 'clumped'       # generate clumped coordinates (see -cf and -cr)
+            if( GenMethod in ['f','fix','fixed'] ): GenMethod = 'fixed'             # generate fixed (rows) coordintes
+            if( GenMethod in ['r','ran','random'] ): GenMethod = 'random'           # generate random coordinates
+            if( GenMethod in ['u','unif','uniform'] ): GenMethod = 'uniform'        # generate uniform coordinates
+        else: GenMethod = 'random'                                              # else, default GenMethod='random'
+
+        print( "OutFormat={}, GenMethod={}, ExpandCoord={}".format(OutFormat, GenMethod, ExpandCoord) )
+
+        #if( (SOPT.gc==0) & (SOPT.gf==0) & (SOPT.gr==0) & (SOPT.gu==0) ): SOPT.gr = True   # random is default coordinate generation
+        #if( (SOPT.ob==0) & (SOPT.ow==0) & (SOPT.os==0) & (SOPT.ox==0) ): SOPT.os = 1   # SVS is default output
 
         if( NOTIFY ): print( 'StandViz.py - Python implementation of Stand Visualization Addin for Excel' )
         print(sys.argv)
@@ -126,25 +152,25 @@ def main():     # implement __main__ scope for handling of command line executio
 
         for FILE in SOPT.FILELIST:
             #D = {}              # create data dictionary
-            (dirname, filename) = os.path.split( FILE )             # get path and filename for file from command line
-            (basename, ext) = os.path.splitext( filename )          # get filebase and extension
+            (dirname, filename) = os.path.split( FILE )                         # get path and filename for file from command line
+            (basename, ext) = os.path.splitext( filename )                      # get filebase and extension
             if( DEBUG ): print( "File: {}, dirname={} filename={} basename={} ext={}".format(FILE, dirname, filename, basename, ext) )
             #DataSet = 'None'
+            FileType = 'unknown'                                                # start with FileType='unknown'
             # determine file format from filename provided on command line
-            if( re.search( '.svs', filename ) != None ):            # process .svs files, just pass through to winsvs.exe if the file exists
-                #SVSEXE = "..\\bin\SVS\winsvs.exe"                   # path to winsvs.exe
-                CMDLINE = "{} {}".format(SVSPath, FILE)              # build command line
-                if( VERBOSE ): print(CMDLINE)                       # echo command line
-                os.system(CMDLINE)                                  # execute command line
-                return
-            elif( re.search( '.csv', filename ) != None ):          # process .csv files
-                DataSet = re.sub( '.csv', '', filename )            # name dataset from base filename
-                FileType = Determine_CSV_Format( FILE )
-                print( "{}: FileType={}".format(FILE,FileType) )
-            elif( re.search( '.xlsx', filename ) != None ):         # process .xlsx or .xlx files
-                DataSet = re.sub( '.xlsx', '', filename )
-            elif( re.search( '.xls', filename ) != None ):
-                DataSet = re.sub( '.xls', '', filename )
+            if( re.search( '.csv', filename ) != None ):                        # have .csv extension
+                DataSet = re.sub( '.csv', '', filename )                        # name dataset from base filename
+                FileType = Determine_CSV_Format( FILE )                         # determine file format
+                if( DEBUG ): print( "{}: FileType={}".format(FILE,FileType) )
+            elif( re.search( '.svs', filename ) != None ):                      # have .svs extension, just pass through to winsvs.exe if the file exists
+                CMDLINE = "{} {}".format(SVSPath, FILE)                         # build command line
+                if( VERBOSE ): print(CMDLINE)                                   # echo command line
+                os.system(CMDLINE)                                              # execute command line
+                return                                                          # exit program
+            elif( re.search( '.xlsx', filename ) != None ):                     # have .xlsx extension
+                DataSet = re.sub( '.xlsx', '', filename )                       # name dataset from filename
+            elif( re.search( '.xls', filename ) != None ):                      # have .xls extension
+                DataSet = re.sub( '.xls', '', filename )                        # name dataset from filename
 
             # data loader for Postex plots: Plot, Plot_Radius, Nr, Tree_Spc, Tree_Dia(.1 in), Tree_Hgt(ft), Tree_Postex1, Tree_Poste2, Tree_Postx3,
             # Tree_Local_x, Tree_Local_y, Tree_Local_Dist, Tree_Local_Angle, Tree_Angle_ToPlotCenter, Latitude, Longitude, Tree_Nr
@@ -152,27 +178,29 @@ def main():     # implement __main__ scope for handling of command line executio
             #if( re.search( 'Postex_016.csv', FILE ) !=None ):
             if( FileType == 'PosTex' ):
                 CsvFileName = "{}".format(FILE)
+                # split path from filename and create .svs in svsfiles folder
                 print( "Processing {}...".format(CsvFileName))
                 # check that it exists
                 D = pd.read_csv( CsvFileName )
-                SVS = StandViz( 'Postex_016' )
-                year = 2020
-                SvsFilename = "Postex_016_{}.svs".format(year)
+                DataSet = re.sub( '.csv', '', filename )
+                SVS = StandViz( DataSet )
+                Year = 2020
+                SvsFilename = "{}_{}.svs".format(DataSet,Year)
                 SVS.SVF = open( SvsFilename, 'w' )
                 SVS.SVS_Write_Header()
                 for L in D.itertuples():
                     standname = L.Plot
                     SVS.Data.Stand[standname] = StandData(standname)
                     (TreeNo, Species, DBH, Ht, X, Y) = (L.Nr, L.Tree_Spc, L.Tree_Dia, L.Tree_Hgt, L.Tree_Local_x, L.Tree_Local_y)
-                    X = (208.71 / 2.0 ) + ((float(X)*3.28084)) * 2.0
-                    Y = (208.71 / 2.0 ) + ((float(Y)*3.28084)) * 2.0
+                    X = (208.71 / 2.0 ) + ((float(X)*3.28084)) * ExpandCoord
+                    Y = (208.71 / 2.0 ) + ((float(Y)*3.28084)) * ExpandCoord
                     if( Species == 1 ): (Species, Status) = ('PITA', 1)
                     elif( Species == 2 ): (Species, Status) = ('HARDWOOD', 1)
                     elif( Species == 3 ): (Species, Status) = ('SNAG', 2)
                     elif( Species == 4 ): (Species, Status) = ('PITA', 2)
                     nTree = len(SVS.Data.Stand[standname].Tree) + 1
                     SVS.Data.Stand[standname].Tree[nTree] = TreeData(Species,TreeNumber=TreeNo, X=X, Y=Y)
-                    SVS.Data.Stand[standname].Tree[nTree].Year[year] = MeasurementData( DBH, Ht, '', 1, 0, Status )
+                    SVS.Data.Stand[standname].Tree[nTree].Year[Year] = MeasurementData( DBH, Ht, '', 1, 0, Status )
                     #print("{},{},{},{},{},{},{},{}".format(standname,TreeNo,Species,DBH,Ht,X,Y,nTree))
                     (LAng, Bearing, EDia, Mark, Z) = (0,0,0,0,0)
                     TPA = 1
@@ -188,31 +216,7 @@ def main():     # implement __main__ scope for handling of command line executio
                 CMDLINE = "{} -A 180 -D 325 {}".format(SVSEXE, SvsFilename)
                 print(CMDLINE)
                 os.system(CMDLINE)
-                #for S in SVS.Data.Stand.keys():
-                #    Trees = SVS.Data.Stand[S].Tree.keys()
-                #    print("Trees.keys()={}".format(SVS.Data.Stand[S].Tree.keys()))
-                #    #YMin = 9999
-                #    #YMax = 0
-                #    #for T in Trees:
-                #    #    Years = SVS.Data.Stand[S].Tree[T].Year.keys()
-                #    #    for Y in Years:
-                #    #        if( Y < YMin ): YMin = Y
-                #    #        if( Y > YMax ): YMax = Y
-                #    #    Years = range( YMin, YMax+1, 5 )
-                #    #    for Y in Years:
-                #    #        #SvsFilename = "Potex_016_{}.svs".format(Y)
-                #    #        #SVS.SVF = open( SvsFilename, 'w' )
-                #    #        #print( "Creating {}".format(SvsFilename))
-                    #        #SVS.SVS_Write_Header()
-                    #        Trees2 = SVS.Data.Stand[S].Tree.keys()
-                    #        for T2 in Trees2:
-                    #            print( "{},{},{}".format(S,Y,T2))
-                    #        #    if( not SVS.Data.Stand[S].Tree.has_key(T) ): continue
-                    #        #    if( not SVS.Data.Stand[S].Tree[T].has_key(Y) ): continue
-                    #        #    (Species, DBH, Ht, TPA, TreeNo, Live, CClass, Status) = ( SVS.Data.Stand[S].Tree[T].Species, SVS.Data.Stand[S].Tree[T].Year[Y].DBH,
-                    #        #        SVS.Data.Stand[S].Tree[T].Year[Y].Height, SVS.Data.Stand[S].Tree[T].Year[Y].TPA, SVS.Data.Stand[S].Tree[T].Year[Y].TreeNumber,
-                    #        #        SVS.Data.Stand[S].Tree[T].Year[Y].Live, SVS.Data.Stand[S].Tree[T].Year[Y].Condition, SVS.Data.Stand[S].Tree[T].Year[Y].Status )
-                    #        #    print( "{},{},{},{},{},{},{},{}".format(Species,DBH,Ht,TPA,TreeNo,Live,CClass,Status) )
+
             elif( FileType == 'StandObject' ):
                 print( "visualizing {}".format(FILE))
                 D = pd.read_csv( FILE )
@@ -291,11 +295,11 @@ def main():     # implement __main__ scope for handling of command line executio
                             (Spp,DBH,Ht,CRat,Status,Cond,Dam,TPA) = TD[P][Y][T]
                             if( pd.isna(DBH) ): DBH = 0.01
                             if( pd.isna(Ht) ): Ht = DBH * 6
-                            if( pd.isna(CRat) ): CRat = 0.33
+                            if( pd.isna(CRat) | (CRat==0) ): CRat = 0.33
                             if( Status == 'Live' ): Status = 1
                             else: Status = 2
                             PClass = 0
-                            CRad = 0
+                            CRad = CRat * Ht / 4
                             CClass = 0
                             OUT.write( "{} {} {} {} {} {} {} {} {}\n".format(Spp,DBH,Ht,CRat,CRad,Status,PClass,CClass,TPA) )
                         OUT.close()
@@ -306,9 +310,44 @@ def main():     # implement __main__ scope for handling of command line executio
                         print( "cmdline={}".format(cmdline) )
                         os.system(cmdline)
                 print( FileNames )
-                if( not os.path.exists( SVSPath ) ): print( "This command will fail!: {}".format(SVSPath) )
-
-
+            elif( FileType == 'LMSObject' ):
+                print( "Creating LMS visualizations..." )
+                D = pd.read_csv( FILE )     # read .csv file
+                # now process into pieces by PlotKey and MeasDate
+                # PlotKey, TreeKey, Species, MeasDate, MeaseAge, Status, Condition, Damage, Screen, DBH, Height, CrownRatio, TPA
+                # need to accumulate data into dictionary by PlotKey and MeasDate
+                TD = {}
+                FileNames = []
+                for d in D.itertuples():
+                    (Stand,Year,Tree,Spp,DBH,Height,CRat,Status,PC,CC,TPA) = (d.STANDNAME,d.year,d.OBJECTID,d.SPECIES,d.QDBH,d.HEIGHT,d.cr,d.status,d.pc,d.cc,d.TPA)
+                    if( not Stand in TD ): TD[Stand] = {}
+                    if( not Year in TD[Stand] ): TD[Stand][Year] = {}
+                    TD[Stand][Year][Tree] = (Spp,DBH,Height,CRat,Status,PC,CC,TPA)
+                for P in sorted(TD.keys()):
+                    for Y in sorted(TD[P].keys()):
+                        OutFilename = "{}/{}-{}.asc".format(dirname,P,Y)
+                        SvsFilename = "{}/{}-{}.svs".format(dirname,P,Y)
+                        FileNames.append(SvsFilename)
+                        OUT = open( OutFilename, 'w' )
+                        OUT.write( ";species dbh height crat crad status pclass cclass tpa\n" )
+                        for T in sorted(TD[P][Y].keys()):
+                            (Spp,DBH,Ht,CRat,Status,PC,CC,TPA) = TD[P][Y][T]
+                            if( pd.isna(DBH) ): DBH = 0.01
+                            if( pd.isna(Ht) ): Ht = DBH * 6
+                            if( pd.isna(CRat) | (CRat==0) ): CRat = 0.45
+                            if( Status=='Live'): Status = 1
+                            #else: Status = 2
+                            PClass = PC
+                            CRad = CRat * Ht / 4
+                            CClass = 0
+                            OUT.write( "{} {} {} {} {} {} {} {} {}\n".format(Spp,DBH,Ht,CRat,CRad,Status,PClass,CClass,TPA ) )
+                        OUT.close()
+                        OPT = open( "{}/{}-{}.opt".format(dirname,P,Y), 'w' )
+                        OPT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\\SVS\\FIA.trf {} {}".format(OutFilename,SvsFilename) )
+                        OPT.close()
+                        cmdline = "{} -G -X{}/{}-{}.opt {}".format(SVSPath,dirname,P,Y,SvsFilename)
+                        print( "cmdline={}".format(cmdline) )
+                        os.system(cmdline)
 
             #print 'DataSet = %s' % (DataSet)
             #SVS = StandViz( DataSet )                 # create class/dataset for input file
@@ -408,7 +447,7 @@ def StandViz_ReportError( errorobj, args, Header = None ):              # error 
     os.system( "notepad.exe {}".format(errorfilename) )                 # display error log file with notepad.exe
 
 def Audit_rSVS_Species_File( ScriptPath ):
-    print( "Performing audit of rSVS_Species.csv file" )
+    print( "Performing audit of rSVS_Species.xlsx file" )
     SppXlsFile = "{}/rSVS_Species.xlsx".format(os.path.realpath("{}/bin".format(os.path.split(ScriptPath)[0])))
     print( "ScriptPath={}, SppXlsFile={}".format(ScriptPath,SppXlsFile) )
     print(SppXlsFile)
@@ -444,7 +483,7 @@ def Audit_rSVS_Species_File( ScriptPath ):
     #os.chdir( OriginalWindowsPath )
 
 def Compare_TreeForm_To_rSVS_Species( SppCodes, Verbose=False ):
-    print( "Performing audit of {}.trf against rSVS_Species.csv".format(SppCodes) )
+    print( "Compare audit of {}.trf against rSVS_Species.xlsx".format(SppCodes) )
     SppXlsFile = "../bin/rSVS_Species.xlsx"                             # set path to rSVS_Species.xlsx
     SPPXLS = pd.ExcelFile( SppXlsFile )                                 # open excel file
     SPP = SPPXLS.parse( 'rSVS_Species' )                                # parse rSVS_Species worksheet
@@ -488,6 +527,7 @@ def Determine_CSV_Format( FileName ):
             else: FileType = 'StandViz'
         elif( ("species" in F.columns) & ("dbh" in F.columns) ): FileType = 'StandObject'
         elif( ('PlotKey' in F.columns) & ('TreeKey' in F.columns) & ('CrownRatio' in F.columns) ): FileType = 'FMDObject'
+        elif( ('STANDNAME' in F.columns) & ('SPECIES' in F.columns) & ('QDBH' in F.columns) ): FileType = 'LMSObject'
         elif( ('Species' in F.columns) & ('PlantClass' in F.columns) & ('CrownClass' in F.columns) ): FileType = 'TBL2SVSObject'
         else: print( "Unknown filetype: columns = {}".format(F.columns) )
     else:
@@ -495,8 +535,6 @@ def Determine_CSV_Format( FileName ):
     return( FileType )
 
 # create SVSTreeForm class and move the SVS_LoadTreeFormFile(), SVS_Write_TreeFormFile(), SVS_WriteHeader() and other appropriate functions into class
-
-
 
 
 
@@ -510,20 +548,55 @@ def Determine_CSV_Format( FileName ):
 # Begin Class Definitions #
 ###########################
 
-#
+##################################################################################################################
 # TreeData, StandData, and ForestData classes store tree information stored by Forest (dataset), stand, and tree
+##################################################################################################################
 #
+# D = ForestData( ForestName )
+# D.Stand[StandName] = StandData( StandName )
+# D.Stand[StandName].Plot[PlotName] = PlotData( 0, Size=1.0 )
+# D.Stand[StandName].Plot[PlotName].Tree[TreeNo] = TreeData( Species, TreeNumber, X, Y )
+# D.Stand[StandName].Plot[PlotName].Tree[TreeNo].Year[Year] = (DBH, Height, CrownRatio, TPA, Live, Status, Condition, ... )
+#
+##########################################################################################
+class ForestData:
+    """class for containing forest/data set/project/file level inventory information"""
+    def __init__( self, Name ):
+        self.Name = Name                    # name for forest/data set
+        self.Stand = {}                     # dictionary for StandData objects
 
-#
-# The TreeData class holds tree information (does not change) and measurements (change with time)
-#
+##########################################################################################
+class StandData:
+    """class for holding stand level information"""
+    def __init__( self, Name, Plots=False ):
+        self.Name = Name                    # name for stand
+        if( Plots ):
+            self.Plot = {}                      # dictionary to hold PlotData objects
+        else:
+            self.Tree = {}                      # dictionary for TreeData objects
+            self.Year = {}                      # dictionary to hold stand summary information
+
+##########################################################################################
+class PlotData:
+    """class for holding plot level information within a stand and dictionary of TreeData for tree information"""
+    def __init__ (self, Name, Size=1.0 ):
+        self.Name = Name
+        self.Size = Size
+        self.Tree = {}                      # dictionary to hold TreddData objects
+
+##########################################################################################
+class TreeData:
+    """class for holding tree information (what does nto change and a dictionary of MeasurementData by year/age (changes with time)"""
+    def __init__( self, Species=None, TreeNumber=None, X=None, Y=None ):
+        self.Species = Species              # species
+        self.TreeNumber = TreeNumber        # tree numbers
+        self.X = X                          # tree X coordinate
+        self.Y = Y                          # tree Y coordinate
+        self.Year = {}                      # dictionary for holding MeasurementData objects
+
+##########################################################################################
 class MeasurementData:
-    """class to hold tree measurement information organized by year"""
-    #D = ForestData( 'ForestName' )
-    #D.Stand['StandName'] = StandData( 'StandName' )
-    # D.STand['StandName'].Plot[0] = PlotData( 0, Size=1.0 )
-    #D.Stand['StandName'].Plot[0].Tree[1] = TreeData( Species, TreeNumber, X, Y )
-    #D.Stand['StandName'].Plot[0].Tree[1].Year[1] = (DBH, Height, CrownRatio, TPA, Live, Status, Condition, ... )
+    """The MeasurementData class holds tree measurement information"""
     def __init__( self, DBH=None, Height=None, CrownRatio=None, TPA=None, Live=None, Status=None, Condition=None,
                   Bearing=None, BrokenHeight=None, BrokenOffset=None, CrownRadius=None, DMR=None, LeanAngle=None, RootWad=None ):
         self.DBH = DBH                      # Diameter at Breat Height
@@ -546,54 +619,6 @@ class MeasurementData:
         self.LeanAngle = LeanAngle          # Angle tree leaning (not implemented yet)
         self.RootWad = RootWad              # Radius of root wad
 
-#########################################################################################
-# The TreeData class hold tree information (what does not change) and a dictionary of MeasurementData by year/age (changes with time)
-class TreeData:
-    """class for holding tree information"""
-    # D = ForestData( 'Forest' )
-    # D.Stand['StandName'] = StandData( 'StandName' )
-    # D.STand['StandName'].Plot[0] = PlotData( 0, Size=1.0 )
-    # D.Stand['StandName'].Plot[0].Tree[1] = TreeData( Species, TreeNumber, X, Y )
-    def __init__( self, Species=None, TreeNumber=None, X=None, Y=None ):
-        self.Species = Species              # species
-        self.TreeNumber = TreeNumber        # tree numbers
-        self.X = X                          # tree X coordinate
-        self.Y = Y                          # tree Y coordinate
-        self.Year = {}                      # dictionary for holding MeasurementData objects
-
-class PlotData:
-    """class for holding plot level information within a stand"""
-    # D = ForestData( 'ForestName' )
-    # D.Stand['StandName'] = StandData( 'StandName' )
-    # D.Stand['StandName'].Plot['PlotName'] = PlotData( 'PlotName' )
-    def __init__ (self, Name, Size=1.0 ):
-        self.Name = Name
-        self.Size = Size
-        self.Tree = {}                      # dictionary to hold TreddData objects
-
-# StandData class holds tree information by stand
-#
-class StandData:
-    """class for holding stand level information"""
-    #D = ForestData( 'DatasetName' )
-    #D.Stand[1] = StandData( 'StandName' )
-    def __init__( self, Name, Plots=False ):
-        self.Name = Name                    # name for stand
-        if( Plots ):
-            self.Plot = {}                      # dictionary to hold PlotData objects
-        else:
-            self.Tree = {}                      # dictionary for TreeData objects
-            self.Year = {}                      # dictionary to hold stand summary information
-
-#
-# ForestData class holds stand information for dataset
-#
-class ForestData:
-    """class for containing forest/data set/project/file level inventory information"""
-    #D = ForestData( 'DatasetName' )
-    def __init__( self, Name ):
-        self.Name = Name                    # name for forest/data set
-        self.Stand = {}                     # dictionary for StandData objects
 
 # D = ForestData( "DataName" )
 # D.Stand[1] = StandData( ... )
@@ -604,6 +629,9 @@ class ForestData:
 #         for t in D.Stand[s].Plot[p].Tree.keys()
 #             (Spp, Dbh, Ht, Cr, TPA) = D.Stand[s].Plot[p].Tree[t]
 
+#
+# SVS_TreeForm class abstract SVS treeform files
+#
 class SVS_TreeForm:
     """class to abstract and provide interface to SVS treeform files"""
     def __init__( self ):
@@ -615,9 +643,8 @@ class SVS_TreeForm:
         pass
 
     def Create_FIA_TreeForm_File():
+        """Create FIA.trf file from rSVS_Species.xlsx file"""
         print( "Creating FIA.trf..." )
-        #SppFile = "../bin/rSVS_Species.csv"
-        #SPP = pd.read_csv( SppFile )
         SppXlsFile = "../bin/rSVS_Species.xlsx"
         SPPXLS = pd.ExcelFile( SppXlsFile )
         SPP = SPPXLS.parse( 'rSVS_Species' )                                                    # get tree records from Blackrock worksheet
@@ -696,9 +723,9 @@ class SVS_TreeForm:
         #           PlantClass,CrownClass,PlantForm,NoBranch,NoWhorl,BranchBase,BranchAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemColor,BranchColor,Foliage1,Foliage2,
         #           SampHt,SampRat,SampRad,Scale) )
         #Species = "{:15d}".format(Spp)
-        OUT.write( "{:15s}{:>5s}{:>7s}{:>7s}{:>10s}{:>8s}{:>9s}{:>6s}{:>9s}{:>8s}{:>9s}{:>9s}{:>9s}{:>8s}{:>7s}{:>7s}{:>8s}{:>9s}{:>11s}{:>9s}{:>11s}{:>7s}\n".format(str(Spp),
-                   PlantClass,CrownClass,PlantForm,NoBranch,NoWhorl,BranchBase,BranchAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemColor,BranchColor,Foliage1,Foliage2,
-                   SampHt,SampRat,SampRad,Scale) )
+        OUT.write( "{:15s}{:>5s}{:>7s}{:>7s}{:>10s}{:>8s}{:>9s}{:>6s}{:>9s}{:>8s}{:>9s}{:>9s}{:>9s}{:>8s}{:>7s}{:>7s}{:>8s}{:>9s}{:>11s}{:>9s}{:>11s}{:>7s}\n".format(
+                   str(Spp),PlantClass,CrownClass,PlantForm,NoBranch,NoWhorl,BranchBase,BranchAngle,LowX,LowY,HighX,HighY,BaseUp,TopUp,StemColor,BranchColor,
+                   Foliage1,Foliage2,SampHt,SampRat,SampRad,Scale) )
 
     def SVS_Write_TreeFormFile( self, TreeFormFile, SpecialForm, SppForm ):
         TFM = open( TreeFormFile, 'w' )
@@ -744,20 +771,19 @@ class StandViz:
         self.Season = 'Summer'
         self.SpeciesCase = 'Upper'
         self.TPAScale = 1
-        self.TreeFormFile = '%s/TIR.trf' % (OWNPATH)
-        self.PaletteFile = '%s/TIR-BLUE.pal' % (OWNPATH)
+        self.TreeFormFile = '%s/NRCS.trf' % (OWNPATH)
+        #self.PaletteFile = '%s/TIR-BLUE.pal' % (OWNPATH)
+        self.PaletteFile = None
         self.ViewpointDist = 1000
         self.ViewpointElev = 1000
-        #self.SvsExe = '%s\winsvs.exe' % ('C:\ProgramData\SVS')
-        #self.SvsExe = '%s\winsvs.exe' % ('C:\App\TIRViz\SVS')
-        self.SvsExe = '%s\\SVS\\winsvs.exe' % (OWNPATH)
+        self.SvsExe = '{}\\SVS\\winsvs.exe'.format(OWNPATH)
         self.Data = ForestData( DataSetName )
         self.SVF = None                         # variable for file handle object
         random.seed( self.RandSeed )            # initialize random seed generator to common starting point
 
     def BMP_To_PNG( bmpfilename, pngfilename ):
         """"""
-        cmdline = '%s/bmp2png.exe -E "%s"' % (OWNPATH, bmpfilename)
+        cmdline = '{}/bmp2png.exe -E "{}"'.format(OWNPATH, bmpfilename)
 
     def Compute_Offset( self, Bearing, Distance ):
         """compute random offset distance"""
@@ -776,7 +802,7 @@ class StandViz:
 
     def CSV_Load_File( self, infilename ):
         """Load .cvs format file into class structures"""
-        print( 'Loading "%s"' % (infilename) )
+        print( 'Loading "{}"'.format(infilename) )
         IN = open( infilename, 'r' )
         standname = None
         laststand = None
@@ -884,7 +910,7 @@ class StandViz:
                 years.sort()
                 y = years[0]
                 tpa = self.Data.Stand[s].Tree[t].Year[y].TPA
-                raw_input( "Stand=%s, Tree=%s, Year=%s, TPA=%s" % (s, t, y, tpa))
+                raw_input( "Stand={}, Tree={}, Year={}, TPA={}".format(s, t, y, tpa) )
 
 
     def Generate_Random( self ):
@@ -956,8 +982,8 @@ class StandViz:
 
     def Update_WinSVS_IniFile( self, Update ):
         """"""
-        inifile = '%s\winsvs.ini' % (OWNPATH)
-        bckfile = '%s\winsvs-SvsAddin-backup.ini' % (OWNPATH)
+        inifile = '{}\winsvs.ini'.format(OWNPATH)
+        bckfile = '{}\winsvs-SvsAddin-backup.ini'.format(OWNPATH)
         if( not os.path.exists( bckfile ) ):
             self.CopyFile( inifile, bckfile )       # make backup copy of file
         CFG = ConfigParser.RawConfigParser()
@@ -982,7 +1008,7 @@ class StandViz:
             CFG.set( 'Preferences', 'FormCols', '12')
         else:                                       # unkown, error
             print( 'Error, unknonw Winsvs.ini update requested: %s' % (Update) )
-        CFGOUT = open( '%s.\winsvs.ini' % (OWNPATH), 'w' )
+        CFGOUT = open( '{}\winsvs.ini'.format(OWNPATH), 'w' )
         CFG.write( CFGOUT )
         CFGOUT.close()
 
@@ -991,7 +1017,7 @@ class StandViz:
         ProjectName = self.Data.Name
         stands = self.Data.Stand.keys()
         stands.sort()
-        batfilename = '%s\\RunSvs.bat' % (dirname)
+        batfilename = '{}\\RunSvs.bat'.format(dirname)
         print( batfilename )
         if( os.path.exists( batfilename ) ): os.unlink( batfilename )
         BAT = open( batfilename, 'w' )
@@ -1006,13 +1032,13 @@ class StandViz:
                     if( y > ymax ): ymax = y
             years = range( ymin, ymax+1, 5 )
             for y in years:
-                SvsFilename = '%s/svsfiles/%s/%s-%s.svs' % (dirname, ProjectName, s, y)
-                SvsTitle = '%s : %s-%s' % (ProjectName, s, y)
-                SvsCmdLine = '-E%s -D%s -L%s -T"%s"' % (self.ViewpointElev, self.ViewpointDist, self.FocalLength, SvsTitle)
-                BAT.write( '"%s" %s "%s"\n' % (self.SvsExe, SvsCmdLine, SvsFilename) )
+                SvsFilename = '{}/svsfiles/{}/{}-{}.svs'.format(dirname, ProjectName, s, y)
+                SvsTitle = '{} : {}-{}'.format(ProjectName, s, y)
+                SvsCmdLine = '-E{} -D{} -L{} -T"{}"'.format(self.ViewpointElev, self.ViewpointDist, self.FocalLength, SvsTitle)
+                BAT.write( '"{}" {} "{}"\n'.format(self.SvsExe, SvsCmdLine, SvsFilename) )
         BAT.close()
         #raw_input( "paused after RunSvs.bat created")
-        os.system( '"%s"' % (batfilename) )
+        os.system( '"{}"'.format(batfilename) )
         #os.unlink( batfilename )
 
     def SVS_Create_Bitmaps( self, dirname ):
@@ -1032,24 +1058,24 @@ class StandViz:
                     if( y > ymax ): ymax = y
             years = range( ymin, ymax+1, 5 )
             for y in years:
-                SvsFilename = '%s/svsfiles/%s/%s-%s.svs' % (dirname, ProjectName, s, y)
-                BmpFilename = '%s/svsfiles/%s/%s-%s.bmp' % (dirname, ProjectName, s, y)
-                HrBmpFilename = '%s/svsfiles/%s/%s-%s_HiRes.bmp' % (dirname, ProjectName, s, y)
-                SvsTitle = '%s : %s-%s' % (ProjectName, s, y)
-                SvsCmdLine = '-E%s -D%s -L%s -T"%s" -C"%s"' % (self.ViewpointElev, self.ViewpointDist, self.FocalLength, SvsTitle, BmpFilename)
-                #BAT.write( '%s %s %s\n' % (self.SvsExe, SvsCmdLine, SvsFilename) )
-                os.system( '%s %s %s' % (self.SvsExe, SvsCmdLine, SvsFilename) )
-                os.system( '%s\\bmp2png.exe -E "%s"' % (OWNPATH, BmpFilename) )
+                SvsFilename = '{}svsfiles/{}/{}-{}.svs'.format(dirname, ProjectName, s, y)
+                BmpFilename = '{}svsfiles/{}/{}-{}.bmp'.format(dirname, ProjectName, s, y)
+                HrBmpFilename = '{}/svsfiles/{}/{}-{}_HiRes.bmp'.format(dirname, ProjectName, s, y)
+                SvsTitle = '{} : {}-{}'.format(ProjectName, s, y)
+                SvsCmdLine = '-E{} -D{} -L{} -T"{}" -C"{}"'.format(self.ViewpointElev, self.ViewpointDist, self.FocalLength, SvsTitle, BmpFilename)
+                #BAT.write( '{} {} {}\n'.format((self.SvsExe, SvsCmdLine, SvsFilename) )
+                os.system( '{} {} {}'.format(self.SvsExe, SvsCmdLine, SvsFilename) )
+                os.system( '{}\\bmp2png.exe -E "{}"'.format(OWNPATH, BmpFilename) )
                 # update winini file
                 #self.Update_WinSVS_IniFile( 'HighRes' )
-                SvsCmdLine = '-E%s -D%s -L%s -T"%s" -C"%s"' % (self.ViewpointElev, self.ViewpointDist, self.FocalLength, SvsTitle, HrBmpFilename)
-                #BAT.write( '%s %s %s\n' % (self.SvsExe, SvsCmdLine, SvsFilename) )
-                os.system( '%s %s %s' % (self.SvsExe, SvsCmdLine, SvsFilename) )
+                SvsCmdLine = '-E{} -D{} -L{} -T"{}" -C"{}"'.format(self.ViewpointElev, self.ViewpointDist, self.FocalLength, SvsTitle, HrBmpFilename)
+                #BAT.write( '{} {} {}\n'.format(self.SvsExe, SvsCmdLine, SvsFilename) )
+                os.system( '{} {} {}'.format(self.SvsExe, SvsCmdLine, SvsFilename) )
                 #self.Update_WinSVS_IniFile( 'NormalRes' )
-                #BAT.write( '%s -E "%s"\n' % ('.\SvsAddin\\bmp2png', BmpFilename) )
-                os.system( '%s\\bmp2png.exe -E "%s"' % (OWNPATH, HrBmpFilename) )
+                #BAT.write( '{} -E "{}"\n'.format('.\SvsAddin\\bmp2png', BmpFilename) )
+                os.system( '{}\\bmp2png.exe -E "{}"'.format(OWNPATH, HrBmpFilename) )
                 #self.Update_WinSVS_IniFile( 'Restore' )
-                #os.system( '.\SvsAddin\\bmp2png -E svsfiles/%s/*.bmp' % (ProjectName) )
+                #os.system( '.\SvsAddin\\bmp2png -E svsfiles/{}/*.bmp'.format(ProjectName) )
         #BAT.close()
         #os.system( 'SvsBat.bat' )
 
@@ -1058,23 +1084,23 @@ class StandViz:
         """ """
         ProjectName = self.Data.Name
         #if( not os.path.exists( 'svsfiles' ) ): os.mkdir( 'svsfiles' )
-        target_path = '%s\\svsfiles' % (dirname)
+        target_path = '{}\\svsfiles'.format(dirname)
         if( not os.path.exists( target_path ) ):
-            print( 'did not find %s, create it' % (target_path) )
+            print( 'did not find {}, create it'.format(target_path) )
             os.mkdir( target_path )
-        #else: print '%s exists already' % (target_path)
-        target_path = '%s\\svsfiles\\%s' % (dirname, ProjectName)
-        print( 'Creating SVS files in %s' % (target_path) )
+        #else: print '{} exists already'.format(target_path)
+        target_path = '{}\\svsfiles\\{}'.format(dirname, ProjectName)
+        print( 'Creating SVS files in {}'.format(target_path) )
         if( not os.path.exists( target_path ) ):
-            print( 'did not find %s, create it' % (target_path) )
+            print( 'did not find {}, create it'.format(target_path) )
             os.mkdir( target_path )
-        #else: print '%s exists already' % (target_path)
+        #else: print '{} exists already' % (target_path)
         # copy .pal and .trf file to directory
-        #print 'Copying %s\\TIR-BLUE.pal to %s' % (OWNPATH)
-        self.CopyFile( '%s\\SVS\\TIR-BLUE.pal' % (OWNPATH), '%s\\TIR-BLUE.pal' % (target_path) )
-        self.CopyFile( '%s\\SVS\\TIR-SvAddin.trf' % (OWNPATH), '%s\\TIR-SvAddin.trf' % (target_path) )
-        #self.SVF.write( '#PALETTE %s\SvsAddin\TIR-BLUE.pal\n' % (OWNPATH) )
-        #self.SVF.write( '#TREEFORM %s\SvsAddin\TIR-SvAddin.trf\n' % (OWNPATH) )
+        #print 'Copying {}\\TIR-BLUE.pal to %s'.format(OWNPATH)
+        self.CopyFile( '{}\\SVS\\TIR-BLUE.pal'.format(OWNPATH), '{}\\TIR-BLUE.pal'.format(target_path) )
+        self.CopyFile( '{}\\SVS\\TIR-SvAddin.trf'.format(OWNPATH), '{}\\TIR-SvAddin.trf'.format(target_path) )
+        #self.SVF.write( '#PALETTE {}\SvsAddin\TIR-BLUE.pal\n'.format(OWNPATH) )
+        #self.SVF.write( '#TREEFORM {}\SvsAddin\TIR-SvAddin.trf\n'.format(OWNPATH) )
         stands = self.Data.Stand.keys()
         stands.sort()
         print( stands )
@@ -1091,7 +1117,7 @@ class StandViz:
             years = range( ymin, ymax+1, 5 )
             #print 'years=%s' % (years)
             for y in years:
-                SvsFilename = '%s/svsfiles/%s/%s-%s.svs' % (dirname, ProjectName, s, y)
+                SvsFilename = '{}/svsfiles/{}/{}-{}.svs'.format(dirname, ProjectName, s, y)
                 print( SvsFilename )
                 self.SVF = open( SvsFilename, 'w' )
                 self.SVS_Write_Header()
@@ -1130,7 +1156,6 @@ class StandViz:
                     elif( live in ( 's', 'stump' ) ):
                         pclass = 0
                         status = 'stump'
-
                     bearing = 0
                     edia = 0
                     lang = 0
@@ -1210,23 +1235,23 @@ class StandViz:
         """ """
         # get list of plots
         # for p in plots:
-        SvsFileName = '%s/%s.svs' % (SVSTempPath, PlotName)
-        BmpFileName = '%s/%s.bmp' % (SvsTempPath, PlotName)
-        BmpLegendFile = '%s/%s.legend' % (SvsTempPath, PlotName)
+        SvsFileName = '{}/{}.svs'.format(SVSTempPath, PlotName)
+        BmpFileName = '{}/{}.bmp'.format(SvsTempPath, PlotName)
+        BmpLegendFile = '{}/{}.legend'.format(SvsTempPath, PlotName)
         SVS_Create_File( SvsFileName )
-        SvsTitle = '%s : % s- %s' % (Workbook_Name, Worksheet_Name, PlotName)
-        SvsCmdLine = '-E %s -D %s -L %s -T "%s" -C"%s"' % (ViewpointElev, ViewpointDist, FocalLength, SvsTitle, BmpFileName)
+        SvsTitle = '{} : {}-{}'.format(Workbook_Name, Worksheet_Name, PlotName)
+        SvsCmdLine = '-E {} -D {} -L {} -T "{}" -C"{}"'.format(ViewpointElev, ViewpointDist, FocalLength, SvsTitle, BmpFileName)
         SVS_Run( SvsCmdLine, SvsFileName )
-        SVS_Generate_Legend( SVSFileName, '%s.bmp' % (BmpLegendFile) )
+        SVS_Generate_Legend( SVSFileName, '{}.bmp'.format(BmpLegendFile) )
 
     def SVS_Run( self, SvsOpts, SvsFilename ):
         """ """
         BAT = open( 'SvBat.bat', 'w' )
         if( SvsOpts == '' ):
-            CmdLine = '%s' % (self.SvsExe)
-            BAT.write( '%s\n' % (CmdLine) )
+            CmdLine = '{}'.format(self.SvsExe)
+            BAT.write( '{}\n'.format(CmdLine) )
         else:
-            CmdLine = '%s %s %s' % (self.SvsExe, SvsOpts, SvsFilename)
+            CmdLine = '{} {} {}'.format(self.SvsExe, SvsOpts, SvsFilename)
         BAT.close()
 
     def SVS_Webpage_Create( self, dirname ):
@@ -1234,19 +1259,19 @@ class StandViz:
         ProjectName = self.Data.Name
         stands = self.Data.Stand.keys()
         stands.sort()
-        batfilename = '%s\\RunSvs.bat' % (dirname)
+        batfilename = '{}\\RunSvs.bat'.format(dirname)
         if( os.path.exists( batfilename ) ): os.unlink( batfilename )
-        print( 'creating %s' % (batfilename) )
+        print( 'creating {}'.format(batfilename) )
         BAT = open( batfilename, 'w' )
-        BAT.write( 'del %s\\svsfiles\\%s\\*.png\n' % (dirname, ProjectName) )
-        htmlfilename = '%s/svsfiles/%s/%s.html' % (dirname, ProjectName, ProjectName)
+        BAT.write( 'del {}\\svsfiles\\{}\\*.png\n'.format(dirname, ProjectName) )
+        htmlfilename = '{}/svsfiles/{}/{}.html'.format(dirname, ProjectName, ProjectName)
         HTML = open( htmlfilename, 'w' )
-        HTML.write( '<html>\n<head>\n<title>%s</title>\n' % (ProjectName) )
+        HTML.write( '<html>\n<head>\n<title>{}</title>\n'.format(ProjectName) )
         HTML.write( '<meta http-equiv="Content-Type" content="text/html; chartset=iso-8859-1" />\n' )
         HTML.write( '</head>\n' )
         HTML.write( '<a name="Top">\n' )
-        HTML.write( '<center><h1>Visualizations for %s</h1></center>' % (ProjectName) )
-        HTML.write( '<p>The %s project contains the following plots.  Click on the plot name below to jump to the ' % (ProjectName) )
+        HTML.write( '<center><h1>Visualizations for {}</h1></center>'.format(ProjectName) )
+        HTML.write( '<p>The {} project contains the following plots.  Click on the plot name below to jump to the '.format(ProjectName) )
         HTML.write( 'visualization for that plot.  Click on the main visualization image to load a higher resolution version of the image.' )
         for s in stands:
             ymin = 9999
@@ -1259,66 +1284,66 @@ class StandViz:
                     if( y > ymax ): ymax = y
             years = range( ymin, ymax+1, 5 )
             for y in years:
-                SvsFilename = '%s/svsfiles/%s/%s-%s.svs' % (dirname, ProjectName, s, y)
-                BmpFilename = '%s/svsfiles/%s/%s-%s.bmp' % (dirname, ProjectName, s, y)
-                HrBmpFilename = '%s/svsfiles/%s/%s-%s_HiRes.bmp' % (dirname, ProjectName, s, y)
-                SvsTitle = '%s : %s-%s' % (ProjectName, s, y)
-                SvsCmdLine = '-E%s -D%s -L%s -T"%s" -C"%s"' % (self.ViewpointElev, self.ViewpointDist, self.FocalLength, SvsTitle, BmpFilename)
+                SvsFilename = '{}/svsfiles/{}/{}-{}.svs'.format(dirname, ProjectName, s, y)
+                BmpFilename = '{}/svsfiles/{}/{}-{}.bmp'.format(dirname, ProjectName, s, y)
+                HrBmpFilename = '{}/svsfiles/{}/{}-{}_HiRes.bmp'.format(dirname, ProjectName, s, y)
+                SvsTitle = '{} : {}-{}' % (ProjectName, s, y)
+                SvsCmdLine = '-E{} -D{} -L{} -T"{}" -C"{}"'.format(self.ViewpointElev, self.ViewpointDist, self.FocalLength, SvsTitle, BmpFilename)
                 #self.Update_WinSVS_IniFile( 'NormalRes' )
-                BAT.write( '"%s\\python.exe" "%s\\Update_WinSVS_IniFile.py" NormalRes\n' % (OWNPATH, OWNPATH) )
-                #print '"%s" %s "%s"' % (self.SvsExe, SvsCmdLine, SvsFilename)
-                #os.system( '"%s" %s "%s"' % (self.SvsExe, SvsCmdLine, SvsFilename) )
-                BAT.write( '"%s" %s "%s"\n' % (self.SvsExe, SvsCmdLine, SvsFilename) )
-                #print '"%s\\bmd2png.exe" -E "%s"' % (OWNPATH, BmpFilename)
-                #os.system( '"%s\\bmp2png.exe" -E "%s"' % (OWNPATH, BmpFilename) )
-                BAT.write( '"%s\\bmp2png.exe" -E "%s"\n' % (OWNPATH, BmpFilename) )
+                BAT.write( '"{}\\python.exe" "{}\\Update_WinSVS_IniFile.py" NormalRes\n'.format(OWNPATH, OWNPATH) )
+                #print '"{}" {} "{}"'.format(self.SvsExe, SvsCmdLine, SvsFilename)
+                #os.system( '"{}" {} "{}"'.format(self.SvsExe, SvsCmdLine, SvsFilename) )
+                BAT.write( '"{}" {} "{}"\n'.format(self.SvsExe, SvsCmdLine, SvsFilename) )
+                #print '"{}\\bmd2png.exe" -E "{}"'.format(OWNPATH, BmpFilename)
+                #os.system( '"{}\\bmp2png.exe" -E "{}"'.format(OWNPATH, BmpFilename) )
+                BAT.write( '"{}\\bmp2png.exe" -E "{}"\n'.format(OWNPATH, BmpFilename) )
                 #self.Update_WinSVS_IniFile( 'HighRes' )
-                BAT.write( '"%s\\python.exe" "%s\\Update_WinSVS_IniFile.py" HighRes\n' % (OWNPATH, OWNPATH) )
-                SvsCmdLine = '-E%s -D%s -L%s -T"%s" -C"%s"' % (self.ViewpointElev, self.ViewpointDist, self.FocalLength, SvsTitle, HrBmpFilename)
-                #os.system( '"%s" %s "%s"' % (self.SvsExe, SvsCmdLine, SvsFilename) )
-                BAT.write( '"%s" %s "%s"\n' % (self.SvsExe, SvsCmdLine, SvsFilename) )
-                #os.system( '"%s\\bmp2png.exe" -E "%s"' % ( OWNPATH, HrBmpFilename) )
-                BAT.write( '"%s\\bmp2png.exe" -E "%s"\n' % ( OWNPATH, HrBmpFilename) )
+                BAT.write( '"{}\\python.exe" "{}\\Update_WinSVS_IniFile.py" HighRes\n'.format(OWNPATH, OWNPATH) )
+                SvsCmdLine = '-E{} -D{} -L{} -T"{}" -C"{}"'.format(self.ViewpointElev, self.ViewpointDist, self.FocalLength, SvsTitle, HrBmpFilename)
+                #os.system( '"{}" {} "{}"'.format(self.SvsExe, SvsCmdLine, SvsFilename) )
+                BAT.write( '"{}" {} "{}"\n'.format(self.SvsExe, SvsCmdLine, SvsFilename) )
+                #os.system( '"{}\\bmp2png.exe" -E "{}"'.format( OWNPATH, HrBmpFilename) )
+                BAT.write( '"{}\\bmp2png.exe" -E "{}"\n'.format( OWNPATH, HrBmpFilename) )
                 #self.Update_WinSVS_IniFile( 'Legend' )
-                BAT.write( '"%s\\python.exe" "%s\\Update_WinSVS_IniFile.py" Legend\n' % (OWNPATH, OWNPATH) )
-                BmpLegendFilename = '%s/svsfiles/%s/%s-%s_legend.bmp' % (dirname, ProjectName, s, y)
-                SvsCmdLine = '-C"%s"' % (BmpLegendFilename)
-                #os.system( '"%s" %s "%s"' % (self.SvsExe, SvsCmdLine, SvsFilename) )
-                BAT.write( '"%s" %s "%s"\n' % (self.SvsExe, SvsCmdLine, SvsFilename) )
-                #os.system( '"%s\\bmp2png.exe" -E "%s"' % ( OWNPATH, BmpLegendFilename) )
-                BAT.write( '"%s\\bmp2png.exe" -E "%s"\n' % ( OWNPATH, BmpLegendFilename) )
+                BAT.write( '"%s\\python.exe" "{}\\Update_WinSVS_IniFile.py" Legend\n'.format(OWNPATH, OWNPATH) )
+                BmpLegendFilename = '{}/svsfiles/{}/{}-{}_legend.bmp'.format(dirname, ProjectName, s, y)
+                SvsCmdLine = '-C"{}"'.format(BmpLegendFilename)
+                #os.system( '"{}" {} "{}"'.format(self.SvsExe, SvsCmdLine, SvsFilename) )
+                BAT.write( '"{}" {} "{}"\n'.format(self.SvsExe, SvsCmdLine, SvsFilename) )
+                #os.system( '"{}\\bmp2png.exe" -E "{}"'.format( OWNPATH, BmpLegendFilename) )
+                BAT.write( '"{}\\bmp2png.exe" -E "{}"\n'.format( OWNPATH, BmpLegendFilename) )
                 #self.Update_WinSVS_IniFile( 'Restore' )
-                BAT.write( '"%s\\python.exe" "%s\\Update_WinSVS_IniFile.py" Restore\n' % (OWNPATH, OWNPATH) )
+                BAT.write( '"{}\\python.exe" "{}\\Update_WinSVS_IniFile.py" Restore\n'.format(OWNPATH, OWNPATH) )
         HTML.write( '<ul>\n' )
         BAT.close()
         raw_input( 'RunSvs.bat created...pause before run' )
-        os.system( '"%s"' % (batfilename) )
+        os.system( '"%s"'.format(batfilename) )
         #os.unlink( batfilename )
         for s in stands:
             for y in years:
-                HTML.write( '<li><a href="#%s-%s">%s-%s</a></li>\n' % (s, y, s, y) )
+                HTML.write( '<li><a href="#{}-{}">{}-{}</a></li>\n'.format(s, y, s, y) )
         HTML.write( '</ul><hr>\n' )
         if( OPT['z'] ):
-            HTML.write( 'Download zip archive of this webpage: <a href="%s.zip">%s.zip</a>\n<hr>\n' % (ProjectName, ProjectName) )
+            HTML.write( 'Download zip archive of this webpage: <a href="{}.zip">{}.zip</a>\n<hr>\n'.format(ProjectName, ProjectName) )
         for s in stands:
             for y in years:
-                PngFilename = '%s-%s.png' % (s, y)
-                PngHighResFilename = '%s-%s_HiRes.png' % (s, y)
-                PngLegendFilename = '%s-%s_legend.png' % (s, y)
-                HTML.write( '<a name="%s-%s"><h1>File: %s - %s-%s</h1></a>\n' % (s, y, ProjectName, s, y))
-                HTML.write( '<a href="%s"><img src="%s" boarder="0"></a>\n' % (PngHighResFilename, PngFilename))
-                HTML.write( '<img src="%s">\n' % (PngLegendFilename) )
+                PngFilename = '{}-{}.png'.format(s, y)
+                PngHighResFilename = '{}-{}_HiRes.png'.format(s, y)
+                PngLegendFilename = '{}-{}_legend.png'.format(s, y)
+                HTML.write( '<a name="{}-{}"><h1>File: {} - {}-{}</h1></a>\n'.format(s, y, ProjectName, s, y))
+                HTML.write( '<a href="{}"><img src="{}" boarder="0"></a>\n'.format(PngHighResFilename, PngFilename))
+                HTML.write( '<img src="{}">\n'.format(PngLegendFilename) )
                 HTML.write( '<p><a href="#Top">Top</a><hr>\n')
-        HTML.write( '<p>Visualizations generated: %s.' % (time.asctime()) )
+        HTML.write( '<p>Visualizations generated: {}.'.format(time.asctime()) )
         HTML.write( '</html>\n' )
         HTML.close()
-        os.system( '"%s\\svsfiles\\%s\\%s.html"' % (dirname, ProjectName, ProjectName) )
+        os.system( '"{}\\svsfiles\\{}\\{}.html"'.format(dirname, ProjectName, ProjectName) )
 
     def SVS_Webpage_Zip( self, dirname ):
         """ """
         ProjectName = self.Data.Name
-        zipcmd = '%s\\zip.exe %s.zip *.html *.pal *.trf *.svs *.png' % (OWNPATH, ProjectName)
-        os.chdir( '%s\\svsfiles\%s' % (dirname, ProjectName) )
+        zipcmd = '{}\\zip.exe {}.zip *.html *.pal *.trf *.svs *.png'.format(OWNPATH, ProjectName)
+        os.chdir( '{}\\svsfiles\{}'.format(dirname, ProjectName) )
         os.system( zipcmd )
         os.chdir( OWNPATH )
 

@@ -120,8 +120,10 @@ FMD2CSV <- function( data ) {                                                   
 LMSObject2CSV <- function( data ) {                                                     # hidden function to convert LMS data in R to .csv file
     if( ! file.exists( 'svsfiles' ) ) dir.create( 'svsfiles' )                          # if svsfiles does not exist, create it
     CSVFilename <- paste0( "svsfiles/", data$stand$STANDNAME, "_", substr(data$measurement$MEASDATE,1,4), ".csv" ) # format filename from $header$standid and $header$ysp
-    tr <- cbind( data$treelist[,c(2,4,5,6,3)], crad=0, status=1, pc=0, cc=0 )           # extract treelist to new dictionary with standid and ysp included
-    tr <- tr[,c(3,4,11,12,13)]                                                          # extract and re-order columns we want
+    year <- substr(data$measurement$MEASDATE,1,4)
+    tr <- cbind( data$treelist[,c(3,1,4,7,11,12,13)], year=year, cr=0, status=1, pc=0, cc=0 )           # extract treelist to new dictionary with standid and ysp included
+    #print(head(tr))
+    #Stand,ObjectID,Species,TreeQuality,QDBH,TPA,Height,Year,CR,Status,PC,CC
     write.csv( tr, CSVFilename, row.names=FALSE )                                       # write .csv file
     return( CSVFilename )                                                               # return filename written
 }
@@ -183,14 +185,17 @@ Detect_DataType <- function( data, verbose=FALSE ) {                            
 
 #' Visualize stand using the Stand Visualization System (SVS)
 #'
-#' The SVS() function will create stand level visualizations of data frames containing appropriate information.  The
-#' function has the abillity to generate coordinates if they are not provided.
+#' The SVS() function will create stand level visualizations from data frames and files containing appropriate information.  The
+#' function has the abillity to generate coordinates if they are not provided. Additionally missing information (height, crown ratio, crown width) values will be
+#' "dubbed" if missing.
 #'
 #' StandViz internal format:
-#' stand, year, species, treeno, x, y, dbh, height, crownratio, crownradius, tpa, live, status, condition, svsstatus, bearing, brokenht, brokenoffset, dmr, leanangle, rootwad
+#' stand, year, species, treeno, x, y, dbh, height, crownratio, crownradius, tpa, live, status, condition, svsstatus, bearing, brokenht, brokenoffset,
+#' dmr, leanangle, rootwad
 #'
-#' rsvs data frame format:
-#' stand, year, treeno, species, dbh, height, crownratio, crownradius, tpa, x, y, live, status, condition, (svsstatus, brokenht, brokenoffset, bearing, dmr, leanangle, rootwad)
+#' rSVS data frame format:
+#' stand, year, treeno, species, dbh, height, crownratio, crownradius, tpa, x, y, live, status, condition, (svsstatus, brokenht, brokenoffset, bearing, dmr,
+#' leanangle, rootwad)
 #'
 #' Live/Dead: live or l|dying|dead or d|stump or s
 #'
@@ -224,60 +229,58 @@ SVS <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, ro
     else PyExePath <- SVS_Environment('python')                                         # else test for and optionally install package copy of python
     DataType <- Detect_DataType( data, verbose )
     print( paste0( "DataType=", DataType ))
-    StandVizOpt <- " "
-    if( verbose ) StandVizOpt <- paste0( StandVizOpt, " -v" )
-    if( debug ) StandVizOpt <- paste0( StandVizOpt, " -D" )
+    StandVizOpt <- " "                                                                  # start with StandViz.py options empty
+    if( verbose ) StandVizOpt <- paste0( StandVizOpt, " -v" )                           # if verbose=TRUE, append -v command line option
+    if( debug ) StandVizOpt <- paste0( StandVizOpt, " -D" )                             # if debug=TRUE, append -D
+    if( clumped ) StandVizOpt <- paste0( StandVizOpt, " -gc" )                          # if clumped=TRUE, add command line option for clumped coordinates
+    else if( row ) StandVizOpt <- paste0( StandVizOpt, " -gf" )                         # if row=TRUE, add command line option for fixed coordinates
+    else if( uniform ) StandVizOpt <- paste0( StandVizOpt, " -gu" )                     # if uniform=TRUE, add command line option for uniform coordinates
+    else StandVizOpt <- paste0( StandVizOpt, " -gr" )                                   # esle add command line option for random coordinates
+    if( !is.null(randomness) ) StandVizOpt <- paste0( StandVizOpt, " -rf ", randomness )    # add randomness factor if specified
+    if( !is.null(clumpiness) ) StandVizOpt <- paste0( StandVizOpt, " -cf ", clumpiness )    # add clumpiness factor if specified
+    if( !is.null(clumpratio) ) StandVizOpt <- paste0( StandVizOpt, " -cr ", clumpratio )    # add clumpratio option if specified
     if( exists(".UseNRCS") ) if( .UseNRCS ) StandVizOpt <- paste0( StandVizOpt, "-N " ) # tell StandViz.py to use NRCS treeform file
-    if( DataType %in% c('SVSFile', 'SVScsvFile', 'StandVizFile', 'StandVizExtendedFile', 'CSVFile') ) { # have a string which is a filename
-        cmdline <- paste0( PyExePath, " ", system.file( "python", "StandViz.py", package="rSVS" ), StandVizOpt, data )    # create path to StandViz.py program
-        if( verbose ) print( cmdline )                                                  # echo command line if verbose
-        RetValue <- system( cmdline, invisible=FALSE, wait=TRUE )                       # execute and save return value
-        if( RetValue == 0 ) return( "SVS() completed" )                                 # return success
-        else print( paste0( "Error running command!  Error = ", RetValue, " for command: ", cmdline ) ) # return error number and commmand line that failed
+    svcmdline <- paste0( PyExePath, ' "', system.file( "python", "StandViz.py", package="rSVS" ), '" ', StandVizOpt )    # create path to StandViz.py program
+    if( DataType %in% c('CSVFile','SVSFile', 'SVScsvFile', 'StandVizFile', 'StandVizExtendedFile', 'TBL2SVSFile') ) { # have a string which is a filename
+        cmdline <- paste0( svcmdline, " ", data )                                            # add data to command line
     } else if( DataType == "StandObject" ) {                                            # have a organon/cips/c2g stand object
-        CsvFile <- StandObject2CSV(data)                                            # convert data to .csv file
-        cmdline <- paste0( PyExePath, " \"", system.file( "python", "StandViz.py", package="rSVS" ), "\"", StandVizOpt, CsvFile ) # command line for running StandViz.py
-        if( verbose ) print( cmdline )                                              # echo command line if verbose
-        RetValue <- system( cmdline, invisible=FALSE, wait=TRUE )                   # execute and save return value
-        if( RetValue == 0 ) return( "SVS() completed" )                             # report success
-        else print( paste0( "Error running command!  Error = ", RetValue, " for command: ", cmdline ) ) # or return error number and failing command line
+        CsvFile <- StandObject2CSV(data)                                                # convert data to .csv file
+        cmdline <- paste0( svcmdline, " ", CsvFile )                                         # add CsvFile to command line
     } else if( DataType == "LMSObject" ) {
-        # Need to recognize LMS formats and pull data at better resolution than lms.tools
-        CsvFile <- LMSObject2CSV(data)                                              # convert data from LMS object to .csv file
-        cmdline <- paste0( PyExePath, " \"", system.file( "python", "StandViz.py", package="rSVS" ), "\"", StandVizOpt, CsvFile ) # command line for running StandViz.py
-        if( verbose ) print( cmdline )                                              # echo command line if verbose
-        RetValue <- system( cmdline, invisible=FALSE, wait=TRUE )                   # execute and save return value
-        if( RetValue == 0 ) return( "SVS() completed" )                             # report success
-        else print( paste0( "Error running command!  Error = ", RetValue, " for command: ", cmdline ) ) # or return error and failed command line
+        CsvFile <- LMSObject2CSV(data)                                                  # convert data from LMS object to .csv file
+        cmdline <- paste0( svcmdline, " ", CsvFile )                                     # add CsvFile to command line
     } else if( DataType=="FMDObject" ) {
         print( paste0( "Will create visualizations for: ", paste(unique(data$PlotKey),collapse=' ') ) )
         CsvFile <- FMD2CSV(data)
-        cmdline <- paste0( PyExePath, " \"", system.file( "python", "StandViz.py", package="rSVS" ), "\"", StandVizOpt, CsvFile )
-        if( verbose ) print( cmdline )
-        RetValue <- system( cmdline, invisible=FALSE, wait=TRUE )
-        if( RetValue == 0 ) return( "SVS() completed" )
-        else print( paste0( "Error running command!  Error = ", RetValue, " for command: ", cmdline ) )
+        cmdline <- paste0( svcmdline, " ", CsvFile )                                     # add CsvFile to command line
     } else if( DataType=="StandVizObject" ) {
         CsvFile <- paste0( "svsfiles/", bquote(data), ".csv" ) # format filename from object name
         write.csv( data, CSVFilename, row.names=FALSE )                                       # write .csv file
-        cmdline <- paste0( PyExePath, " \"", system.file( "python", "StandViz.py", package="rSVS" ), "\"", StandVizOpt, CsvFile )
-        if( verbose ) print( cmdline )
-        RetValue <- system( cmdline, invisible=FALSE, wait=TRUE )
-        if( RetValue == 0 ) return( "SVS() completed" )
-        else print( paste0( "Error running command!  Error = ", RetValue, " for command: ", cmdline ) )
+        #cmdline <- paste0( PyExePath, " \"", system.file( "python", "StandViz.py", package="rSVS" ), "\"", StandVizOpt, CsvFile )
+        cmdline <- paste0( svcmdline, " ", CsvFile )                                     # add CsvFile to command line
+        #if( verbose ) print( paste0( "cmdline: ", cmdline )  )
+        #RetValue <- system( cmdline, invisible=FALSE, wait=TRUE )
+        #if( RetValue == 0 ) return( "SVS() completed" )
+        #else print( paste0( "Error running command!  Error = ", RetValue, " for command: ", cmdline ) )
     } else if( DataType=="TBL2SVSObject" ) {
         print( "Processing TBLS2SVSObject..." )
         CsvFilename <- paste0( "svsfiles/", deparse(substitute(data)), ".csv" ) # format filename from object name
         write.csv( data, CsvFilename, row.names=FALSE )
-        cmdline <- paste0( PyExePath, " ", system.file( "python", "StandViz.py", package="rSVS" ), StandVizOpt, CsvFilename )
-        if( verbose ) print( paste0( "cmdline: ", cmdline )  )
-        RetValue <- system( cmdline, invisible=FALSE, wait=TRUE )
-        if( RetValue == 0 ) return( "SVS() completed" )
-        else print( paste0( "Error running command!  Error = ", RetValue, " for command: ", cmdline ) )
+        #cmdline <- paste0( PyExePath, " ", system.file( "python", "StandViz.py", package="rSVS" ), StandVizOpt, CsvFilename )
+        cmdline <- paste0( svcmdline, " ", CsvFilename )                                     # add CsvFile to command line
+        #if( verbose ) print( paste0( "cmdline: ", cmdline )  )
+        #RetValue <- system( cmdline, invisible=FALSE, wait=TRUE )
+        #if( RetValue == 0 ) return( "SVS() completed" )
+        #else print( paste0( "Error running command!  Error = ", RetValue, " for command: ", cmdline ) )
     } else {
         print( paste0( "Don't know how to handle this type of data: ", typeof(data) ) )
         print(str(data))
+        return
     }
+    if( verbose ) print( paste0( "cmdline: ", cmdline )  )
+    RetValue <- system( cmdline, invisible=FALSE, wait=TRUE )                       # execute and save return value
+    if( RetValue == 0 ) return( "SVS() completed" )                                 # return success
+    else print( paste0( "Error running command!  Error = ", RetValue, " for command: ", cmdline ) ) # return error number and commmand line that failed
     #if( ! "reticulate" %in% .packages() ) if( verbose ) print( paste0( "reticulate package NOT loaded" ) )
     #if( ! "reticulate" %in% rownames(installed.packages()) ) if( verbose ) print( paste0( "reticulate package NOT installed" ) )
     # if reticulate

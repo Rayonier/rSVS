@@ -41,15 +41,18 @@ SVS(
 \item{randommess}{control "noise" of coordinates generated}
 }
 \description{
-The SVS() function will create stand level visualizations of data frames containing appropriate information.  The
-function has the abillity to generate coordinates if they are not provided.
+The SVS() function will create stand level visualizations from data frames and files containing appropriate information.  The
+function has the abillity to generate coordinates if they are not provided. Additionally missing information (height, crown ratio, crown width) values will be
+"dubbed" if missing.
 }
 \details{
 StandViz internal format:
-stand, year, species, treeno, x, y, dbh, height, crownratio, crownradius, tpa, live, status, condition, svsstatus, bearing, brokenht, brokenoffset, dmr, leanangle, rootwad
+stand, year, species, treeno, x, y, dbh, height, crownratio, crownradius, tpa, live, status, condition, svsstatus, bearing, brokenht, brokenoffset,
+dmr, leanangle, rootwad
 
-rsvs data frame format:
-stand, year, treeno, species, dbh, height, crownratio, crownradius, tpa, x, y, live, status, condition, (svsstatus, brokenht, brokenoffset, bearing, dmr, leanangle, rootwad)
+rSVS data frame format:
+stand, year, treeno, species, dbh, height, crownratio, crownradius, tpa, x, y, live, status, condition, (svsstatus, brokenht, brokenoffset, bearing, dmr,
+leanangle, rootwad)
 
 Live/Dead: live or l|dying|dead or d|stump or s
 
