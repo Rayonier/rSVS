@@ -131,7 +131,12 @@ LMSObject2CSV <- function( data ) {                                             
 StandObject2CSV <- function( data ) {                                                   # hidden function to convert StandObject in R to .csv file
     if( ! file.exists( 'svsfiles' ) ) dir.create( 'svsfiles' )                          # if svsfiles does not exist, create it
     CSVFilename <- paste0( "svsfiles/", data$header$standid, "_", data$header$ysp, ".csv" ) # format filename from $header$standid and $header$ysp
+    year <- data$header$ysp
     tr <- cbind( data$treelist[,c(2,4,5,6,3)], crad=0, status=1, pc=0, cc=0 )           # extract treelist to new dictionary with standid and ysp included
+    if( nrow(data$cut.trees) > 0 ) {                                                    # if we have records in cut-trees (need to validate year)
+      tt <- cbind( data$cut.trees[,c(3,5,6,7,4)], crad=0, status=3, pc=0, cc=0 )
+      tr <- rbind( tr, tt )
+    }
     tr <- tr[,c(1,2,3,4,6,7,8,9,5)]                                                     # extract and re-order columns we want
     write.csv( tr, CSVFilename, row.names=FALSE )                                       # write .csv file
     return( CSVFilename )                                                               # return filename written
@@ -158,7 +163,7 @@ Detect_DataType <- function( data, verbose=FALSE ) {                            
         if( ! file.exists( data ) ) print( paste0( "Error: File '", data, "' does not exist!" ) )   # warn if file does not exist
     } else if( class(data) == "list" ) {                                                # have a list, now test of what type of data
         if( (attributes(data)$names[1]=="header") & (attributes(data)$names[2]=="treelist"))  {     # should be organon/cipsanon/ryn.c2g stand object
-            if( verbose ) print( "Detected organon/cips/c2g stand object" )                      # echo verbose
+            if( verbose ) print( "Detected organon/cips/plc stand object" )             # echo verbose
             DataType <- 'StandObject'                                                   # set DataType to StandObject type
         } else if( (attributes(data)$names[1]=="stand") & (attributes(data)$names[2]=="measurement") & (attributes(data)$names[3]=="treelist") )  {
             if( verbose ) print( "Detected LMS stand object" )                          # echo if verbose
@@ -255,7 +260,7 @@ SVS <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, ro
         cmdline <- paste0( svcmdline, " ", CsvFile )                                     # add CsvFile to command line
     } else if( DataType=="StandVizObject" ) {
         CsvFile <- paste0( "svsfiles/", bquote(data), ".csv" ) # format filename from object name
-        write.csv( data, CSVFilename, row.names=FALSE )                                       # write .csv file
+        write.csv( data, CsvFile, row.names=FALSE )                                       # write .csv file
         #cmdline <- paste0( PyExePath, " \"", system.file( "python", "StandViz.py", package="rSVS" ), "\"", StandVizOpt, CsvFile )
         cmdline <- paste0( svcmdline, " ", CsvFile )                                     # add CsvFile to command line
         #if( verbose ) print( paste0( "cmdline: ", cmdline )  )
