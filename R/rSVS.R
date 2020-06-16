@@ -233,7 +233,7 @@ SVS <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, ro
     if( exists(".Development") ) PyExePath <- ".\\python38\\python.exe"                 # if under development use local copy of python
     else PyExePath <- SVS_Environment('python')                                         # else test for and optionally install package copy of python
     DataType <- Detect_DataType( data, verbose )
-    print( paste0( "DataType=", DataType ))
+    if( debug ) print( paste0( "DataType=", DataType ))
     StandVizOpt <- " "                                                                  # start with StandViz.py options empty
     if( verbose ) StandVizOpt <- paste0( StandVizOpt, " -v" )                           # if verbose=TRUE, append -v command line option
     if( debug ) StandVizOpt <- paste0( StandVizOpt, " -D" )                             # if debug=TRUE, append -D

@@ -140,13 +140,13 @@ def main():     # implement __main__ scope for handling of command line executio
             if( GenMethod in ['u','unif','uniform'] ): GenMethod = 'uniform'        # generate uniform coordinates
         else: GenMethod = 'random'                                              # else, default GenMethod='random'
 
-        print( "OutFormat={}, GenMethod={}, ExpandCoord={}".format(OutFormat, GenMethod, ExpandCoord) )
+        if( DEBUG ): print( "OutFormat={}, GenMethod={}, ExpandCoord={}".format(OutFormat, GenMethod, ExpandCoord) )
 
         #if( (SOPT.gc==0) & (SOPT.gf==0) & (SOPT.gr==0) & (SOPT.gu==0) ): SOPT.gr = True   # random is default coordinate generation
         #if( (SOPT.ob==0) & (SOPT.ow==0) & (SOPT.os==0) & (SOPT.ox==0) ): SOPT.os = 1   # SVS is default output
 
         if( NOTIFY ): print( 'StandViz.py - Python implementation of Stand Visualization Addin for Excel' )
-        print(sys.argv)
+        if( DEBUG ): print(sys.argv)
         #if( DEBUG ): print( 'nFile={}, FILELIST={}' % (nFile, SOPT.FILELIST) )
         #if( DEBUG ): print( 'Using Python {} on {} from {}'.format(sys.version, sys.platform, sys.prefix) )
 
@@ -354,7 +354,7 @@ def main():     # implement __main__ scope for handling of command line executio
                 print( "cmdline={}".format(cmdline) )
                 os.system(cmdline)
             else:
-                print( "Error, don't know how to handle this kind of data")
+                print( "Error, Sorry I don't know how to handle this kind of data yet!")
 
             #print 'DataSet = %s' % (DataSet)
             #SVS = StandViz( DataSet )                 # create class/dataset for input file
@@ -503,24 +503,30 @@ def Compare_TreeForm_To_rSVS_Species( SppCodes, Verbose=False ):
     if( Verbose ): print("")
     print( "{}: Has {}, Missing {}".format(TreeFormFile, Have, len(SPP.index)-Have) )   # report results
 
-def Determine_CSV_Format( FileName ):
+def Determine_CSV_Format( FileName, debug=False ):
     FileType = 'Unknown'
     # first make sure file exists
     if( os.path.exists( FileName ) ):
-        print( "Determine_CSV_Format(): {} exists".format(FileName) )
+        if( debug ): print( "Determine_CSV_Format(): {} exists".format(FileName) )
         F = pd.read_csv( FileName )                                             # read with pd.read_csv()
-        #print( list(F.columns) )                                                # print column names
+        #print( list(F.columns) )         
+        #PosTex: Plot,Plot_Radius,Nr,Tree_Spc,Tree_Dia,Tree_Hgt,Tree_PosTex1,Tree_PosTex2,Tree_PosTex3,Tree_Local_x,Tree_Local_y,Tree_Local_Dist,Tree_Local_Angle,
+        #Tree_Angle_ToPlotCenter,Latitude,Longitude,Tree_Nr
         if( 'Tree_PosTex1' in F.columns ): FileType = 'PosTex'
+        elif( ('PlotKey' in F.columns) & ('TreeKey' in F.columns) & ('CrownRatio' in F.columns) ): FileType = 'FMDObject'
+        elif( ('STANDNAME' in F.columns) & ('SPECIES' in F.columns) & ('QDBH' in F.columns) ): FileType = 'LMSObject'
+        elif( ("species" in F.columns) & ("dbh" in F.columns) ): FileType = 'StandObject'
+        # StandViz: Stand,Year/Age,Species,TreeNo,Live/Dead,TreeStat,CrwnClass,DBH,Height,Cradius,Cratio,TPA,X,Y
+        # StandVizExtended: Stand,Year/Age,Species,TreeNo,Live/Dead,Status,Condition,DBH,Height,CrownRatio,CrownRadius,TPA,BrokenHt,Offset,Bearing,Lean,RootWad,X,Y
         elif( ('Year/Age' in F.columns) | ('Year.Age' in F.columns) ):
             if( 'RootWad' in F.columns ): FileType = 'StandVizExtended'
             else: FileType = 'StandViz'
-        elif( ("species" in F.columns) & ("dbh" in F.columns) ): FileType = 'StandObject'
-        elif( ('PlotKey' in F.columns) & ('TreeKey' in F.columns) & ('CrownRatio' in F.columns) ): FileType = 'FMDObject'
-        elif( ('STANDNAME' in F.columns) & ('SPECIES' in F.columns) & ('QDBH' in F.columns) ): FileType = 'LMSObject'
+        # SVScsv: Species,TreeNo,PlntClass,CrwnClass,Status,DBH,Height,LAng,FAng,SDia,CRad1,CRat1,CRad2,CRat2,CRad3,CRat3,CRad,CRat4,ExpFactor,MarkCode,X,Y,Z
+        elif( ('PlntClass' in F.columns) & ('CRat1' in F.columns) ): FileType = 'SVScsv'
         elif( ('Species' in F.columns) & ('PlantClass' in F.columns) & ('CrownClass' in F.columns) ): FileType = 'TBL2SVSObject'
         else: print( "Unknown filetype: columns = {}".format(F.columns) )
     else:
-        print( "{} does not exist!".format(FileName) )
+        print( "Error, file '{}' does not exist!".format(FileName) )
     return( FileType )
 
 # create SVSTreeForm class and move the SVS_LoadTreeFormFile(), SVS_Write_TreeFormFile(), SVS_WriteHeader() and other appropriate functions into class
