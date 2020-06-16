@@ -2,6 +2,8 @@
 
 This rSVS package provides an interface to perform Stand Visualization System (SVS, Robert J. McGaughey, USDA Forest Service, PNW Research Station) visualizations from R.
 
+Please contact Jim McCarter (jim.mccater@rayonier.com) with questions and comments about the rSVS package.
+
 You can either download the binary package installation file from the dist folder or download the entire repository and build and install local.
 
 ## Installing binary distribution
