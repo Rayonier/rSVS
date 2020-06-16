@@ -40,5 +40,5 @@ help("rSVS-package")
 ```
 Also see the [Wiki](https://github.com/Rayonier/rSVS/wiki) for examples and details.
 
-NOTE: The first time you run many of the fuctions in rSVS the package will check to see if you have a Python distribution available.  If not, the package will prompt you to allow it to install (unzip) a package internal copy of Python so that it's "back-end" can do it's work.  Example visulizations from the SVS_Example() function will work without this step so that you can demo the package.
+NOTE: The first time you run many of the functions in rSVS the package will check to see if you have a Python distribution available.  If not, the package will prompt you to allow it to install (unzip) a package internal copy of Python so that it's "back-end" can do it's work.  Example visualizations from the SVS_Example() function will work without this step so that you can demo the package.
 
