@@ -1,8 +1,10 @@
 # demo showing loading of example data provided in package
 
-# Postex_016.csv
+
 
 # SouthernPine.csv
+
+sp <- system.file( "inst/extdata", "SouthernPine.csv", package="rSVS" )
 
 # SouthernPine2.csv
 

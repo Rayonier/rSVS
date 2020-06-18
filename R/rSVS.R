@@ -142,6 +142,14 @@ StandObject2CSV <- function( data ) {                                           
     return( CSVFilename )                                                               # return filename written
 }
 
+SVScsvObject2CSV <- function( data, name=deparse(substitute(data)) ) {
+    if( ! file.exists( 'svsfiles' ) ) dir.create( 'svsfiles' )
+    CSVFilename <- paste0( "svsfiles/", deparse(substitute(data)), ".csv" )
+    print( paste0( "CSVFilename = ", CSVFilename, ", name= ", name ) )
+    write.csv( data, CSVFilename, row.names=FALSE )
+    return( CSVFilename )
+}
+
 # turn comment into #' to export and make available to user
 #' @export
 Detect_DataType <- function( data, verbose=FALSE ) {                                    # hidden function to detect data type of object or file
@@ -244,8 +252,9 @@ SVS <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, ro
     if( !is.null(randomness) ) StandVizOpt <- paste0( StandVizOpt, " -rf ", randomness )    # add randomness factor if specified
     if( !is.null(clumpiness) ) StandVizOpt <- paste0( StandVizOpt, " -cf ", clumpiness )    # add clumpiness factor if specified
     if( !is.null(clumpratio) ) StandVizOpt <- paste0( StandVizOpt, " -cr ", clumpratio )    # add clumpratio option if specified
-    if( exists(".UseNRCS") ) if( .UseNRCS ) StandVizOpt <- paste0( StandVizOpt, "-N " ) # tell StandViz.py to use NRCS treeform file
+    if( exists(".UseNRCS") ) if( .UseNRCS ) StandVizOpt <- paste0( StandVizOpt, " -N" ) # tell StandViz.py to use NRCS treeform file
     svcmdline <- paste0( PyExePath, ' "', system.file( "python", "StandViz.py", package="rSVS" ), '" ', StandVizOpt )    # create path to StandViz.py program
+    if( debug ) print(svcmdline)
     if( DataType %in% c('CSVFile','SVSFile', 'SVScsvFile', 'StandVizFile', 'StandVizExtendedFile', 'TBL2SVSFile') ) { # have a string which is a filename
         cmdline <- paste0( svcmdline, " ", data )                                            # add data to command line
     } else if( DataType == "StandObject" ) {                                            # have a organon/cips/c2g stand object
@@ -267,12 +276,16 @@ SVS <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, ro
         #RetValue <- system( cmdline, invisible=FALSE, wait=TRUE )
         #if( RetValue == 0 ) return( "SVS() completed" )
         #else print( paste0( "Error running command!  Error = ", RetValue, " for command: ", cmdline ) )
+    } else if( DataType=="SVScsvObject" ) {
+        CsvFile <- SVScsvObject2CSV( data )
+        print( paste0( "SVScsvObject: CSVFile = ", CsvFile ) )
+        cmdline <- paste0( svcmdline, " ", CsvFile )
     } else if( DataType=="TBL2SVSObject" ) {
         print( "Processing TBLS2SVSObject..." )
-        CsvFilename <- paste0( "svsfiles/", deparse(substitute(data)), ".csv" ) # format filename from object name
-        write.csv( data, CsvFilename, row.names=FALSE )
+        CsvFile <- paste0( "svsfiles/", deparse(substitute(data)), ".csv" ) # format filename from object name
+        write.csv( data, CsvFile, row.names=FALSE )
         #cmdline <- paste0( PyExePath, " ", system.file( "python", "StandViz.py", package="rSVS" ), StandVizOpt, CsvFilename )
-        cmdline <- paste0( svcmdline, " ", CsvFilename )                                     # add CsvFile to command line
+        cmdline <- paste0( svcmdline, " ", CsvFile )                                     # add CsvFile to command line
         #if( verbose ) print( paste0( "cmdline: ", cmdline )  )
         #RetValue <- system( cmdline, invisible=FALSE, wait=TRUE )
         #if( RetValue == 0 ) return( "SVS() completed" )
