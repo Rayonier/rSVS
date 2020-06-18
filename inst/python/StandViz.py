@@ -8,6 +8,7 @@
 #
 
 import argparse     # ArgumentParser()
+import datetime     # datetime.date.today()
 import math         # math.ceil(), .floor(), .sqrt()
 import os           # os.path.split(), os.path.splitext(), os.system()
 import pandas as pd # Pandas DataFrame, .read_csv()
@@ -44,7 +45,7 @@ def main():     # implement __main__ scope for handling of command line executio
                                                              "\t%(prog)s [-v] [-ta] [-tc FIA|NRCS] [-CF]" )
         SARGO = SARG.add_argument_group( "Output arguments" )
         SARGO.add_argument( "-D", action="store_true", help="Debug output" )
-        SARGO.add_argument( "-n", action="store_true", help="Notify progress in DOS window" )
+        SARGO.add_argument( "-n", action="store_true", help="Notify progress in DOS window", default=True )
         SARGO.add_argument( "-o", action="store", nargs=1, metavar="format", help="Output format (bitmap|csv|svs(default)|web)" )
         SARGO.add_argument( "-v", action="store_true", help="Verbose output" )
         #SARGO.add_argument( "-os", action="store_true", help="Output to SVS (default)" )
@@ -151,7 +152,6 @@ def main():     # implement __main__ scope for handling of command line executio
         #if( DEBUG ): print( 'Using Python {} on {} from {}'.format(sys.version, sys.platform, sys.prefix) )
 
         for FILE in SOPT.FILELIST:
-            #D = {}              # create data dictionary
             (dirname, filename) = os.path.split( FILE )                         # get path and filename for file from command line
             (basename, ext) = os.path.splitext( filename )                      # get filebase and extension
             if( DEBUG ): print( "File: {}, dirname={} filename={} basename={} ext={}".format(FILE, dirname, filename, basename, ext) )
@@ -160,7 +160,6 @@ def main():     # implement __main__ scope for handling of command line executio
             # determine file format from filename provided on command line
             if( re.search( '.csv', filename ) != None ):                        # have .csv extension
                 DataSet = re.sub( '.csv', '', filename )                        # name dataset from base filename
-                FileType = Determine_CSV_Format( FILE )                         # determine file format
                 if( DEBUG ): print( "{}: FileType={}".format(FILE,FileType) )
             elif( re.search( '.svs', filename ) != None ):                      # have .svs extension, just pass through to winsvs.exe if the file exists
                 CMDLINE = "{} {}".format(SVSPath, FILE)                         # build command line
@@ -172,189 +171,19 @@ def main():     # implement __main__ scope for handling of command line executio
             elif( re.search( '.xls', filename ) != None ):                      # have .xls extension
                 DataSet = re.sub( '.xls', '', filename )                        # name dataset from filename
 
-            if( FileType=='FMDObject' ):
-                print( "Creating FDM visualizations..." )
-                D = pd.read_csv( FILE )     # read .csv file
-                # now process into pieces by PlotKey and MeasDate
-                # PlotKey, TreeKey, Species, MeasDate, MeaseAge, Status, Condition, Damage, Screen, DBH, Height, CrownRatio, TPA
-                # need to accumulate data into dictionary by PlotKey and MeasDate
-                TD = {}
-                FileNames = []
-                for d in D.itertuples():
-                    (Plot,Tree,Spp,MeasDate,DBH,Ht,CRat,Status,Cond,Dam,TPA) = (d.PlotKey,d.TreeKey,d.Species,d.MeasDate,d.DBH,d.Height,
-                                                                                d.CrownRatio,d.Status,d.Condition,d.Damage,d.TPA)
-                    if( not Plot in TD ): TD[Plot] = {}
-                    if( not MeasDate in TD[Plot] ): TD[Plot][MeasDate] = {}
-                    TD[Plot][MeasDate][Tree] = (Spp,DBH,Ht,CRat,Status,Cond,Dam,TPA)
-                print( "Plots={}".format(TD.keys()) )
-                for P in sorted(TD.keys()):
-                    print( "Plot={}, Years={}".format(P,sorted(TD[P].keys())) )
-                    for Y in sorted(TD[P].keys()):
-                        OutFilename = "{}/{}-{}.asc".format(dirname,P,Y)
-                        SvsFilename = "{}/{}-{}.svs".format(dirname,P,Y)
-                        print( "Creating {} and {}".format(OutFilename, SvsFilename))
-                        FileNames.append(SvsFilename)
-                        OUT = open( OutFilename, 'w' )
-                        OUT.write( ";species dbh height crat crad status pclass cclass tpa\n")
-                        for T in sorted(TD[P][Y].keys()):
-                            (Spp,DBH,Ht,CRat,Status,Cond,Dam,TPA) = TD[P][Y][T]
-                            if( pd.isna(DBH) ): DBH = 0.01
-                            if( pd.isna(Ht) ): Ht = DBH * 6
-                            if( pd.isna(CRat) | (CRat==0) ): CRat = 0.33
-                            if( Status == 'Live' ): Status = 1
-                            else: Status = 2
-                            PClass = 0
-                            CRad = CRat * Ht / 4
-                            CClass = 0
-                            OUT.write( "{} {} {} {} {} {} {} {} {}\n".format(Spp,DBH,Ht,CRat,CRad,Status,PClass,CClass,TPA) )
-                        OUT.close()
-                        OPT = open("{}/{}-{}.opt".format(dirname,P,Y), 'w' )
-                        OPT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\\SVS\\FIA.trf {} {}".format(OutFilename,SvsFilename) )
-                        OPT.close()
-                        cmdline = "{} -G -X{}/{}-{}.opt {}".format(SVSPath,dirname,P,Y,SvsFilename)
-                        print( "cmdline={}".format(cmdline) )
-                        os.system(cmdline)
-                print( FileNames )
-            elif( FileType=='LMSObject' ):
-                print( "Creating LMS visualizations..." )
-                D = pd.read_csv( FILE )     # read .csv file
-                # now process into pieces by PlotKey and MeasDate
-                # PlotKey, TreeKey, Species, MeasDate, MeaseAge, Status, Condition, Damage, Screen, DBH, Height, CrownRatio, TPA
-                # need to accumulate data into dictionary by PlotKey and MeasDate
-                TD = {}
-                FileNames = []
-                for d in D.itertuples():
-                    (Stand,Year,Tree,Spp,DBH,Height,CRat,Status,PC,CC,TPA) = (d.STANDNAME,d.year,d.OBJECTID,d.SPECIES,d.QDBH,d.HEIGHT,d.cr,d.status,d.pc,d.cc,d.TPA)
-                    if( not Stand in TD ): TD[Stand] = {}
-                    if( not Year in TD[Stand] ): TD[Stand][Year] = {}
-                    TD[Stand][Year][Tree] = (Spp,DBH,Height,CRat,Status,PC,CC,TPA)
-                for P in sorted(TD.keys()):
-                    for Y in sorted(TD[P].keys()):
-                        OutFilename = "{}/{}-{}.asc".format(dirname,P,Y)
-                        SvsFilename = "{}/{}-{}.svs".format(dirname,P,Y)
-                        FileNames.append(SvsFilename)
-                        OUT = open( OutFilename, 'w' )
-                        OUT.write( ";species dbh height crat crad status pclass cclass tpa\n" )
-                        for T in sorted(TD[P][Y].keys()):
-                            (Spp,DBH,Ht,CRat,Status,PC,CC,TPA) = TD[P][Y][T]
-                            if( pd.isna(DBH) ): DBH = 0.01
-                            if( pd.isna(Ht) ): Ht = DBH * 6
-                            if( pd.isna(CRat) | (CRat==0) ): CRat = 0.45
-                            if( Status=='Live'): Status = 1
-                            #else: Status = 2
-                            PClass = PC
-                            CRad = CRat * Ht / 4
-                            CClass = 0
-                            OUT.write( "{} {} {} {} {} {} {} {} {}\n".format(Spp,DBH,Ht,CRat,CRad,Status,PClass,CClass,TPA ) )
-                        OUT.close()
-                        OPT = open( "{}/{}-{}.opt".format(dirname,P,Y), 'w' )
-                        OPT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\\SVS\\FIA.trf {} {}".format(OutFilename,SvsFilename) )
-                        OPT.close()
-                        cmdline = "{} -G -X{}/{}-{}.opt {}".format(SVSPath,dirname,P,Y,SvsFilename)
-                        print( "cmdline={}".format(cmdline) )
-                        os.system(cmdline)
-            elif( FileType=='PosTex' ):
-                # data loader for Postex plots: Plot, Plot_Radius, Nr, Tree_Spc, Tree_Dia(.1 in), Tree_Hgt(ft), Tree_Postex1, Tree_Poste2, Tree_Postx3,
-                # Tree_Local_x, Tree_Local_y, Tree_Local_Dist, Tree_Local_Angle, Tree_Angle_ToPlotCenter, Latitude, Longitude, Tree_Nr
-                # TreeSpc: 1=Unforked pine, 2=hardwood, 3=dead tree (pine or hardwood), 4=forked pine
-                CsvFileName = "{}".format(FILE)
-                # split path from filename and create .svs in svsfiles folder
-                print( "Processing {}...".format(CsvFileName))
-                # check that it exists
-                D = pd.read_csv( CsvFileName )
-                DataSet = re.sub( '.csv', '', filename )
-                SVS = StandViz( DataSet )
-                Year = 2020
-                SvsFilename = "{}_{}.svs".format(DataSet,Year)
-                SVS.SVF = open( SvsFilename, 'w' )
-                SVS.SVS_Write_Header()
-                for L in D.itertuples():
-                    standname = L.Plot
-                    SVS.Data.Stand[standname] = StandData(standname)
-                    (TreeNo, Species, DBH, Ht, X, Y) = (L.Nr, L.Tree_Spc, L.Tree_Dia, L.Tree_Hgt, L.Tree_Local_x, L.Tree_Local_y)
-                    X = (208.71 / 2.0 ) + ((float(X)*3.28084)) * ExpandCoord
-                    Y = (208.71 / 2.0 ) + ((float(Y)*3.28084)) * ExpandCoord
-                    if( Species == 1 ): (Species, Status) = ('PITA', 1)
-                    elif( Species == 2 ): (Species, Status) = ('HARDWOOD', 1)
-                    elif( Species == 3 ): (Species, Status) = ('SNAG', 2)
-                    elif( Species == 4 ): (Species, Status) = ('PITA', 2)
-                    nTree = len(SVS.Data.Stand[standname].Tree) + 1
-                    SVS.Data.Stand[standname].Tree[nTree] = TreeData(Species,TreeNumber=TreeNo, X=X, Y=Y)
-                    SVS.Data.Stand[standname].Tree[nTree].Year[Year] = MeasurementData( DBH, Ht, '', 1, 0, Status )
-                    #print("{},{},{},{},{},{},{},{}".format(standname,TreeNo,Species,DBH,Ht,X,Y,nTree))
-                    (LAng, Bearing, EDia, Mark, Z) = (0,0,0,0,0)
-                    TPA = 1
-                    DBH /= 10
-                    PClass = 0
-                    CClass = 1
-                    CR = 0.45
-                    CW = 10
-                    SVS.SVS_Write_Tree_Live( Species, TreeNo, PClass, CClass, Status, DBH, Ht, LAng, Bearing, EDia, CW, CR, TPA, Mark, X,Y, Z)
-                #print("Stand.keys()={}".format(SVS.Data.Stand.keys()))
-                SVS.SVS_Write_Footer()
-                SVSEXE = "inst\\bin\SVS\winsvs.exe"
-                CMDLINE = "{} -A 180 -D 325 {}".format(SVSEXE, SvsFilename)
-                print(CMDLINE)
-                os.system(CMDLINE)
-            elif( FileType=='StandObject' ):
-                print( "visualizing {}".format(FILE))
-                D = pd.read_csv( FILE )
-                print( "{} lines read".format(len(D.index)))
-                OutFilename = "{}/{}.asc".format(dirname,basename)
-                SvsFilename = "{}/{}.svs".format(dirname,basename)
-                OptFilename = "{}/{}.opt".format(dirname,basename)
-                print( "OutFilename={}".format(OutFilename))
-                OUT = open( OutFilename, 'w' )
-                OUT.write( ";species dbh height crat crad status pclass cclass tpa\n")
-                for d in D.itertuples():
-                    OUT.write( "{} {} {} {} {} {} {} {} {}\n".format(d.species,d.dbh,d.height,d.cr,d.crad,d.status,d.pc,d.cc,d.tpa))
-                OUT.close()
-                OUT = open( OptFilename, 'w')
-                if( SOPT.N ): OUT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\SVS\\NRCS.trf {} {}".format(OutFilename,SvsFilename) )
-                else: OUT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\SVS\\FIA.trf {} {}".format(OutFilename,SvsFilename) )
-                OUT.close()
-                #SVS = StandViz( basename )
-                SVSEXE = "inst\\bin\SVS\winsvs.exe"
-                if( not os.path.exists( SVSEXE ) ): print( "This command will fail!: {}".format(SVSEXE))
-                cmdline = "{} -G -X{} {}".format(SVSEXE,OptFilename,SvsFilename)
-                print( "cmdline={}".format(cmdline) )
-                os.system(cmdline)
-            elif( FileType=='StandViz' ):
-                D = pd.read_csv( FILE )
-                print( "{} lines read".format(len(D.index)))
-                OutFilename = "{}/{}.asc".format(dirname,basename)
-                SvsFilename = "{}/{}.svs".format(dirname,basename)
-            elif( FileType=='TBL2SVSObject' ):
-                print( "visualizing {}".format(FILE))
-                D = pd.read_csv( FILE )
-                print( "{} lines read".format(len(D.index)))
-                OutFilename = "{}/{}.asc".format(dirname,basename)
-                SvsFilename = "{}/{}.svs".format(dirname,basename)
-                OptFilename = "{}/{}.opt".format(dirname,basename)
-                print( "OutFilename={}".format(OutFilename))
-                OUT = open( OutFilename, 'w' )
-                OUT.write( ";species dbh height crat crad status pclass cclass tpa\n")
-                for d in D.itertuples():
-                    if( pd.isna(d.DBH) ): DBH = 0.01
-                    else: DBH = d.DBH
-                    if( pd.isna(d.Height) | (d.Height <= 0) ): Height = d.DBH * 6
-                    else: Height = d.Height
-                    if( pd.isna(d.CrownRatio) | (d.CrownRatio <= 0) ): CRat = 0.33
-                    else: CRat = d.CrownRatio
-                    if( pd.isna(d.CrownRadius) ): CRad = CRat * Height / 4.0
-                    else: CRad = d.CrownRadius
-                    OUT.write( "{} {} {} {} {} {} {} {} {}\n".format(d.Species,DBH,Height,CRat,CRad,d.Status,d.PlantClass,d.CrownClass,d.TPA))
-                OUT.close()
-                OUT = open( OptFilename, 'w')
-                if( SOPT.N ): OUT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\SVS\\NRCS.trf {} {}".format(OutFilename,SvsFilename) )
-                else: OUT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\SVS\\FIA.trf {} {}".format(OutFilename,SvsFilename) )
-                OUT.close()
-                if( not os.path.exists( SVSPath ) ): print( "This command will fail!: {}".format(SVSEXE))
-                cmdline = "{} -G -X{} {}".format(SVSPath,OptFilename,SvsFilename)
-                print( "cmdline={}".format(cmdline) )
-                os.system(cmdline)
+            SVS = StandViz( DataSet, SvsPath=SVSPath )
+            FileType = SVS.Determine_CSV_Format( FILE )                         # determine file format
+
+            if( FileType=='FMDObject' ): SVS.Viz_FMDObject( FILE )
+            elif( FileType=='LMSObject' ): SVS.Viz_LMSObject( FILE )
+            elif( FileType=='PosTex' ): SVS.Viz_PosTex( FILE, ExpandCoord=ExpandCoord )
+            elif( FileType=='StandObject' ): SVS.Viz_StandObject( FILE )
+            elif( FileType=='StandViz' ): SVS.Viz_StandViz( FILE )
+            elif( FileType=='StandVizExtended' ): SVS.Viz_StandVizExtended( FILE )
+            elif( FileType=='SVScsv' ): SVS.Viz_SVScsv( FILE ):
+            elif( FileType=='TBL2SVSObject' ): SVS.Viz_TBL2SVSObject( FILE )
             else:
-                print( "Error, Sorry I don't know how to handle this kind of data yet!")
+                print( "Error, Sorry I don't know how to handle '{}' data yet!".format(FileType))
 
             #print 'DataSet = %s' % (DataSet)
             #SVS = StandViz( DataSet )                 # create class/dataset for input file
@@ -503,31 +332,6 @@ def Compare_TreeForm_To_rSVS_Species( SppCodes, Verbose=False ):
     if( Verbose ): print("")
     print( "{}: Has {}, Missing {}".format(TreeFormFile, Have, len(SPP.index)-Have) )   # report results
 
-def Determine_CSV_Format( FileName, debug=False ):
-    FileType = 'Unknown'
-    # first make sure file exists
-    if( os.path.exists( FileName ) ):
-        if( debug ): print( "Determine_CSV_Format(): {} exists".format(FileName) )
-        F = pd.read_csv( FileName )                                             # read with pd.read_csv()
-        #print( list(F.columns) )         
-        #PosTex: Plot,Plot_Radius,Nr,Tree_Spc,Tree_Dia,Tree_Hgt,Tree_PosTex1,Tree_PosTex2,Tree_PosTex3,Tree_Local_x,Tree_Local_y,Tree_Local_Dist,Tree_Local_Angle,
-        #Tree_Angle_ToPlotCenter,Latitude,Longitude,Tree_Nr
-        if( 'Tree_PosTex1' in F.columns ): FileType = 'PosTex'
-        elif( ('PlotKey' in F.columns) & ('TreeKey' in F.columns) & ('CrownRatio' in F.columns) ): FileType = 'FMDObject'
-        elif( ('STANDNAME' in F.columns) & ('SPECIES' in F.columns) & ('QDBH' in F.columns) ): FileType = 'LMSObject'
-        elif( ("species" in F.columns) & ("dbh" in F.columns) ): FileType = 'StandObject'
-        # StandViz: Stand,Year/Age,Species,TreeNo,Live/Dead,TreeStat,CrwnClass,DBH,Height,Cradius,Cratio,TPA,X,Y
-        # StandVizExtended: Stand,Year/Age,Species,TreeNo,Live/Dead,Status,Condition,DBH,Height,CrownRatio,CrownRadius,TPA,BrokenHt,Offset,Bearing,Lean,RootWad,X,Y
-        elif( ('Year/Age' in F.columns) | ('Year.Age' in F.columns) ):
-            if( 'RootWad' in F.columns ): FileType = 'StandVizExtended'
-            else: FileType = 'StandViz'
-        # SVScsv: Species,TreeNo,PlntClass,CrwnClass,Status,DBH,Height,LAng,FAng,SDia,CRad1,CRat1,CRad2,CRat2,CRad3,CRat3,CRad,CRat4,ExpFactor,MarkCode,X,Y,Z
-        elif( ('PlntClass' in F.columns) & ('CRat1' in F.columns) ): FileType = 'SVScsv'
-        elif( ('Species' in F.columns) & ('PlantClass' in F.columns) & ('CrownClass' in F.columns) ): FileType = 'TBL2SVSObject'
-        else: print( "Unknown filetype: columns = {}".format(F.columns) )
-    else:
-        print( "Error, file '{}' does not exist!".format(FileName) )
-    return( FileType )
 
 # create SVSTreeForm class and move the SVS_LoadTreeFormFile(), SVS_Write_TreeFormFile(), SVS_WriteHeader() and other appropriate functions into class
 
@@ -762,7 +566,7 @@ class SVS:
 #########################################################################################
 class StandViz:
     """class to handle interface to Stand Visualization System (SVS)"""
-    def __init__( self, DataSetName ):
+    def __init__( self, DataSetName, SvsPath=None ):
         self.ResolutionLow = '1024x768'
         self.ResolutionHigh = '2048x1536'
         self.FocalLength = 150
@@ -776,7 +580,8 @@ class StandViz:
         self.PaletteFile = None
         self.ViewpointDist = 1000
         self.ViewpointElev = 1000
-        self.SvsExe = '{}\\SVS\\winsvs.exe'.format(OWNPATH)
+        if( SvsPath == None ): self.SvsExe = '{}\\SVS\\winsvs.exe'.format(OWNPATH)
+        else: self.SvsExe = SvsPath
         self.Data = ForestData( DataSetName )
         self.SVF = None                         # variable for file handle object
         random.seed( self.RandSeed )            # initialize random seed generator to common starting point
@@ -861,6 +666,32 @@ class StandViz:
                     self.SVF.write( '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s\n' % \
                                (s, y, t, treeno, species, dbh, ht, live, status, cclass, tpa ) )
         self.SVF.close()
+
+    def Determine_CSV_Format( self, FileName, debug=False ):
+        FileType = 'Unknown'
+        # first make sure file exists
+        if( os.path.exists( FileName ) ):
+            if( debug ): print( "Determine_CSV_Format(): {} exists".format(FileName) )
+            F = pd.read_csv( FileName )                                             # read with pd.read_csv()
+            #print( list(F.columns) )         
+            #PosTex: Plot,Plot_Radius,Nr,Tree_Spc,Tree_Dia,Tree_Hgt,Tree_PosTex1,Tree_PosTex2,Tree_PosTex3,Tree_Local_x,Tree_Local_y,Tree_Local_Dist,Tree_Local_Angle,
+            #Tree_Angle_ToPlotCenter,Latitude,Longitude,Tree_Nr
+            if( 'Tree_PosTex1' in F.columns ): FileType = 'PosTex'
+            elif( ('PlotKey' in F.columns) & ('TreeKey' in F.columns) & ('CrownRatio' in F.columns) ): FileType = 'FMDObject'
+            elif( ('STANDNAME' in F.columns) & ('SPECIES' in F.columns) & ('QDBH' in F.columns) ): FileType = 'LMSObject'
+            elif( ("species" in F.columns) & ("dbh" in F.columns) ): FileType = 'StandObject'
+            # StandViz: Stand,Year/Age,Species,TreeNo,Live/Dead,TreeStat,CrwnClass,DBH,Height,Cradius,Cratio,TPA,X,Y
+            # StandVizExtended: Stand,Year/Age,Species,TreeNo,Live/Dead,Status,Condition,DBH,Height,CrownRatio,CrownRadius,TPA,BrokenHt,Offset,Bearing,Lean,RootWad,X,Y
+            elif( ('Year/Age' in F.columns) | ('Year.Age' in F.columns) ):
+                if( 'RootWad' in F.columns ): FileType = 'StandVizExtended'
+                else: FileType = 'StandViz'
+            # SVScsv: Species,TreeNo,PlntClass,CrwnClass,Status,DBH,Height,LAng,FAng,SDia,CRad1,CRat1,CRad2,CRat2,CRad3,CRat3,CRad,CRat4,ExpFactor,MarkCode,X,Y,Z
+            elif( ('PlntClass' in F.columns) & ('CRat1' in F.columns) ): FileType = 'SVScsv'
+            elif( ('Species' in F.columns) & ('PlantClass' in F.columns) & ('CrownClass' in F.columns) ): FileType = 'TBL2SVSObject'
+            else: print( "Unknown filetype: columns = {}".format(F.columns) )
+        else:
+            print( "Error, file '{}' does not exist!".format(FileName) )
+        return( FileType )
 
     def Determin_Excel_Format( self, ExcelFileName ):
         # determine if StandViz, StandVizExtended, OTIS, or other
@@ -1375,6 +1206,208 @@ class StandViz:
         #self.SVF.write( '0.85    1.0   0       4.8   201.91        0\n' )
         #self.SVF.write( ';PITA           01-02             0    0    1    2.5     14     0     0     0   4.62 0.88   4.62 0.88   4.62 0.88   4.62 ' )
         #self.SVF.write( '0.88    1.0   0      12.8   201.91        0\n' )
+
+    def Viz_FMDObject( self, FileName ):
+        print( "Creating FDM visualizations..." )
+        (dirname, filename) = os.path.split( FileName )                         # get path and filename for file from command line
+        (basename, ext) = os.path.splitext( filename )                      # get filebase and extension
+        D = pd.read_csv( FileName )     # read .csv file
+        # now process into pieces by PlotKey and MeasDate
+        # PlotKey, TreeKey, Species, MeasDate, MeaseAge, Status, Condition, Damage, Screen, DBH, Height, CrownRatio, TPA
+        # need to accumulate data into dictionary by PlotKey and MeasDate
+        TD = {}
+        FileNames = []
+        for d in D.itertuples():
+            (Plot,Tree,Spp,MeasDate,DBH,Ht,CRat,Status,Cond,Dam,TPA) = (d.PlotKey,d.TreeKey,d.Species,d.MeasDate,d.DBH,d.Height,
+                                                                        d.CrownRatio,d.Status,d.Condition,d.Damage,d.TPA)
+            if( not Plot in TD ): TD[Plot] = {}
+            if( not MeasDate in TD[Plot] ): TD[Plot][MeasDate] = {}
+            TD[Plot][MeasDate][Tree] = (Spp,DBH,Ht,CRat,Status,Cond,Dam,TPA)
+        print( "Plots={}".format(TD.keys()) )
+        nViz = 0
+        #for P in sorted(TD.keys()):
+        #    for Y in sorted(TD[P].keys()):
+        #        nViz += 1
+        #if( nViz > 3 ): 
+        #    ans = input( "Note: This will create {} visualizations which cannot be interupted.  Proceed (Y/N)?" )
+        #    if( ans=='N' ): return
+        for P in sorted(TD.keys()):
+            print( "Plot={}, Years={}".format(P,sorted(TD[P].keys())) )
+            for Y in sorted(TD[P].keys()):
+                OutFilename = "{}/{}-{}.asc".format(dirname,P,Y)
+                SvsFilename = "{}/{}-{}.svs".format(dirname,P,Y)
+                print( "Creating {} and {}".format(OutFilename, SvsFilename))
+                FileNames.append(SvsFilename)
+                OUT = open( OutFilename, 'w' )
+                OUT.write( ";species dbh height crat crad status pclass cclass tpa\n")
+                for T in sorted(TD[P][Y].keys()):
+                    (Spp,DBH,Ht,CRat,Status,Cond,Dam,TPA) = TD[P][Y][T]
+                    if( pd.isna(DBH) ): DBH = 0.01
+                    if( pd.isna(Ht) ): Ht = DBH * 6
+                    if( pd.isna(CRat) | (CRat==0) ): CRat = 0.33
+                    if( Status == 'Live' ): Status = 1
+                    else: Status = 2
+                    PClass = 0
+                    CRad = CRat * Ht / 4
+                    CClass = 0
+                    OUT.write( "{} {} {} {} {} {} {} {} {}\n".format(Spp,DBH,Ht,CRat,CRad,Status,PClass,CClass,TPA) )
+                OUT.close()
+                OPT = open("{}/{}-{}.opt".format(dirname,P,Y), 'w' )
+                OPT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\\SVS\\FIA.trf {} {}".format(OutFilename,SvsFilename) )
+                OPT.close()
+                cmdline = "{} -G -X{}/{}-{}.opt {}".format(self.SvsExe,dirname,P,Y,SvsFilename)
+                print( "cmdline={}".format(cmdline) )
+                os.system(cmdline)
+        print( FileNames )
+
+    def Viz_LMSObject( self, FileName ):
+        print( "Creating LMS visualizations..." )
+        D = pd.read_csv( FILE )     # read .csv file
+        # now process into pieces by PlotKey and MeasDate
+        # PlotKey, TreeKey, Species, MeasDate, MeaseAge, Status, Condition, Damage, Screen, DBH, Height, CrownRatio, TPA
+        # need to accumulate data into dictionary by PlotKey and MeasDate
+        TD = {}
+        FileNames = []
+        for d in D.itertuples():
+            (Stand,Year,Tree,Spp,DBH,Height,CRat,Status,PC,CC,TPA) = (d.STANDNAME,d.year,d.OBJECTID,d.SPECIES,d.QDBH,d.HEIGHT,d.cr,d.status,d.pc,d.cc,d.TPA)
+            if( not Stand in TD ): TD[Stand] = {}
+            if( not Year in TD[Stand] ): TD[Stand][Year] = {}
+            TD[Stand][Year][Tree] = (Spp,DBH,Height,CRat,Status,PC,CC,TPA)
+        for P in sorted(TD.keys()):
+            for Y in sorted(TD[P].keys()):
+                OutFilename = "{}/{}-{}.asc".format(dirname,P,Y)
+                SvsFilename = "{}/{}-{}.svs".format(dirname,P,Y)
+                FileNames.append(SvsFilename)
+                OUT = open( OutFilename, 'w' )
+                OUT.write( ";species dbh height crat crad status pclass cclass tpa\n" )
+                for T in sorted(TD[P][Y].keys()):
+                    (Spp,DBH,Ht,CRat,Status,PC,CC,TPA) = TD[P][Y][T]
+                    if( pd.isna(DBH) ): DBH = 0.01
+                    if( pd.isna(Ht) ): Ht = DBH * 6
+                    if( pd.isna(CRat) | (CRat==0) ): CRat = 0.45
+                    if( Status=='Live'): Status = 1
+                    #else: Status = 2
+                    PClass = PC
+                    CRad = CRat * Ht / 4
+                    CClass = 0
+                    OUT.write( "{} {} {} {} {} {} {} {} {}\n".format(Spp,DBH,Ht,CRat,CRad,Status,PClass,CClass,TPA ) )
+                OUT.close()
+                OPT = open( "{}/{}-{}.opt".format(dirname,P,Y), 'w' )
+                OPT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\\SVS\\FIA.trf {} {}".format(OutFilename,SvsFilename) )
+                OPT.close()
+                cmdline = "{} -G -X{}/{}-{}.opt {}".format(SVSPath,dirname,P,Y,SvsFilename)
+                print( "cmdline={}".format(cmdline) )
+                os.system(cmdline)
+
+    def Viz_PosTex( self, FileName, ExpandCoord, Year=None ):
+        # data loader for Postex plots: Plot, Plot_Radius, Nr, Tree_Spc, Tree_Dia(.1 in), Tree_Hgt(ft), Tree_Postex1, Tree_Poste2, Tree_Postx3,
+        # Tree_Local_x, Tree_Local_y, Tree_Local_Dist, Tree_Local_Angle, Tree_Angle_ToPlotCenter, Latitude, Longitude, Tree_Nr
+        # TreeSpc: 1=Unforked pine, 2=hardwood, 3=dead tree (pine or hardwood), 4=forked pine
+        CsvFileName = "{}".format(FileName)
+        # split path from filename and create .svs in svsfiles folder
+        print( "Processing {}...".format(CsvFileName))
+        # check that it exists
+        D = pd.read_csv( CsvFileName )
+        #DataSet = re.sub( '.csv', '', filename )
+        #SVS = StandViz( DataSet )
+        if( Year==None ): Year = datetime.date.today().year         # get year from current date if not provided
+        SvsFilename = "{}_{}.svs".format(self.Data.Name,Year)
+        self.SVF = open( SvsFilename, 'w' )
+        self.SVS_Write_Header()
+        for L in D.itertuples():
+            standname = L.Plot
+            self.Data.Stand[standname] = StandData(standname)
+            (TreeNo, Species, DBH, Ht, X, Y) = (L.Nr, L.Tree_Spc, L.Tree_Dia, L.Tree_Hgt, L.Tree_Local_x, L.Tree_Local_y)
+            X = (208.71 / 2.0 ) + ((float(X)*3.28084)) * ExpandCoord
+            Y = (208.71 / 2.0 ) + ((float(Y)*3.28084)) * ExpandCoord
+            if( Species == 1 ): (Species, Status) = ('PITA', 1)
+            elif( Species == 2 ): (Species, Status) = ('HARDWOOD', 1)
+            elif( Species == 3 ): (Species, Status) = ('SNAG', 2)
+            elif( Species == 4 ): (Species, Status) = ('PITA', 2)
+            nTree = len(self.Data.Stand[standname].Tree) + 1
+            self.Data.Stand[standname].Tree[nTree] = TreeData(Species,TreeNumber=TreeNo, X=X, Y=Y)
+            self.Data.Stand[standname].Tree[nTree].Year[Year] = MeasurementData( DBH, Ht, '', 1, 0, Status )
+            #print("{},{},{},{},{},{},{},{}".format(standname,TreeNo,Species,DBH,Ht,X,Y,nTree))
+            (LAng, Bearing, EDia, Mark, Z) = (0,0,0,0,0)
+            TPA = 1
+            DBH /= 10
+            PClass = 0
+            CClass = 1
+            CR = 0.45
+            CW = 10
+            self.SVS_Write_Tree_Live( Species, TreeNo, PClass, CClass, Status, DBH, Ht, LAng, Bearing, EDia, CW, CR, TPA, Mark, X,Y, Z)
+        #print("Stand.keys()={}".format(SVS.Data.Stand.keys()))
+        self.SVS_Write_Footer()
+        SVSEXE = "inst\\bin\SVS\winsvs.exe"
+        CMDLINE = "{} -A 180 -D 325 {}".format(SVSEXE, SvsFilename)
+        print(CMDLINE)
+        os.system(CMDLINE)
+
+    def Viz_StandObject( self, FileName ):
+        print( "visualizing {}".format(FILE))
+        D = pd.read_csv( FILE )
+        print( "{} lines read".format(len(D.index)))
+        OutFilename = "{}/{}.asc".format(dirname,basename)
+        SvsFilename = "{}/{}.svs".format(dirname,basename)
+        OptFilename = "{}/{}.opt".format(dirname,basename)
+        print( "OutFilename={}".format(OutFilename))
+        OUT = open( OutFilename, 'w' )
+        OUT.write( ";species dbh height crat crad status pclass cclass tpa\n")
+        for d in D.itertuples():
+            OUT.write( "{} {} {} {} {} {} {} {} {}\n".format(d.species,d.dbh,d.height,d.cr,d.crad,d.status,d.pc,d.cc,d.tpa))
+        OUT.close()
+        OUT = open( OptFilename, 'w')
+        if( SOPT.N ): OUT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\SVS\\NRCS.trf {} {}".format(OutFilename,SvsFilename) )
+        else: OUT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\SVS\\FIA.trf {} {}".format(OutFilename,SvsFilename) )
+        OUT.close()
+        #SVS = StandViz( basename )
+        SVSEXE = "inst\\bin\SVS\winsvs.exe"
+        if( not os.path.exists( SVSEXE ) ): print( "This command will fail!: {}".format(SVSEXE))
+        cmdline = "{} -G -X{} {}".format(SVSEXE,OptFilename,SvsFilename)
+        print( "cmdline={}".format(cmdline) )
+        os.system(cmdline)
+
+    def Viz_StandViz( self, FileName ):
+        D = pd.read_csv( FILE )
+        print( "{} lines read".format(len(D.index)))
+        OutFilename = "{}/{}.asc".format(dirname,basename)
+        SvsFilename = "{}/{}.svs".format(dirname,basename)
+
+    def Viz_StandVizExtended( self, FileName ):
+        pass
+
+    def Viz_SVScsv( self, FileName ):
+        pass
+
+    def Viz_TBL2SVSObject( self, FileName ):
+        print( "visualizing {}".format(FILE))
+        D = pd.read_csv( FILE )
+        print( "{} lines read".format(len(D.index)))
+        OutFilename = "{}/{}.asc".format(dirname,basename)
+        SvsFilename = "{}/{}.svs".format(dirname,basename)
+        OptFilename = "{}/{}.opt".format(dirname,basename)
+        print( "OutFilename={}".format(OutFilename))
+        OUT = open( OutFilename, 'w' )
+        OUT.write( ";species dbh height crat crad status pclass cclass tpa\n")
+        for d in D.itertuples():
+            if( pd.isna(d.DBH) ): DBH = 0.01
+            else: DBH = d.DBH
+            if( pd.isna(d.Height) | (d.Height <= 0) ): Height = d.DBH * 6
+            else: Height = d.Height
+            if( pd.isna(d.CrownRatio) | (d.CrownRatio <= 0) ): CRat = 0.33
+            else: CRat = d.CrownRatio
+            if( pd.isna(d.CrownRadius) ): CRad = CRat * Height / 4.0
+            else: CRad = d.CrownRadius
+            OUT.write( "{} {} {} {} {} {} {} {} {}\n".format(d.Species,DBH,Height,CRat,CRad,d.Status,d.PlantClass,d.CrownClass,d.TPA))
+        OUT.close()
+        OUT = open( OptFilename, 'w')
+        if( SOPT.N ): OUT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\SVS\\NRCS.trf {} {}".format(OutFilename,SvsFilename) )
+        else: OUT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\SVS\\FIA.trf {} {}".format(OutFilename,SvsFilename) )
+        OUT.close()
+        if( not os.path.exists( SVSPath ) ): print( "This command will fail!: {}".format(SVSEXE))
+        cmdline = "{} -G -X{} {}".format(SVSPath,OptFilename,SvsFilename)
+        print( "cmdline={}".format(cmdline) )
+        os.system(cmdline)
 
 def Test_Excel_Format( filename ):
     FileFormat = 'Unknown'

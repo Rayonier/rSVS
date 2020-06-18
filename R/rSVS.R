@@ -264,7 +264,13 @@ SVS <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, ro
         CsvFile <- LMSObject2CSV(data)                                                  # convert data from LMS object to .csv file
         cmdline <- paste0( svcmdline, " ", CsvFile )                                     # add CsvFile to command line
     } else if( DataType=="FMDObject" ) {
+        # need to figure out how many visualizations will be created.  Unique(PlotKey and 
+        nViz <- length( unique( paste0( data$PlotKey,"_",data$MeasDate) ) )
         print( paste0( "Will create visualizations for: ", paste(unique(data$PlotKey),collapse=' ') ) )
+        if( nViz > 3 ) {
+            ans <- readline( prompt=paste0( "You are requestion ", nViz, " visualizations.  Proceed (Y/N)? " ) )
+            if( !(tolower(ans) %in% c('y', 'yes')) ) return( "Visualizations Cancelled!")
+        }
         CsvFile <- FMD2CSV(data)
         cmdline <- paste0( svcmdline, " ", CsvFile )                                     # add CsvFile to command line
     } else if( DataType=="StandVizObject" ) {
