@@ -180,7 +180,7 @@ def main():     # implement __main__ scope for handling of command line executio
             elif( FileType=='StandObject' ): SVS.Viz_StandObject( FILE )
             elif( FileType=='StandViz' ): SVS.Viz_StandViz( FILE )
             elif( FileType=='StandVizExtended' ): SVS.Viz_StandVizExtended( FILE )
-            elif( FileType=='SVScsv' ): SVS.Viz_SVScsv( FILE ):
+            elif( FileType=='SVScsv' ): SVS.Viz_SVScsv( FILE )
             elif( FileType=='TBL2SVSObject' ): SVS.Viz_TBL2SVSObject( FILE )
             else:
                 print( "Error, Sorry I don't know how to handle '{}' data yet!".format(FileType))

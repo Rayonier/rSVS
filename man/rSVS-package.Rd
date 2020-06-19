@@ -15,7 +15,7 @@ The package includes the following functions:
     \item SVS_Example()     - show reginal example visualizations
     \item SVS_ExampleData() - generate stand data for visualizations
     \item SVS_Species()     - list known species
-    \item svsfiles_clean()  - clean out svsfiles folder containing temporary files for visualizations
+    \item svsfiles()        - list or clean out svsfiles folder containing temporary files for visualizations
     \item FIA2NRCS()        - convert species codes from FIA # to NRCS code
     \item NRCS2FIA()        - convert species codes from NRCS code to FIA #
 }

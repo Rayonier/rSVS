@@ -11,7 +11,7 @@
 #'     \item SVS_Example()     - show reginal example visualizations
 #'     \item SVS_ExampleData() - generate stand data for visualizations
 #'     \item SVS_Species()     - list known species
-#'     \item svsfiles_clean()  - clean out svsfiles folder containing temporary files for visualizations
+#'     \item svsfiles()        - list or clean out svsfiles folder containing temporary files for visualizations
 #'     \item FIA2NRCS()        - convert species codes from FIA # to NRCS code
 #'     \item NRCS2FIA()        - convert species codes from NRCS code to FIA #
 #' }
@@ -108,7 +108,7 @@
 #' @name rSVS-package
 NULL
 
-# data conversion functions
+# internal data conversion functions
 FMD2CSV <- function( data ) {                                                           # hidden function to convert FMD plot data in R to .csv file
     if( ! file.exists('svsfiles') ) dir.create( 'svsfiles' )                            # if svsfiles does not exist, create it
     CSVFilename <- paste0( "svsfiles/FMD_data.csv"  )                                   # create filename
@@ -230,13 +230,13 @@ Detect_DataType <- function( data, verbose=FALSE ) {                            
 #' @param verbose turn on verbose output
 #' @author James Mccarter \email{jim.mccarter@@rayonier.com}
 #' @examples
-#' SVS( d )
-#' SVS( '../MyFiles/Stand1.csv' )
-#' SVS( '../MyFiles/Stand2.xlsx', Sheet='Sheet1' )
-#' SVS( d, random=true )    # visualize stand in svs using random tree locations
-#' SVS( d, row=true )       # visualize stand in svs using rows
+#' svs( d )
+#' svs( '../MyFiles/Stand1.csv' )
+#' svs( '../MyFiles/Stand2.xlsx', Sheet='Sheet1' )
+#' svs( d, random=true )    # visualize stand in svs using random tree locations
+#' svs( d, row=true )       # visualize stand in svs using rows
 #' @export
-SVS <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, row=FALSE, uniform=FALSE, randomness=NULL, clumpiness=NULL, clumpratio=NULL,
+svs <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, row=FALSE, uniform=FALSE, randomness=NULL, clumpiness=NULL, clumpratio=NULL,
                  verbose=FALSE, debug=FALSE ) {
     if( exists(".Development") ) PyExePath <- ".\\python38\\python.exe"                 # if under development use local copy of python
     else PyExePath <- SVS_Environment('python')                                         # else test for and optionally install package copy of python
@@ -502,7 +502,7 @@ SVS_Example <- function( Example=NULL ) {
 # @export
 treelist <- function( species, dbh, tpa, scale=4, shape=2, n=30, dmin=0.0001, dmax=100, incr=0.1  ) {
     # exponential decrease (scale=2.5, shape=1); left skew(scale=4, shape=2); normal(scale=10, shape=3.6); right skew(scale=15, shape=10)
-    d = data.frame( scale, shape, species, dbh, tpa)                     # create data frame of inputs
+    d = data.frame( scale, shape, species, dbh, tpa)                # create data frame of inputs
     tr = list()                                                     # create empty list for the returned treelist
     nSpp = nrow(d)                                                  # get number of species entered
     for( i in 1:nrow(d) ) {                                         # loop across species
@@ -524,11 +524,6 @@ treelist <- function( species, dbh, tpa, scale=4, shape=2, n=30, dmin=0.0001, dm
     return( do.call(rbind, tr) )                                    # return combined treelist
 }
 
-# Need function to generate tree data for visulizations:
-#
-# SVS_Generate( (DF, 12.5, 75.0, 100), (WH, 7.8, 68, 150), Random=TRUE )
-#
-
 #' Create SVS example data
 #'
 #' Create different kinds of example data understood by this package.
@@ -537,11 +532,11 @@ treelist <- function( species, dbh, tpa, scale=4, shape=2, n=30, dmin=0.0001, dm
 #' \itemize{
 #   \item StandObject format
 #'   \item StandViz format
-#'   \item StandVizExtended format
+#   \item StandVizExtended format
 #'   \item TBL2SVS format
 #' }
 #'
-#' @param datatype Type of example data to create
+#' @param type Type of example data to create
 #' @param species individual or list of species for stand
 #' @param dbh average diameter breast height for each species
 #' @param tpa trees per acre for each species
@@ -553,15 +548,15 @@ treelist <- function( species, dbh, tpa, scale=4, shape=2, n=30, dmin=0.0001, dm
 #' @param hd height to diameter ratio for height dubbing (default 7)
 #' @return data frame of list with example data for use with SVS()
 #' @examples
-#' SV <- SVS_ExampleData( species=c(202,263), tpa=c(300,275), dbh=c(7.8,4.7) )
-#' SVS_ExampleData( datatype=NULL )     # force function to return known data types
+#' SV <- svsdata( species=c(202,263), tpa=c(300,275), dbh=c(7.8,4.7) )
+#' svsdata( datatype=NULL )     # force function to return known data types
 #' @author James McCarter \email{jim.mccarter@@rayonier.com}
 #' @export
-SVS_ExampleData <- function( datatype='TBL2SVS', species, dbh, tpa, scale=4, shape=2, n=30, dmin=0.001, dmax=100, incr=0.1, hd=7 ) {
-    if( is.null(datatype) ) {
-        return( "Known data types are: StandViz (default) and TBL2SVS." )
+svsdata <- function( type='TBL2SVS', species, dbh, tpa, scale=4, shape=2, n=30, dmin=0.001, dmax=100, incr=0.1, hd=7 ) {
+    if( is.null(type) ) {
+        return( "Known data types are: 'StandViz' and 'TBL2SVS' (default)." )
     }
-    tr <- treelist( species, dbh, tpa, scale, shape, n, dmin, dmax, incr )
+    tr <- treelist( species, dbh, tpa, scale, shape, n, dmin, dmax, incr )  # call internal treelist function to impute trees
     tr2 <- tr[c(3,2,5)]                                                     # get subset of columns we want: species, dbh, tpa
     tr2$ht <- tr2$dbh * rnorm(n,hd)                                         # dib in ht scaled from dbh with random normal noise around hd factor
     tr2$dbh[tr2$ht<4.5] <- 0.01                                             # if ht < 4.5, reset dbh to very small
@@ -628,28 +623,30 @@ SVS_Species <- function() {
     return( Species )                                                                   # and return DataFrame
 }
 
-#' Clean out svsfiles temorary directory
+#' Function to list and clean out svsfiles folder
+#'
+#' List of clean out svsfiles folder
+#'
+#' Use the svsfiles() function to manage files in the svsfiles temporary folder.
+#' Using the function with no arguments to view a list of files in the folder.  
+#' Use svsfiles(clean=TRUE) to remove files from the folder
 #'
 #' @author James McCarter \email{jim.mccarter@rayonier.com}
+#' @param clean 
 #' @examples
-#' svsfiles_clean()
+#' svsfiles()
+#' svsfiles(clean=TRUE)
 #' @export
-svsfiles_clean <- function() {
-    filelist <- list.files( "svsfiles" )                # get list if files in svsfiles folder
-    for( FILE in filelist ) {                           # loop across files to remove them
-        file.remove( paste0( "svsfiles/", FILE ) )      # remove current file
+svsfiles <- function( clean=FALSE ) {
+    if( clean ) {                                       # if cleaning asked for
+        filelist <- list.files( "svsfiles" )            # get list of files in svsfiles folder
+        for( file in filelist ) {                       # loop across files to remove them
+            file.remove( paste0( "svsfiles/", file ) )  # remove current file
+        }
+    } else {
+        if( file.exists( "svsfiles" ) ) return( dir( "svsfiles" ) )
+        else return( "'svsfiles' fodler does not exist" )
     }
-}
-
-#' List files in svsfiles folder
-#'
-#' @author James McCarter \email{jim.mccarter@rayonier.com}
-#' @examples
-#' svsfiles_list()
-#' @export
-svsfiles_list <- function() {
-    if( file.exists( 'svsfiles' ) ) return( dir( 'svsfiles' ) )
-    else return( "'svsfiles' folder does not exist")
 }
 
 #' Convert species codes from FIA number to NRCS code
