@@ -6,14 +6,14 @@
 #'
 #' The package includes the following functions:
 #' \itemize{
-#'     \item SVS()             - main function for performing visualziations
-#'     \item SVS_Environment() - check package environment and returns path to components
-#'     \item SVS_Example()     - show reginal example visualizations
-#'     \item SVS_ExampleData() - generate stand data for visualizations
-#'     \item SVS_Species()     - list known species
-#'     \item svsfiles()        - list or clean out svsfiles folder containing temporary files for visualizations
-#'     \item FIA2NRCS()        - convert species codes from FIA # to NRCS code
-#'     \item NRCS2FIA()        - convert species codes from NRCS code to FIA #
+#'     \item svs()                - main function for performing visualziations
+#'     \item svsdata()            - generate stand data for visualizations
+#'     \item svsfiles()           - list or clean out svsfiles folder containing temporary files for visualizations
+#'     \item SVS_Environment()    - check package environment and returns path to components
+#'     \item SVS_Example()        - show reginal example visualizations
+#'     \item SVS_Species()        - list known species
+#'     \item Translate_FIA2NRCS() - convert species codes from FIA # to NRCS code
+#'     \item Translate_NRCS2FIA() - convert species codes from NRCS code to FIA #
 #' }
 #'
 #' The package supports either species identified by FIA # or NRCS Plants Database code. The default
@@ -108,50 +108,9 @@
 #' @name rSVS-package
 NULL
 
-# internal data conversion functions
-FMD2CSV <- function( data ) {                                                           # hidden function to convert FMD plot data in R to .csv file
-    if( ! file.exists('svsfiles') ) dir.create( 'svsfiles' )                            # if svsfiles does not exist, create it
-    CSVFilename <- paste0( "svsfiles/FMD_data.csv"  )                                   # create filename
-    tl <- data[,c(3,9:11,14:16,18:21)]                                                        # select columns
-    write.csv( tl, CSVFilename, row.names=FALSE )                                       # write .csv file
-    return( CSVFilename )                                                               # return filename written
-}
-
-LMSObject2CSV <- function( data ) {                                                     # hidden function to convert LMS data in R to .csv file
-    if( ! file.exists( 'svsfiles' ) ) dir.create( 'svsfiles' )                          # if svsfiles does not exist, create it
-    CSVFilename <- paste0( "svsfiles/", data$stand$STANDNAME, "_", substr(data$measurement$MEASDATE,1,4), ".csv" ) # format filename from $header$standid and $header$ysp
-    year <- substr(data$measurement$MEASDATE,1,4)
-    tr <- cbind( data$treelist[,c(3,1,4,7,11,12,13)], year=year, cr=0, status=1, pc=0, cc=0 )           # extract treelist to new dictionary with standid and ysp included
-    #print(head(tr))
-    #Stand,ObjectID,Species,TreeQuality,QDBH,TPA,Height,Year,CR,Status,PC,CC
-    write.csv( tr, CSVFilename, row.names=FALSE )                                       # write .csv file
-    return( CSVFilename )                                                               # return filename written
-}
-
-StandObject2CSV <- function( data ) {                                                   # hidden function to convert StandObject in R to .csv file
-    if( ! file.exists( 'svsfiles' ) ) dir.create( 'svsfiles' )                          # if svsfiles does not exist, create it
-    CSVFilename <- paste0( "svsfiles/", data$header$standid, "_", data$header$ysp, ".csv" ) # format filename from $header$standid and $header$ysp
-    year <- data$header$ysp
-    tr <- cbind( data$treelist[,c(2,4,5,6,3)], crad=0, status=1, pc=0, cc=0 )           # extract treelist to new dictionary with standid and ysp included
-    if( nrow(data$cut.trees) > 0 ) {                                                    # if we have records in cut-trees (need to validate year)
-      tt <- cbind( data$cut.trees[,c(3,5,6,7,4)], crad=0, status=3, pc=0, cc=0 )
-      tr <- rbind( tr, tt )
-    }
-    tr <- tr[,c(1,2,3,4,6,7,8,9,5)]                                                     # extract and re-order columns we want
-    write.csv( tr, CSVFilename, row.names=FALSE )                                       # write .csv file
-    return( CSVFilename )                                                               # return filename written
-}
-
-SVScsvObject2CSV <- function( data, name=deparse(substitute(data)) ) {
-    if( ! file.exists( 'svsfiles' ) ) dir.create( 'svsfiles' )
-    CSVFilename <- paste0( "svsfiles/", deparse(substitute(data)), ".csv" )
-    print( paste0( "CSVFilename = ", CSVFilename, ", name= ", name ) )
-    write.csv( data, CSVFilename, row.names=FALSE )
-    return( CSVFilename )
-}
 
 # turn comment into #' to export and make available to user
-#' @export
+# @export
 Detect_DataType <- function( data, verbose=FALSE ) {                                    # hidden function to detect data type of object or file
     DataType <- NULL                                                                    # start with data type not known
     if( verbose ) print( paste0( "class(data) = ", class(data) ) )                      # echo what type of data we have
@@ -198,7 +157,7 @@ Detect_DataType <- function( data, verbose=FALSE ) {                            
 
 #' Visualize stand using the Stand Visualization System (SVS)
 #'
-#' The SVS() function will create stand level visualizations from data frames and files containing appropriate information.  The
+#' The svs() function will create stand level visualizations from data frames and files containing appropriate information.  The
 #' function has the abillity to generate coordinates if they are not provided. Additionally missing information (height, crown ratio, crown width) values will be
 #' "dubbed" if missing.
 #'
@@ -310,6 +269,95 @@ svs <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, ro
     # if reticulate
     # library(reticulate)
     # SVS <- import_from_path( "StandViz", path="inst/python" )
+}
+
+#' Create SVS example data
+#'
+#' Create different kinds of example data understood by this package.
+#'
+#' This function will return data data frame in one of the following formats:
+#' \itemize{
+#   \item StandObject format
+#'   \item StandViz format
+#   \item StandVizExtended format
+#'   \item TBL2SVS format
+#' }
+#'
+#' @param type Type of example data to create
+#' @param species individual or list of species for stand
+#' @param dbh average diameter breast height for each species
+#' @param tpa trees per acre for each species
+#' @param scale weibull scale parameter (default=4)
+#' @param shape weibull shape parameter (default=2)
+#' @param dmin minimum diameter for distribution (default 0.001")
+#' @param dmax maximum diameter for distribution (default 100")
+#' @param incr diameter increment between dmin and dmax (default 0.1")
+#' @param hd height to diameter ratio for height dubbing (default 7)
+#' @return data frame of list with example data for use with SVS()
+#' @examples
+#' SV <- svsdata( species=c(202,263), tpa=c(300,275), dbh=c(7.8,4.7) )
+#' svsdata( datatype=NULL )     # force function to return known data types
+#' @author James McCarter \email{jim.mccarter@@rayonier.com}
+#' @export
+svsdata <- function( type='TBL2SVS', species, dbh, tpa, scale=4, shape=2, n=30, dmin=0.001, dmax=100, incr=0.1, hd=7 ) {
+    if( is.null(type) ) {
+        return( "Known data types are: 'StandViz' and 'TBL2SVS' (default)." )
+    }
+    tr <- treelist( species, dbh, tpa, scale, shape, n, dmin, dmax, incr )  # call internal treelist function to impute trees
+    tr2 <- tr[c(3,2,5)]                                                     # get subset of columns we want: species, dbh, tpa
+    tr2$ht <- tr2$dbh * rnorm(n,hd)                                         # dib in ht scaled from dbh with random normal noise around hd factor
+    tr2$dbh[tr2$ht<4.5] <- 0.01                                             # if ht < 4.5, reset dbh to very small
+    if( datatype=='TBL2SVS' ) {
+        # Species, DBH, Height, CRat, Crad, Status, PlantClass, CrownClass, TPA
+        tr2$CrownRatio <- 0.45                      # add CrownRatio
+        tr2$CrownRadius <- tr2$ht * tr2$CrownRatio * 0.33 / 2.0     # add CrownRadius
+        tr2$Status <- 1
+        tr2$PlantClass <- 0
+        tr2$CrownClass <- 0
+        tr2 <- tr2[,c(1,2,4,5,6,7,8,9,3)]
+        names(tr2) <- c("Species", "DBH", "Height", "CrownRatio", "CrownRadius", "Status", "PlantClass", "CrownClass", "TPA")
+    } else if( datatype=='StandViz' ) {
+        # Stand, Year/Age, Species, TreeNo, Live/Dead, Status, Condiiion, DBH, Height, CrowRat, CrownRad, TPA
+        tr2$Stand <- 'Stand'                        # and stand name
+        tr2$Year.Age <- substr( Sys.time(), 1, 4 )      # add year
+        tr2$TreeNo <- seq.int(nrow(tr2) )           # add TreeNo
+        tr2$CrownRatio <- 0.45                      # add CrownRatio
+        tr2$CrownRadius <- tr2$ht * tr2$CrownRatio * 0.33 / 2.0     # add CrownRadius
+        tr2$Live.Dead <- NA
+        tr2$Status <- NA
+        tr2$Condition <- NA
+        tr2 <- tr2[,c(5,6,1,7,10,11,12,2,4,8,9,3)]
+        names(tr2) <- c("Stand", "Year.Age", "Species", "TreeNo", "Live.Dead", "Status", "Condition", "DBH", "Height", "CrownRatio", "CrownRadius", "TPA")
+    #} else if( datatype=='StandVizExtended' ) {
+    #    print( "Return StandViz Extended format example data" )
+    }
+    return( tr2 )
+}
+
+#' Function to list and clean out svsfiles folder
+#'
+#' List of clean out svsfiles folder
+#'
+#' Use the svsfiles() function to manage files in the svsfiles temporary folder.
+#' Using the function with no arguments to view a list of files in the folder.  
+#' Use svsfiles(clean=TRUE) to remove files from the folder
+#'
+#' @author James McCarter \email{jim.mccarter@rayonier.com}
+#' @param clean 
+#' @examples
+#' svsfiles()
+#' svsfiles(clean=TRUE)
+#' @export
+svsfiles <- function( clean=FALSE ) {
+    if( clean ) {                                       # if cleaning asked for
+        filelist <- list.files( "svsfiles" )            # get list of files in svsfiles folder
+        for( file in filelist ) {                       # loop across files to remove them
+            file.remove( paste0( "svsfiles/", file ) )  # remove current file
+        }
+    } else {
+        if( file.exists( "svsfiles" ) ) return( dir( "svsfiles" ) )
+        else return( "'svsfiles' fodler does not exist" )
+    }
 }
 
 #' Check SVS environment and return path to components
@@ -498,102 +546,13 @@ SVS_Example <- function( Example=NULL ) {
     return( 'SVS_Example() existed.' )                                                  # echo that SVS has exited
 }
 
-# hidden treelist function for use by SVS_ExampleData()
-# @export
-treelist <- function( species, dbh, tpa, scale=4, shape=2, n=30, dmin=0.0001, dmax=100, incr=0.1  ) {
-    # exponential decrease (scale=2.5, shape=1); left skew(scale=4, shape=2); normal(scale=10, shape=3.6); right skew(scale=15, shape=10)
-    d = data.frame( scale, shape, species, dbh, tpa)                # create data frame of inputs
-    tr = list()                                                     # create empty list for the returned treelist
-    nSpp = nrow(d)                                                  # get number of species entered
-    for( i in 1:nrow(d) ) {                                         # loop across species
-        z = d[i,]                                                   # get row of dictionary
-        #print( paste0( "dmin=", dmin, ", dmax=", dmax, ", incr=", incr) )
-        di = seq( dmin, dmax, by=incr )                             # get initial sequence for distribution
-        pdf = dweibull( di, shape=z$shape, scale=z$scale )          # generate pdf for 2 parameter weibull
-        k = which(pdf > 0.01 )                                      # filter to values > 0.01
-        dlims = range(di[k])                                        # get range of values with prob > 0.01
-        #print( paste0( "dbh=", z$dbh, ", dlims[1]=", dlims[1], ", dlims[2]=", dlims[2] ) )
-        di = seq( z$dbh-mean(dlims)-dlims[1], z$dbh+mean(dlims)-dlims[1], length.out=n/nSpp )           # create new sequence of diamters with prob > 0.01
-        pdf = dweibull(di, shape=z$shape, scale=z$scale )           # create new pdf across diameter range
-        o = data.frame( pdf, dbh=round(di,2) )                      # create data frame with pdf and diameters
-        o$species = z$species                                       # add appropriate species
-        o$wi = o$pdf / sum(o$pdf)                                   # add weight (proportion of pdf)
-        o$tpa = z$tpa * o$wi                                        # compute tpa from weight
-        tr[[i]] <- o                                                # add to treelist
-    }
-    return( do.call(rbind, tr) )                                    # return combined treelist
-}
-
-#' Create SVS example data
-#'
-#' Create different kinds of example data understood by this package.
-#'
-#' This function will return data data frame in one of the following formats:
-#' \itemize{
-#   \item StandObject format
-#'   \item StandViz format
-#   \item StandVizExtended format
-#'   \item TBL2SVS format
-#' }
-#'
-#' @param type Type of example data to create
-#' @param species individual or list of species for stand
-#' @param dbh average diameter breast height for each species
-#' @param tpa trees per acre for each species
-#' @param scale weibull scale parameter (default=4)
-#' @param shape weibull shape parameter (default=2)
-#' @param dmin minimum diameter for distribution (default 0.001")
-#' @param dmax maximum diameter for distribution (default 100")
-#' @param incr diameter increment between dmin and dmax (default 0.1")
-#' @param hd height to diameter ratio for height dubbing (default 7)
-#' @return data frame of list with example data for use with SVS()
-#' @examples
-#' SV <- svsdata( species=c(202,263), tpa=c(300,275), dbh=c(7.8,4.7) )
-#' svsdata( datatype=NULL )     # force function to return known data types
-#' @author James McCarter \email{jim.mccarter@@rayonier.com}
-#' @export
-svsdata <- function( type='TBL2SVS', species, dbh, tpa, scale=4, shape=2, n=30, dmin=0.001, dmax=100, incr=0.1, hd=7 ) {
-    if( is.null(type) ) {
-        return( "Known data types are: 'StandViz' and 'TBL2SVS' (default)." )
-    }
-    tr <- treelist( species, dbh, tpa, scale, shape, n, dmin, dmax, incr )  # call internal treelist function to impute trees
-    tr2 <- tr[c(3,2,5)]                                                     # get subset of columns we want: species, dbh, tpa
-    tr2$ht <- tr2$dbh * rnorm(n,hd)                                         # dib in ht scaled from dbh with random normal noise around hd factor
-    tr2$dbh[tr2$ht<4.5] <- 0.01                                             # if ht < 4.5, reset dbh to very small
-    if( datatype=='TBL2SVS' ) {
-        # Species, DBH, Height, CRat, Crad, Status, PlantClass, CrownClass, TPA
-        tr2$CrownRatio <- 0.45                      # add CrownRatio
-        tr2$CrownRadius <- tr2$ht * tr2$CrownRatio * 0.33 / 2.0     # add CrownRadius
-        tr2$Status <- 1
-        tr2$PlantClass <- 0
-        tr2$CrownClass <- 0
-        tr2 <- tr2[,c(1,2,4,5,6,7,8,9,3)]
-        names(tr2) <- c("Species", "DBH", "Height", "CrownRatio", "CrownRadius", "Status", "PlantClass", "CrownClass", "TPA")
-    } else if( datatype=='StandViz' ) {
-        # Stand, Year/Age, Species, TreeNo, Live/Dead, Status, Condiiion, DBH, Height, CrowRat, CrownRad, TPA
-        tr2$Stand <- 'Stand'                        # and stand name
-        tr2$Year.Age <- substr( Sys.time(), 1, 4 )      # add year
-        tr2$TreeNo <- seq.int(nrow(tr2) )           # add TreeNo
-        tr2$CrownRatio <- 0.45                      # add CrownRatio
-        tr2$CrownRadius <- tr2$ht * tr2$CrownRatio * 0.33 / 2.0     # add CrownRadius
-        tr2$Live.Dead <- NA
-        tr2$Status <- NA
-        tr2$Condition <- NA
-        tr2 <- tr2[,c(5,6,1,7,10,11,12,2,4,8,9,3)]
-        names(tr2) <- c("Stand", "Year.Age", "Species", "TreeNo", "Live.Dead", "Status", "Condition", "DBH", "Height", "CrownRatio", "CrownRadius", "TPA")
-    #} else if( datatype=='StandVizExtended' ) {
-    #    print( "Return StandViz Extended format example data" )
-    }
-    return( tr2 )
-}
-
 #' List species codes
 #'
 #' List known species codes.
 #'
 #' This function simply reads and returns the list of known species codes distributed with the rSVS
 #' package (rSVS_Species.csv). This file is also used as the basis for species translation by the
-#' FIA2NRCS() and NRCS2FIA() funtions.
+#' Translate_FIA2NRCS() and Translate_NRCS2FIA() funtions.
 #'
 #' The rSVS package supports FIA number and NRCS alphabetic codes. The displayed table will include
 #' FIA, NRCS, Genus, Species, Common, and Comment, FIA.trf, NRCS.trf, FVS.trf, FVSSpCode, FVS.East,
@@ -623,33 +582,7 @@ SVS_Species <- function() {
     return( Species )                                                                   # and return DataFrame
 }
 
-#' Function to list and clean out svsfiles folder
-#'
-#' List of clean out svsfiles folder
-#'
-#' Use the svsfiles() function to manage files in the svsfiles temporary folder.
-#' Using the function with no arguments to view a list of files in the folder.  
-#' Use svsfiles(clean=TRUE) to remove files from the folder
-#'
-#' @author James McCarter \email{jim.mccarter@rayonier.com}
-#' @param clean 
-#' @examples
-#' svsfiles()
-#' svsfiles(clean=TRUE)
-#' @export
-svsfiles <- function( clean=FALSE ) {
-    if( clean ) {                                       # if cleaning asked for
-        filelist <- list.files( "svsfiles" )            # get list of files in svsfiles folder
-        for( file in filelist ) {                       # loop across files to remove them
-            file.remove( paste0( "svsfiles/", file ) )  # remove current file
-        }
-    } else {
-        if( file.exists( "svsfiles" ) ) return( dir( "svsfiles" ) )
-        else return( "'svsfiles' fodler does not exist" )
-    }
-}
-
-#' Convert species codes from FIA number to NRCS code
+#' Translate species codes from FIA number to NRCS code
 #'
 #' Function not implemented yet.
 #'
@@ -657,9 +590,9 @@ svsfiles <- function( clean=FALSE ) {
 #' @return Data frame with converted species codes
 #' @author Jim McCarter \email{jim.mccarter@rayonier.com}
 #' @examples
-#' FIA2NRCS( MyData )
+#' Translate_FIA2NRCS( MyData )
 #' @export
-FIA2NRCS <- function( Data ) {
+Translate_FIA2NRCS <- function( Data ) {
     DataType <- Detect_DataType( Data )
     SppRef <- read.csv( system.file( "bin", "rSVS_Species.csv", package="rSVS" ) )[,c(1,2)] # read rSVS_Species.csv and get just FIA and NRCS fields
     if( DataType %in% c('StandVizObject','StandVizExtendedObject','SVScsvObject','TBL2SVSObject') ) {
@@ -676,7 +609,7 @@ FIA2NRCS <- function( Data ) {
     }
 }
 
-#' Convert species codes from NRCS code to FIA number
+#' Translate species codes from NRCS code to FIA number
 #'
 #' Function not implemented yet.
 #'
@@ -684,9 +617,9 @@ FIA2NRCS <- function( Data ) {
 #' @return Data frame with converted species codes
 #' @author Jim McCarter \email{jim.mccarter@rayonier.com}
 #' @examples
-#' NRCS2FIA( MyData )
+#' Translate_NRCS2FIA( MyData )
 #' @export
-NRCS2FIA <- function( Data ) {
+Translate_NRCS2FIA <- function( Data ) {
     DataType <- Detect_DataType( Data )
     SppRef <- read.csv( system.file( "bin", "rSVS_Species.csv", package="rSVS" ) )[,c(1,2)] # read rSVS_Species.csv and get just FIA and NRCS fields
     if( DataType %in% c('StandVizObject','StandVizExtendedObject','SVScsvObject','TBL2SVSObject') ) {
@@ -701,6 +634,75 @@ NRCS2FIA <- function( Data ) {
     } else {
         print( paste0( "NCRS2FIA(): Don't know how to convert ", DataType, " object yet!") )
     }
+}
+
+# hidden treelist function for use by SVS_ExampleData()
+# @export
+treelist <- function( species, dbh, tpa, scale=4, shape=2, n=30, dmin=0.0001, dmax=100, incr=0.1  ) {
+    # exponential decrease (scale=2.5, shape=1); left skew(scale=4, shape=2); normal(scale=10, shape=3.6); right skew(scale=15, shape=10)
+    d = data.frame( scale, shape, species, dbh, tpa)                # create data frame of inputs
+    tr = list()                                                     # create empty list for the returned treelist
+    nSpp = nrow(d)                                                  # get number of species entered
+    for( i in 1:nrow(d) ) {                                         # loop across species
+        z = d[i,]                                                   # get row of dictionary
+        #print( paste0( "dmin=", dmin, ", dmax=", dmax, ", incr=", incr) )
+        di = seq( dmin, dmax, by=incr )                             # get initial sequence for distribution
+        pdf = dweibull( di, shape=z$shape, scale=z$scale )          # generate pdf for 2 parameter weibull
+        k = which(pdf > 0.01 )                                      # filter to values > 0.01
+        dlims = range(di[k])                                        # get range of values with prob > 0.01
+        #print( paste0( "dbh=", z$dbh, ", dlims[1]=", dlims[1], ", dlims[2]=", dlims[2] ) )
+        di = seq( z$dbh-mean(dlims)-dlims[1], z$dbh+mean(dlims)-dlims[1], length.out=n/nSpp )           # create new sequence of diamters with prob > 0.01
+        pdf = dweibull(di, shape=z$shape, scale=z$scale )           # create new pdf across diameter range
+        o = data.frame( pdf, dbh=round(di,2) )                      # create data frame with pdf and diameters
+        o$species = z$species                                       # add appropriate species
+        o$wi = o$pdf / sum(o$pdf)                                   # add weight (proportion of pdf)
+        o$tpa = z$tpa * o$wi                                        # compute tpa from weight
+        tr[[i]] <- o                                                # add to treelist
+    }
+    return( do.call(rbind, tr) )                                    # return combined treelist
+}
+
+# internal data conversion functions
+
+LMSObject2CSV <- function( data ) {                                                     # hidden function to convert LMS data in R to .csv file
+    if( ! file.exists( 'svsfiles' ) ) dir.create( 'svsfiles' )                          # if svsfiles does not exist, create it
+    CSVFilename <- paste0( "svsfiles/", data$stand$STANDNAME, "_", substr(data$measurement$MEASDATE,1,4), ".csv" ) # format filename from $header$standid and $header$ysp
+    year <- substr(data$measurement$MEASDATE,1,4)
+    tr <- cbind( data$treelist[,c(3,1,4,7,11,12,13)], year=year, cr=0, status=1, pc=0, cc=0 )           # extract treelist to new dictionary with standid and ysp included
+    #print(head(tr))
+    #Stand,ObjectID,Species,TreeQuality,QDBH,TPA,Height,Year,CR,Status,PC,CC
+    write.csv( tr, CSVFilename, row.names=FALSE )                                       # write .csv file
+    return( CSVFilename )                                                               # return filename written
+}
+
+StandObject2CSV <- function( data ) {                                                   # hidden function to convert StandObject in R to .csv file
+    if( ! file.exists( 'svsfiles' ) ) dir.create( 'svsfiles' )                          # if svsfiles does not exist, create it
+    CSVFilename <- paste0( "svsfiles/", data$header$standid, "_", data$header$ysp, ".csv" ) # format filename from $header$standid and $header$ysp
+    year <- data$header$ysp
+    tr <- cbind( data$treelist[,c(2,4,5,6,3)], crad=0, status=1, pc=0, cc=0 )           # extract treelist to new dictionary with standid and ysp included
+    if( nrow(data$cut.trees) > 0 ) {                                                    # if we have records in cut-trees (need to validate year)
+      tt <- cbind( data$cut.trees[,c(3,5,6,7,4)], crad=0, status=3, pc=0, cc=0 )
+      tr <- rbind( tr, tt )
+    }
+    tr <- tr[,c(1,2,3,4,6,7,8,9,5)]                                                     # extract and re-order columns we want
+    write.csv( tr, CSVFilename, row.names=FALSE )                                       # write .csv file
+    return( CSVFilename )                                                               # return filename written
+}
+
+SVScsvObject2CSV <- function( data, name=deparse(substitute(data)) ) {
+    if( ! file.exists( 'svsfiles' ) ) dir.create( 'svsfiles' )
+    CSVFilename <- paste0( "svsfiles/", deparse(substitute(data)), ".csv" )
+    print( paste0( "CSVFilename = ", CSVFilename, ", name= ", name ) )
+    write.csv( data, CSVFilename, row.names=FALSE )
+    return( CSVFilename )
+}
+
+TFMD2CSV <- function( data ) {                                                           # hidden function to convert FMD plot data in R to .csv file
+    if( ! file.exists('svsfiles') ) dir.create( 'svsfiles' )                            # if svsfiles does not exist, create it
+    CSVFilename <- paste0( "svsfiles/FMD_data.csv"  )                                   # create filename
+    tl <- data[,c(3,9:11,14:16,18:21)]                                                        # select columns
+    write.csv( tl, CSVFilename, row.names=FALSE )                                       # write .csv file
+    return( CSVFilename )                                                               # return filename written
 }
 
 # You can learn more about package authoring with RStudio at:

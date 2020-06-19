@@ -10,14 +10,14 @@ This rSVS package provides an interface to perform SVS visualiations from R.
 \details{
 The package includes the following functions:
 \itemize{
-    \item SVS()             - main function for performing visualziations
-    \item SVS_Environment() - check package environment and returns path to components
-    \item SVS_Example()     - show reginal example visualizations
-    \item SVS_ExampleData() - generate stand data for visualizations
-    \item SVS_Species()     - list known species
-    \item svsfiles()        - list or clean out svsfiles folder containing temporary files for visualizations
-    \item FIA2NRCS()        - convert species codes from FIA # to NRCS code
-    \item NRCS2FIA()        - convert species codes from NRCS code to FIA #
+    \item svs()                - main function for performing visualziations
+    \item svsdata()            - generate stand data for visualizations
+    \item svsfiles()           - list or clean out svsfiles folder containing temporary files for visualizations
+    \item SVS_Environment()    - check package environment and returns path to components
+    \item SVS_Example()        - show reginal example visualizations
+    \item SVS_Species()        - list known species
+    \item Translate_FIA2NRCS() - convert species codes from FIA # to NRCS code
+    \item Translate_NRCS2FIA() - convert species codes from NRCS code to FIA #
 }
 
 The package supports either species identified by FIA # or NRCS Plants Database code. The default

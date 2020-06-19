@@ -41,7 +41,7 @@ svs(
 \item{randommess}{control "noise" of coordinates generated}
 }
 \description{
-The SVS() function will create stand level visualizations from data frames and files containing appropriate information.  The
+The svs() function will create stand level visualizations from data frames and files containing appropriate information.  The
 function has the abillity to generate coordinates if they are not provided. Additionally missing information (height, crown ratio, crown width) values will be
 "dubbed" if missing.
 }

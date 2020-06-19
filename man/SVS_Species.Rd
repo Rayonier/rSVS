@@ -15,7 +15,7 @@ List known species codes.
 \details{
 This function simply reads and returns the list of known species codes distributed with the rSVS
 package (rSVS_Species.csv). This file is also used as the basis for species translation by the
-FIA2NRCS() and NRCS2FIA() funtions.
+Translate_FIA2NRCS() and Translate_NRCS2FIA() funtions.
 
 The rSVS package supports FIA number and NRCS alphabetic codes. The displayed table will include
 FIA, NRCS, Genus, Species, Common, and Comment, FIA.trf, NRCS.trf, FVS.trf, FVSSpCode, FVS.East,
