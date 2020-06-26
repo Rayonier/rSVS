@@ -6,6 +6,9 @@
 \usage{
 svsfiles(clean = FALSE)
 }
+\arguments{
+\item{clean}{logical flag to determine if function lists files or removes them}
+}
 \description{
 List of clean out svsfiles folder
 }

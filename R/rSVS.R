@@ -298,7 +298,7 @@ svsdata <- function( type='TBL2SVS', species, dbh, tpa, scale=4, shape=2, n=30, 
 #' Use svsfiles(clean=TRUE) to remove files from the folder
 #'
 #' @author James McCarter \email{jim.mccarter@rayonier.com}
-#' @param clean
+#' @param clean logical flag to determine if function lists files or removes them
 #' @examples
 #' svsfiles()
 #' svsfiles(clean=TRUE)
@@ -315,15 +315,15 @@ svsfiles <- function( clean=FALSE ) {
     }
 }
 
-# turn comment into #' to export and make available to user
+# turn comment below into #' to export and make available for debugging or users
 # @export
-SVS_DataType <- function( data, verbose=FALSE ) {                                    # hidden function to detect data type of object or file
+SVS_DataType <- function( data, verbose=FALSE ) {                                       # hidden function to detect data type of object or file
     DataType <- NULL                                                                    # start with data type not known
     if( verbose ) print( paste0( "class(data) = ", class(data) ) )                      # echo what type of data we have
     if( class(data) == "character" ) {                                                  # have a string which is a filename
-        if( verbose ) print( paste0( "Data = \"character\"" ) )                         # echo if verbose
-        if( grepl( ".svs", tolower(data) ) ) DataType <- 'SVSFile'                               # have a .svs file
-        else if( grepl( '.csv', tolower(data) ) ) {                                              # have a .csv file
+        if( verbose ) print( paste0( "Data = \"character\", filename of .svs or .csv file" ) )   # echo if verbose
+        if( grepl( ".svs", tolower(data) ) ) DataType <- 'SVSFile'                      # have a .svs file
+        else if( grepl( '.csv', tolower(data) ) ) {                                     # have a .csv file
             if( file.exists( data ) ) {                                                 # make sure file exists
                 tf <- read.csv( data )                                                  # read file to check format
                 if( length(attributes(tf)$names) < 14 ) DataType <- 'TBL2SVSFile'       # TBL2SVS format file
@@ -335,6 +335,7 @@ SVS_DataType <- function( data, verbose=FALSE ) {                               
         }
         if( ! file.exists( data ) ) print( paste0( "Error: File '", data, "' does not exist!" ) )   # warn if file does not exist
     } else if( class(data) == "list" ) {                                                # have a list, now test of what type of data
+        if( verbose ) print( paste0( "Data = \"list\"" ) )
         if( (attributes(data)$names[1]=="header") & (attributes(data)$names[2]=="treelist"))  {     # should be organon/cipsanon/ryn.c2g stand object
             if( verbose ) print( "Detected organon/cips/plc stand object" )             # echo verbose
             DataType <- 'StandObject'                                                   # set DataType to StandObject type
@@ -345,6 +346,7 @@ SVS_DataType <- function( data, verbose=FALSE ) {                               
             print( paste0( "Not sure what object type we have here: ", attributes(data)$names, str(data) ) )    # don't know format
         }
     } else if( class(data) == "data.frame" ) {                                          # have a data frame
+        if( verbose ) print( paste0( "Data = \"data.frame\"" ) )
         if( (attributes(data)$names[1]=="DataSource") & (attributes(data)$names[3]=="PlotKey") ) {       # have FMD treelist for plots
             if( verbose ) print( "Detected FMD tree data frame")                        # if verbose, echo type detected
             DataType <- 'FMDObject'                                                     # set DataType to FMDObject
@@ -353,7 +355,7 @@ SVS_DataType <- function( data, verbose=FALSE ) {                               
         } else if( (length(attributes(data)$names)>=14) & (attributes(data)$names[2]=='Year.Age') ) { DataType <- 'StandVizObject'
         } else if( attributes(data)$names[12]=='CRat1' ) { DataType <- 'SVScsvObject'   # SVScsv format object
         } else {
-            print( "Some unknown data.frame format:" )                                  # don't know this format
+            print( "Some unknown data.frame format: " )                                 # don't know this format
             print(str(data))
             print(attributes(data)$names)
         }
@@ -698,10 +700,11 @@ SVScsvObject2CSV <- function( data, name=deparse(substitute(data)) ) {
     return( CSVFilename )
 }
 
-TFMD2CSV <- function( data ) {                                                           # hidden function to convert FMD plot data in R to .csv file
+FMD2CSV <- function( data ) {                                                           # hidden function to convert FMD plot data in R to .csv file
     if( ! file.exists('svsfiles') ) dir.create( 'svsfiles' )                            # if svsfiles does not exist, create it
     CSVFilename <- paste0( "svsfiles/FMD_data.csv"  )                                   # create filename
-    tl <- data[,c(3,9:11,14:16,18:21)]                                                        # select columns
+    tl <- data %>% dplyr::select(PlotKey,TreeKey,Species,MeasDate,Status,Condition,Damage,DBH,Height,CrownRatio,TPA)
+    #tl <- data[,c(3,9:11,14:16,18:21)]                                                        # select columns
     write.csv( tl, CSVFilename, row.names=FALSE )                                       # write .csv file
     return( CSVFilename )                                                               # return filename written
 }
