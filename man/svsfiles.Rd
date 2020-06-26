@@ -6,15 +6,12 @@
 \usage{
 svsfiles(clean = FALSE)
 }
-\arguments{
-\item{clean}{}
-}
 \description{
 List of clean out svsfiles folder
 }
 \details{
 Use the svsfiles() function to manage files in the svsfiles temporary folder.
-Using the function with no arguments to view a list of files in the folder.  
+Using the function with no arguments to view a list of files in the folder.
 Use svsfiles(clean=TRUE) to remove files from the folder
 }
 \examples{

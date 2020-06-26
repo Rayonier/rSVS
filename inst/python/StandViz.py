@@ -93,10 +93,10 @@ def main():     # implement __main__ scope for handling of command line executio
         OriginalWindowsPath = os.getcwd()                                       # save starting path
         ScriptPath = _MyPath                                                    # 
         if( ScriptPath == '' ): ScriptPath = OriginalWindowsPath
-        if( DEBUG ): print( "OriginalPath={}, ScriptPath={}, os.path.realpath()={}".format(OriginalWindowsPath, ScriptPath, os.path.realpath(ScriptPath)) )
+        if( DEBUG ): print( "StandViz.py: OriginalPath={}, ScriptPath={}, os.path.realpath()={}".format(OriginalWindowsPath, ScriptPath, os.path.realpath(ScriptPath)) )
         SVSPath = os.path.normpath( os.path.split(ScriptPath)[0] + '/bin/SVS/winsvs.exe' )
         if( not os.path.exists( SVSPath ) ): print( "This command will fail!: {}".format(SVSPath) )
-        if( DEBUG ): print( "SVSPath = {}".format(SVSPath))
+        if( DEBUG ): print( "StandViz.py: SVSPath = {}".format(SVSPath))
 
         #os.chdir( ScriptPath )
 
@@ -141,26 +141,27 @@ def main():     # implement __main__ scope for handling of command line executio
             if( GenMethod in ['u','unif','uniform'] ): GenMethod = 'uniform'        # generate uniform coordinates
         else: GenMethod = 'random'                                              # else, default GenMethod='random'
 
-        if( DEBUG ): print( "OutFormat={}, GenMethod={}, ExpandCoord={}".format(OutFormat, GenMethod, ExpandCoord) )
+        if( NOTIFY ): print( 'StandViz.py - Python implementation of Stand Visualization Addin for Excel' )
+
+        if( DEBUG ): print( "StandViz.py: OutFormat={}, GenMethod={}, ExpandCoord={}".format(OutFormat, GenMethod, ExpandCoord) )
 
         #if( (SOPT.gc==0) & (SOPT.gf==0) & (SOPT.gr==0) & (SOPT.gu==0) ): SOPT.gr = True   # random is default coordinate generation
         #if( (SOPT.ob==0) & (SOPT.ow==0) & (SOPT.os==0) & (SOPT.ox==0) ): SOPT.os = 1   # SVS is default output
 
-        if( NOTIFY ): print( 'StandViz.py - Python implementation of Stand Visualization Addin for Excel' )
-        if( DEBUG ): print(sys.argv)
+        if( DEBUG ): print( "StandViz.py: sys.argv={}".format(sys.argv) )
         #if( DEBUG ): print( 'nFile={}, FILELIST={}' % (nFile, SOPT.FILELIST) )
         #if( DEBUG ): print( 'Using Python {} on {} from {}'.format(sys.version, sys.platform, sys.prefix) )
 
         for FILE in SOPT.FILELIST:
             (dirname, filename) = os.path.split( FILE )                         # get path and filename for file from command line
             (basename, ext) = os.path.splitext( filename )                      # get filebase and extension
-            if( DEBUG ): print( "File: {}, dirname={} filename={} basename={} ext={}".format(FILE, dirname, filename, basename, ext) )
+            if( DEBUG ): print( "StandViz.py: File: {}, dirname={} filename={} basename={} ext={}".format(FILE, dirname, filename, basename, ext) )
             #DataSet = 'None'
             FileType = 'unknown'                                                # start with FileType='unknown'
             # determine file format from filename provided on command line
             if( re.search( '.csv', filename ) != None ):                        # have .csv extension
                 DataSet = re.sub( '.csv', '', filename )                        # name dataset from base filename
-                if( DEBUG ): print( "{}: FileType={}".format(FILE,FileType) )
+                if( DEBUG ): print( "StandViz.py: {}: FileType={}".format(FILE,FileType) )
             elif( re.search( '.svs', filename ) != None ):                      # have .svs extension, just pass through to winsvs.exe if the file exists
                 CMDLINE = "{} {}".format(SVSPath, FILE)                         # build command line
                 if( VERBOSE ): print(CMDLINE)                                   # echo command line
@@ -1208,7 +1209,7 @@ class StandViz:
         #self.SVF.write( '0.88    1.0   0      12.8   201.91        0\n' )
 
     def Viz_FMDObject( self, FileName ):
-        print( "Creating FDM visualizations..." )
+        print( "StandViz.py: Creating FDM visualizations..." )
         (dirname, filename) = os.path.split( FileName )                         # get path and filename for file from command line
         (basename, ext) = os.path.splitext( filename )                      # get filebase and extension
         D = pd.read_csv( FileName )     # read .csv file
@@ -1223,7 +1224,7 @@ class StandViz:
             if( not Plot in TD ): TD[Plot] = {}
             if( not MeasDate in TD[Plot] ): TD[Plot][MeasDate] = {}
             TD[Plot][MeasDate][Tree] = (Spp,DBH,Ht,CRat,Status,Cond,Dam,TPA)
-        print( "Plots={}".format(TD.keys()) )
+        print( "StandViz.py: Plots={}".format(TD.keys()) )
         nViz = 0
         #for P in sorted(TD.keys()):
         #    for Y in sorted(TD[P].keys()):
@@ -1232,11 +1233,11 @@ class StandViz:
         #    ans = input( "Note: This will create {} visualizations which cannot be interupted.  Proceed (Y/N)?" )
         #    if( ans=='N' ): return
         for P in sorted(TD.keys()):
-            print( "Plot={}, Years={}".format(P,sorted(TD[P].keys())) )
+            print( "StandViz.py: Plot={}, Years={}".format(P,sorted(TD[P].keys())) )
             for Y in sorted(TD[P].keys()):
                 OutFilename = "{}/{}-{}.asc".format(dirname,P,Y)
                 SvsFilename = "{}/{}-{}.svs".format(dirname,P,Y)
-                print( "Creating {} and {}".format(OutFilename, SvsFilename))
+                print( "StandViz.py: Creating {} and {}".format(OutFilename, SvsFilename))
                 FileNames.append(SvsFilename)
                 OUT = open( OutFilename, 'w' )
                 OUT.write( ";species dbh height crat crad status pclass cclass tpa\n")
@@ -1261,7 +1262,7 @@ class StandViz:
         print( FileNames )
 
     def Viz_LMSObject( self, FileName ):
-        print( "Creating LMS visualizations..." )
+        print( "StandViz.py: Creating LMS visualizations..." )
         D = pd.read_csv( FILE )     # read .csv file
         # now process into pieces by PlotKey and MeasDate
         # PlotKey, TreeKey, Species, MeasDate, MeaseAge, Status, Condition, Damage, Screen, DBH, Height, CrownRatio, TPA
@@ -1305,7 +1306,7 @@ class StandViz:
         # TreeSpc: 1=Unforked pine, 2=hardwood, 3=dead tree (pine or hardwood), 4=forked pine
         CsvFileName = "{}".format(FileName)
         # split path from filename and create .svs in svsfiles folder
-        print( "Processing {}...".format(CsvFileName))
+        print( "StandViz.py: Processing {}...".format(CsvFileName))
         # check that it exists
         D = pd.read_csv( CsvFileName )
         #DataSet = re.sub( '.csv', '', filename )
@@ -1344,13 +1345,13 @@ class StandViz:
         os.system(CMDLINE)
 
     def Viz_StandObject( self, FileName ):
-        print( "visualizing {}".format(FILE))
+        print( "StandViz.py: visualizing {}".format(FILE))
         D = pd.read_csv( FILE )
-        print( "{} lines read".format(len(D.index)))
+        print( "StandViz.py: {} lines read".format(len(D.index)))
         OutFilename = "{}/{}.asc".format(dirname,basename)
         SvsFilename = "{}/{}.svs".format(dirname,basename)
         OptFilename = "{}/{}.opt".format(dirname,basename)
-        print( "OutFilename={}".format(OutFilename))
+        print( "StandViz.py: OutFilename={}".format(OutFilename))
         OUT = open( OutFilename, 'w' )
         OUT.write( ";species dbh height crat crad status pclass cclass tpa\n")
         for d in D.itertuples():
@@ -1369,7 +1370,7 @@ class StandViz:
 
     def Viz_StandViz( self, FileName ):
         D = pd.read_csv( FILE )
-        print( "{} lines read".format(len(D.index)))
+        print( "StandViz.py: {} lines read".format(len(D.index)))
         OutFilename = "{}/{}.asc".format(dirname,basename)
         SvsFilename = "{}/{}.svs".format(dirname,basename)
 
@@ -1380,13 +1381,13 @@ class StandViz:
         pass
 
     def Viz_TBL2SVSObject( self, FileName ):
-        print( "visualizing {}".format(FILE))
+        print( "StandViz.py:TBL2SVSObject: visualizing {}".format(FILE))
         D = pd.read_csv( FILE )
-        print( "{} lines read".format(len(D.index)))
+        print( "StandViz.py: {} lines read".format(len(D.index)))
         OutFilename = "{}/{}.asc".format(dirname,basename)
         SvsFilename = "{}/{}.svs".format(dirname,basename)
         OptFilename = "{}/{}.opt".format(dirname,basename)
-        print( "OutFilename={}".format(OutFilename))
+        print( "StandViz.py: OutFilename={}".format(OutFilename))
         OUT = open( OutFilename, 'w' )
         OUT.write( ";species dbh height crat crad status pclass cclass tpa\n")
         for d in D.itertuples():

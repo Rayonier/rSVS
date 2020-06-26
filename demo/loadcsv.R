@@ -1,9 +1,6 @@
 # demo showing loading of example data provided in package
 
-
-
 # SouthernPine.csv
-
 sp <- system.file( "extdata", "SouthernPine.csv", package="rSVS" )
 spo <- read.csv(sp)
 

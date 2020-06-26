@@ -8,7 +8,7 @@
 #' \itemize{
 #'     \item svs()                - main function for performing visualziations
 #'     \item svsdata()            - generate stand data for visualizations
-#'     \item svsfiles()           - list or clean out svsfiles folder containing temporary files for visualizations
+#'     \item svsfiles()           - list or clean svsfiles folder containing temporary files for visualizations
 #'     \item SVS_Environment()    - check package environment and returns path to components
 #'     \item SVS_Example()        - show reginal example visualizations
 #'     \item SVS_Species()        - list known species
@@ -109,52 +109,6 @@
 NULL
 
 
-# turn comment into #' to export and make available to user
-# @export
-Detect_DataType <- function( data, verbose=FALSE ) {                                    # hidden function to detect data type of object or file
-    DataType <- NULL                                                                    # start with data type not known
-    if( verbose ) print( paste0( "class(data) = ", class(data) ) )                      # echo what type of data we have
-    if( class(data) == "character" ) {                                                  # have a string which is a filename
-        if( verbose ) print( paste0( "Data = \"character\"" ) )                         # echo if verbose
-        if( grepl( ".svs", tolower(data) ) ) DataType <- 'SVSFile'                               # have a .svs file
-        else if( grepl( '.csv', tolower(data) ) ) {                                              # have a .csv file
-            if( file.exists( data ) ) {                                                 # make sure file exists
-                tf <- read.csv( data )                                                  # read file to check format
-                if( length(attributes(tf)$names) < 14 ) DataType <- 'TBL2SVSFile'       # TBL2SVS format file
-                else if( attributes(tf)$names[12]=="CRat1") DataType <- 'SVScsvFile'    # SVScsv format file
-                else if( (length(attributes(tf)$names)>=19) & (attributes(tf)$names[17]=="RootWad") ) DataType <- 'StandVizExtendedFile'
-                else if( (length(attributes(tf)$names)>=14) & (attributes(tf)$names[2]=="Year.Age") ) DataType <- 'StandVizFile'
-                else DataType <- 'CSVFile'                                              # some other .csv format
-            }
-        }
-        if( ! file.exists( data ) ) print( paste0( "Error: File '", data, "' does not exist!" ) )   # warn if file does not exist
-    } else if( class(data) == "list" ) {                                                # have a list, now test of what type of data
-        if( (attributes(data)$names[1]=="header") & (attributes(data)$names[2]=="treelist"))  {     # should be organon/cipsanon/ryn.c2g stand object
-            if( verbose ) print( "Detected organon/cips/plc stand object" )             # echo verbose
-            DataType <- 'StandObject'                                                   # set DataType to StandObject type
-        } else if( (attributes(data)$names[1]=="stand") & (attributes(data)$names[2]=="measurement") & (attributes(data)$names[3]=="treelist") )  {
-            if( verbose ) print( "Detected LMS stand object" )                          # echo if verbose
-            DataType <- 'LMSObject'                                                     # set DataType to LMSObject type
-        } else {
-            print( paste0( "Not sure what object type we have here: ", attributes(data)$names, str(data) ) )    # don't know format
-        }
-    } else if( class(data) == "data.frame" ) {                                          # have a data frame
-        if( (attributes(data)$names[1]=="DataSource") & (attributes(data)$names[3]=="PlotKey") ) {       # have FMD treelist for plots
-            if( verbose ) print( "Detected FMD tree data frame")                        # if verbose, echo type detected
-            DataType <- 'FMDObject'                                                     # set DataType to FMDObject
-        } else if( length(attributes(data)$names)<14 ) { DataType <- 'TBL2SVSObject'    # TBL2SVS format object
-        } else if( (length(attributes(data)$names)>=19) & (attributes(data)$names[17]=='RootWad') ) { DataType <- 'StandVizExtendedObject'
-        } else if( (length(attributes(data)$names)>=14) & (attributes(data)$names[2]=='Year.Age') ) { DataType <- 'StandVizObject'
-        } else if( attributes(data)$names[12]=='CRat1' ) { DataType <- 'SVScsvObject'   # SVScsv format object
-        } else {
-            print( "Some unknown data.frame format:" )                                  # don't know this format
-            print(str(data))
-            print(attributes(data)$names)
-        }
-    }
-    return( DataType )                                                                  # return detected data type
-}
-
 #' Visualize stand using the Stand Visualization System (SVS)
 #'
 #' The svs() function will create stand level visualizations from data frames and files containing appropriate information.  The
@@ -197,17 +151,18 @@ Detect_DataType <- function( data, verbose=FALSE ) {                            
 #' @export
 svs <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, row=FALSE, uniform=FALSE, randomness=NULL, clumpiness=NULL, clumpratio=NULL,
                  verbose=FALSE, debug=FALSE ) {
+    if( is.null(data) ) return( "data missing!" )
     if( exists(".Development") ) PyExePath <- ".\\python38\\python.exe"                 # if under development use local copy of python
     else PyExePath <- SVS_Environment('python')                                         # else test for and optionally install package copy of python
-    DataType <- Detect_DataType( data, verbose )
-    if( debug ) print( paste0( "DataType=", DataType ))
-    StandVizOpt <- " "                                                                  # start with StandViz.py options empty
+    DataType <- SVS_DataType( data, verbose )                                           # getect data type passed into function
+    if( debug ) print( paste0( "svs(): DataType=", DataType ))                          # if debug, echo data type detected
+    StandVizOpt <- ""                                                                   # start with StandViz.py options empty
     if( verbose ) StandVizOpt <- paste0( StandVizOpt, " -v" )                           # if verbose=TRUE, append -v command line option
     if( debug ) StandVizOpt <- paste0( StandVizOpt, " -D" )                             # if debug=TRUE, append -D
     if( clumped ) StandVizOpt <- paste0( StandVizOpt, " -gc" )                          # if clumped=TRUE, add command line option for clumped coordinates
     else if( row ) StandVizOpt <- paste0( StandVizOpt, " -gf" )                         # if row=TRUE, add command line option for fixed coordinates
     else if( uniform ) StandVizOpt <- paste0( StandVizOpt, " -gu" )                     # if uniform=TRUE, add command line option for uniform coordinates
-    else StandVizOpt <- paste0( StandVizOpt, " -gr" )                                   # esle add command line option for random coordinates
+    else StandVizOpt <- paste0( StandVizOpt, " -gr" )                                   # else add command line option for random coordinates
     if( !is.null(randomness) ) StandVizOpt <- paste0( StandVizOpt, " -rf ", randomness )    # add randomness factor if specified
     if( !is.null(clumpiness) ) StandVizOpt <- paste0( StandVizOpt, " -cf ", clumpiness )    # add clumpiness factor if specified
     if( !is.null(clumpratio) ) StandVizOpt <- paste0( StandVizOpt, " -cr ", clumpratio )    # add clumpratio option if specified
@@ -215,26 +170,26 @@ svs <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, ro
     svcmdline <- paste0( PyExePath, ' "', system.file( "python", "StandViz.py", package="rSVS" ), '" ', StandVizOpt )    # create path to StandViz.py program
     if( debug ) print(svcmdline)
     if( DataType %in% c('CSVFile','SVSFile', 'SVScsvFile', 'StandVizFile', 'StandVizExtendedFile', 'TBL2SVSFile') ) { # have a string which is a filename
-        cmdline <- paste0( svcmdline, " ", data )                                            # add data to command line
+        cmdline <- paste0( svcmdline, " ", data )                                       # add data to command line
     } else if( DataType == "StandObject" ) {                                            # have a organon/cips/c2g stand object
         CsvFile <- StandObject2CSV(data)                                                # convert data to .csv file
-        cmdline <- paste0( svcmdline, " ", CsvFile )                                         # add CsvFile to command line
+        cmdline <- paste0( svcmdline, " ", CsvFile )                                    # add CsvFile to command line
     } else if( DataType == "LMSObject" ) {
         CsvFile <- LMSObject2CSV(data)                                                  # convert data from LMS object to .csv file
-        cmdline <- paste0( svcmdline, " ", CsvFile )                                     # add CsvFile to command line
+        cmdline <- paste0( svcmdline, " ", CsvFile )                                    # add CsvFile to command line
     } else if( DataType=="FMDObject" ) {
-        # need to figure out how many visualizations will be created.  Unique(PlotKey and 
+        # need to figure out how many visualizations will be created.  Unique(PlotKey and
         nViz <- length( unique( paste0( data$PlotKey,"_",data$MeasDate) ) )
         print( paste0( "Will create visualizations for: ", paste(unique(data$PlotKey),collapse=' ') ) )
         if( nViz > 3 ) {
-            ans <- readline( prompt=paste0( "You are requestion ", nViz, " visualizations.  Proceed (Y/N)? " ) )
+            ans <- readline( prompt=paste0( "You are requesting ", nViz, " visualizations.  Proceed (Y/N)? " ) )
             if( !(tolower(ans) %in% c('y', 'yes')) ) return( "Visualizations Cancelled!")
         }
         CsvFile <- FMD2CSV(data)
         cmdline <- paste0( svcmdline, " ", CsvFile )                                     # add CsvFile to command line
     } else if( DataType=="StandVizObject" ) {
         CsvFile <- paste0( "svsfiles/", bquote(data), ".csv" ) # format filename from object name
-        write.csv( data, CsvFile, row.names=FALSE )                                       # write .csv file
+        write.csv( data, CsvFile, row.names=FALSE )                                      # write .csv file
         #cmdline <- paste0( PyExePath, " \"", system.file( "python", "StandViz.py", package="rSVS" ), "\"", StandVizOpt, CsvFile )
         cmdline <- paste0( svcmdline, " ", CsvFile )                                     # add CsvFile to command line
         #if( verbose ) print( paste0( "cmdline: ", cmdline )  )
@@ -243,7 +198,7 @@ svs <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, ro
         #else print( paste0( "Error running command!  Error = ", RetValue, " for command: ", cmdline ) )
     } else if( DataType=="SVScsvObject" ) {
         CsvFile <- SVScsvObject2CSV( data )
-        print( paste0( "SVScsvObject: CSVFile = ", CsvFile ) )
+        print( paste0( "svs(): SVScsvObject: CSVFile = ", CsvFile ) )
         cmdline <- paste0( svcmdline, " ", CsvFile )
     } else if( DataType=="TBL2SVSObject" ) {
         print( "Processing TBLS2SVSObject..." )
@@ -260,10 +215,10 @@ svs <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, ro
         print(str(data))
         return
     }
-    if( verbose ) print( paste0( "cmdline: ", cmdline )  )
+    if( verbose ) print( paste0( "svs(): cmdline: ", cmdline )  )
     RetValue <- system( cmdline, invisible=FALSE, wait=TRUE )                       # execute and save return value
     if( RetValue == 0 ) return( "SVS() completed" )                                 # return success
-    else print( paste0( "Error running command!  Error = ", RetValue, " for command: ", cmdline ) ) # return error number and commmand line that failed
+    else print( paste0( "svs(): Error running command!  Error = ", RetValue, " for command: ", cmdline ) ) # return error number and commmand line that failed
     #if( ! "reticulate" %in% .packages() ) if( verbose ) print( paste0( "reticulate package NOT loaded" ) )
     #if( ! "reticulate" %in% rownames(installed.packages()) ) if( verbose ) print( paste0( "reticulate package NOT installed" ) )
     # if reticulate
@@ -339,11 +294,11 @@ svsdata <- function( type='TBL2SVS', species, dbh, tpa, scale=4, shape=2, n=30, 
 #' List of clean out svsfiles folder
 #'
 #' Use the svsfiles() function to manage files in the svsfiles temporary folder.
-#' Using the function with no arguments to view a list of files in the folder.  
+#' Using the function with no arguments to view a list of files in the folder.
 #' Use svsfiles(clean=TRUE) to remove files from the folder
 #'
 #' @author James McCarter \email{jim.mccarter@rayonier.com}
-#' @param clean 
+#' @param clean
 #' @examples
 #' svsfiles()
 #' svsfiles(clean=TRUE)
@@ -358,6 +313,52 @@ svsfiles <- function( clean=FALSE ) {
         if( file.exists( "svsfiles" ) ) return( dir( "svsfiles" ) )
         else return( "'svsfiles' fodler does not exist" )
     }
+}
+
+# turn comment into #' to export and make available to user
+# @export
+SVS_DataType <- function( data, verbose=FALSE ) {                                    # hidden function to detect data type of object or file
+    DataType <- NULL                                                                    # start with data type not known
+    if( verbose ) print( paste0( "class(data) = ", class(data) ) )                      # echo what type of data we have
+    if( class(data) == "character" ) {                                                  # have a string which is a filename
+        if( verbose ) print( paste0( "Data = \"character\"" ) )                         # echo if verbose
+        if( grepl( ".svs", tolower(data) ) ) DataType <- 'SVSFile'                               # have a .svs file
+        else if( grepl( '.csv', tolower(data) ) ) {                                              # have a .csv file
+            if( file.exists( data ) ) {                                                 # make sure file exists
+                tf <- read.csv( data )                                                  # read file to check format
+                if( length(attributes(tf)$names) < 14 ) DataType <- 'TBL2SVSFile'       # TBL2SVS format file
+                else if( attributes(tf)$names[12]=="CRat1") DataType <- 'SVScsvFile'    # SVScsv format file
+                else if( (length(attributes(tf)$names)>=19) & (attributes(tf)$names[17]=="RootWad") ) DataType <- 'StandVizExtendedFile'
+                else if( (length(attributes(tf)$names)>=14) & (attributes(tf)$names[2]=="Year.Age") ) DataType <- 'StandVizFile'
+                else DataType <- 'CSVFile'                                              # some other .csv format
+            }
+        }
+        if( ! file.exists( data ) ) print( paste0( "Error: File '", data, "' does not exist!" ) )   # warn if file does not exist
+    } else if( class(data) == "list" ) {                                                # have a list, now test of what type of data
+        if( (attributes(data)$names[1]=="header") & (attributes(data)$names[2]=="treelist"))  {     # should be organon/cipsanon/ryn.c2g stand object
+            if( verbose ) print( "Detected organon/cips/plc stand object" )             # echo verbose
+            DataType <- 'StandObject'                                                   # set DataType to StandObject type
+        } else if( (attributes(data)$names[1]=="stand") & (attributes(data)$names[2]=="measurement") & (attributes(data)$names[3]=="treelist") )  {
+            if( verbose ) print( "Detected LMS stand object" )                          # echo if verbose
+            DataType <- 'LMSObject'                                                     # set DataType to LMSObject type
+        } else {
+            print( paste0( "Not sure what object type we have here: ", attributes(data)$names, str(data) ) )    # don't know format
+        }
+    } else if( class(data) == "data.frame" ) {                                          # have a data frame
+        if( (attributes(data)$names[1]=="DataSource") & (attributes(data)$names[3]=="PlotKey") ) {       # have FMD treelist for plots
+            if( verbose ) print( "Detected FMD tree data frame")                        # if verbose, echo type detected
+            DataType <- 'FMDObject'                                                     # set DataType to FMDObject
+        } else if( length(attributes(data)$names)<14 ) { DataType <- 'TBL2SVSObject'    # TBL2SVS format object
+        } else if( (length(attributes(data)$names)>=19) & (attributes(data)$names[17]=='RootWad') ) { DataType <- 'StandVizExtendedObject'
+        } else if( (length(attributes(data)$names)>=14) & (attributes(data)$names[2]=='Year.Age') ) { DataType <- 'StandVizObject'
+        } else if( attributes(data)$names[12]=='CRat1' ) { DataType <- 'SVScsvObject'   # SVScsv format object
+        } else {
+            print( "Some unknown data.frame format:" )                                  # don't know this format
+            print(str(data))
+            print(attributes(data)$names)
+        }
+    }
+    return( DataType )                                                                  # return detected data type
 }
 
 #' Check SVS environment and return path to components
@@ -593,7 +594,7 @@ SVS_Species <- function() {
 #' Translate_FIA2NRCS( MyData )
 #' @export
 Translate_FIA2NRCS <- function( Data ) {
-    DataType <- Detect_DataType( Data )
+    DataType <- SVS_DataType( Data )
     SppRef <- read.csv( system.file( "bin", "rSVS_Species.csv", package="rSVS" ) )[,c(1,2)] # read rSVS_Species.csv and get just FIA and NRCS fields
     if( DataType %in% c('StandVizObject','StandVizExtendedObject','SVScsvObject','TBL2SVSObject') ) {
         Data$Species <- as.character( Data$Species )                                        # coerce Species to character from factor
@@ -620,7 +621,7 @@ Translate_FIA2NRCS <- function( Data ) {
 #' Translate_NRCS2FIA( MyData )
 #' @export
 Translate_NRCS2FIA <- function( Data ) {
-    DataType <- Detect_DataType( Data )
+    DataType <- SVS_DataType( Data )
     SppRef <- read.csv( system.file( "bin", "rSVS_Species.csv", package="rSVS" ) )[,c(1,2)] # read rSVS_Species.csv and get just FIA and NRCS fields
     if( DataType %in% c('StandVizObject','StandVizExtendedObject','SVScsvObject','TBL2SVSObject') ) {
         Data$Species <- as.character( Data$Species )                                        # coerce Species to character from factor

@@ -12,7 +12,7 @@ The package includes the following functions:
 \itemize{
     \item svs()                - main function for performing visualziations
     \item svsdata()            - generate stand data for visualizations
-    \item svsfiles()           - list or clean out svsfiles folder containing temporary files for visualizations
+    \item svsfiles()           - list or clean svsfiles folder containing temporary files for visualizations
     \item SVS_Environment()    - check package environment and returns path to components
     \item SVS_Example()        - show reginal example visualizations
     \item SVS_Species()        - list known species
