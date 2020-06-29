@@ -262,7 +262,7 @@ svsdata <- function( type='TBL2SVS', species, dbh, tpa, scale=4, shape=2, n=30, 
     tr2 <- tr[c(3,2,5)]                                                     # get subset of columns we want: species, dbh, tpa
     tr2$ht <- tr2$dbh * rnorm(n,hd)                                         # dib in ht scaled from dbh with random normal noise around hd factor
     tr2$dbh[tr2$ht<4.5] <- 0.01                                             # if ht < 4.5, reset dbh to very small
-    if( datatype=='TBL2SVS' ) {
+    if( type=='TBL2SVS' ) {
         # Species, DBH, Height, CRat, Crad, Status, PlantClass, CrownClass, TPA
         tr2$CrownRatio <- 0.45                      # add CrownRatio
         tr2$CrownRadius <- tr2$ht * tr2$CrownRatio * 0.33 / 2.0     # add CrownRadius
@@ -271,7 +271,7 @@ svsdata <- function( type='TBL2SVS', species, dbh, tpa, scale=4, shape=2, n=30, 
         tr2$CrownClass <- 0
         tr2 <- tr2[,c(1,2,4,5,6,7,8,9,3)]
         names(tr2) <- c("Species", "DBH", "Height", "CrownRatio", "CrownRadius", "Status", "PlantClass", "CrownClass", "TPA")
-    } else if( datatype=='StandViz' ) {
+    } else if( type=='StandViz' ) {
         # Stand, Year/Age, Species, TreeNo, Live/Dead, Status, Condiiion, DBH, Height, CrowRat, CrownRad, TPA
         tr2$Stand <- 'Stand'                        # and stand name
         tr2$Year.Age <- substr( Sys.time(), 1, 4 )      # add year
@@ -283,7 +283,7 @@ svsdata <- function( type='TBL2SVS', species, dbh, tpa, scale=4, shape=2, n=30, 
         tr2$Condition <- NA
         tr2 <- tr2[,c(5,6,1,7,10,11,12,2,4,8,9,3)]
         names(tr2) <- c("Stand", "Year.Age", "Species", "TreeNo", "Live.Dead", "Status", "Condition", "DBH", "Height", "CrownRatio", "CrownRadius", "TPA")
-    #} else if( datatype=='StandVizExtended' ) {
+    #} else if( type=='StandVizExtended' ) {
     #    print( "Return StandViz Extended format example data" )
     }
     return( tr2 )

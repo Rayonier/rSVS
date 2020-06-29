@@ -1,7 +1,7 @@
 Package: rSVS
 Type: Package
 Title: R Package for stand level visualization using the Stand Visualization System (SVS)
-Version: 1.0.3
+Version: 1.0.4
 Author: James McCarter
 Maintainer: James McCarter <jim.mccarter@rayonier.com>
 Description: This package implements an interface to the Stand Visualization System (SVS) for 

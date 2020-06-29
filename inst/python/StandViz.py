@@ -175,6 +175,8 @@ def main():     # implement __main__ scope for handling of command line executio
             SVS = StandViz( DataSet, SvsPath=SVSPath )
             FileType = SVS.Determine_CSV_Format( FILE )                         # determine file format
 
+            if( SOPT.N ): SVS.TreeForm = 'NRCS'
+
             if( FileType=='FMDObject' ): SVS.Viz_FMDObject( FILE )
             elif( FileType=='LMSObject' ): SVS.Viz_LMSObject( FILE )
             elif( FileType=='PosTex' ): SVS.Viz_PosTex( FILE, ExpandCoord=ExpandCoord )
@@ -567,7 +569,7 @@ class SVS:
 #########################################################################################
 class StandViz:
     """class to handle interface to Stand Visualization System (SVS)"""
-    def __init__( self, DataSetName, SvsPath=None ):
+    def __init__( self, DataSetName, SvsPath=None, TreeForm='FIA' ):
         self.ResolutionLow = '1024x768'
         self.ResolutionHigh = '2048x1536'
         self.FocalLength = 150
@@ -576,13 +578,18 @@ class StandViz:
         self.Season = 'Summer'
         self.SpeciesCase = 'Upper'
         self.TPAScale = 1
+        self.TreeForm = TreeForm
         self.TreeFormFile = '%s/NRCS.trf' % (OWNPATH)
         #self.PaletteFile = '%s/TIR-BLUE.pal' % (OWNPATH)
         self.PaletteFile = None
         self.ViewpointDist = 1000
         self.ViewpointElev = 1000
-        if( SvsPath == None ): self.SvsExe = '{}\\SVS\\winsvs.exe'.format(OWNPATH)
-        else: self.SvsExe = SvsPath
+        if( SvsPath == None ):
+            self.SvsPath = OWNPATH
+            self.SvsExe = '{}\\SVS\\winsvs.exe'.format(OWNPATH)
+        else: 
+            self.SvsPath = SvsPath
+            self.SvsExe = '{}\\winsvs.exe'.format(SvsPath)
         self.Data = ForestData( DataSetName )
         self.SVF = None                         # variable for file handle object
         random.seed( self.RandSeed )            # initialize random seed generator to common starting point
@@ -1263,7 +1270,7 @@ class StandViz:
 
     def Viz_LMSObject( self, FileName ):
         print( "StandViz.py: Creating LMS visualizations..." )
-        D = pd.read_csv( FILE )     # read .csv file
+        D = pd.read_csv( FileName )     # read .csv file
         # now process into pieces by PlotKey and MeasDate
         # PlotKey, TreeKey, Species, MeasDate, MeaseAge, Status, Condition, Damage, Screen, DBH, Height, CrownRatio, TPA
         # need to accumulate data into dictionary by PlotKey and MeasDate
@@ -1345,7 +1352,9 @@ class StandViz:
         os.system(CMDLINE)
 
     def Viz_StandObject( self, FileName ):
-        print( "StandViz.py: visualizing {}".format(FILE))
+        print( "StandViz.py: visualizing {}".format(FileName))
+        (dirname, filename) = os.path.split( FileName )                         # get path and filename for file from command line
+        (basename, ext) = os.path.splitext( filename )                      # get filebase and extension
         D = pd.read_csv( FILE )
         print( "StandViz.py: {} lines read".format(len(D.index)))
         OutFilename = "{}/{}.asc".format(dirname,basename)
@@ -1369,7 +1378,9 @@ class StandViz:
         os.system(cmdline)
 
     def Viz_StandViz( self, FileName ):
-        D = pd.read_csv( FILE )
+        (dirname, filename) = os.path.split( FileName )                         # get path and filename for file from command line
+        (basename, ext) = os.path.splitext( filename )                      # get filebase and extension
+        D = pd.read_csv( FileName )
         print( "StandViz.py: {} lines read".format(len(D.index)))
         OutFilename = "{}/{}.asc".format(dirname,basename)
         SvsFilename = "{}/{}.svs".format(dirname,basename)
@@ -1381,8 +1392,10 @@ class StandViz:
         pass
 
     def Viz_TBL2SVSObject( self, FileName ):
-        print( "StandViz.py:TBL2SVSObject: visualizing {}".format(FILE))
-        D = pd.read_csv( FILE )
+        print( "StandViz.py:TBL2SVSObject: visualizing {}".format(FileName))
+        (dirname, filename) = os.path.split( FileName )                         # get path and filename for file from command line
+        (basename, ext) = os.path.splitext( filename )                      # get filebase and extension
+        D = pd.read_csv( FileName )
         print( "StandViz.py: {} lines read".format(len(D.index)))
         OutFilename = "{}/{}.asc".format(dirname,basename)
         SvsFilename = "{}/{}.svs".format(dirname,basename)
@@ -1402,11 +1415,11 @@ class StandViz:
             OUT.write( "{} {} {} {} {} {} {} {} {}\n".format(d.Species,DBH,Height,CRat,CRad,d.Status,d.PlantClass,d.CrownClass,d.TPA))
         OUT.close()
         OUT = open( OptFilename, 'w')
-        if( SOPT.N ): OUT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\SVS\\NRCS.trf {} {}".format(OutFilename,SvsFilename) )
+        if( self.TreeForm=='NRCS' ): OUT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\SVS\\NRCS.trf {} {}".format(OutFilename,SvsFilename) )
         else: OUT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\SVS\\FIA.trf {} {}".format(OutFilename,SvsFilename) )
         OUT.close()
-        if( not os.path.exists( SVSPath ) ): print( "This command will fail!: {}".format(SVSEXE))
-        cmdline = "{} -G -X{} {}".format(SVSPath,OptFilename,SvsFilename)
+        if( not os.path.exists( self.SvsPath ) ): print( "This command will fail!: {}".format(SVSEXE))
+        cmdline = "{} -G -X{} {}".format(self.SvsPath,OptFilename,SvsFilename)
         print( "cmdline={}".format(cmdline) )
         os.system(cmdline)
 
