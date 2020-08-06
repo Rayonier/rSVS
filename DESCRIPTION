@@ -2,12 +2,18 @@ Package: rSVS
 Type: Package
 Title: R Package for stand level visualization using the Stand Visualization System (SVS)
 Version: 1.0.4
-Author: James McCarter
-Maintainer: James McCarter <jim.mccarter@rayonier.com>
+Authors@R: 
+    person(given = "James",
+           family = "McCarter",
+           role = c("aut", "cre"),
+           email = "jim.mccarter@rayonier.com",
+           comment = c(ORCID = "0000-0003-3256-8314"))
 Description: This package implements an interface to the Stand Visualization System (SVS) for 
     creating stand level visualizations from R.  SVS was created by Robert J. McGaughey, 
     USDA Forest Service, PNW Research Station.  This package is sponsored by Rayonier, Inc. 
     and shared to the broader forestry community.
+Depends: R (>= 3.0.0)
+Suggets: reticulate
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
