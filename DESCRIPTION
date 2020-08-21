@@ -1,7 +1,7 @@
 Package: rSVS
 Type: Package
 Title: R Package for stand level visualization using the Stand Visualization System (SVS)
-Version: 1.0.4
+Version: 1.0.5
 Authors@R: 
     person(given = "James",
            family = "McCarter",
