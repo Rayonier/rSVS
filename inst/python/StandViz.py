@@ -94,7 +94,8 @@ def main():     # implement __main__ scope for handling of command line executio
         ScriptPath = _MyPath                                                    # 
         if( ScriptPath == '' ): ScriptPath = OriginalWindowsPath
         if( DEBUG ): print( "StandViz.py: OriginalPath={}, ScriptPath={}, os.path.realpath()={}".format(OriginalWindowsPath, ScriptPath, os.path.realpath(ScriptPath)) )
-        SVSPath = os.path.normpath( os.path.split(ScriptPath)[0] + '/bin/SVS/winsvs.exe' )
+        #SVSPath = os.path.normpath( os.path.split(ScriptPath)[0] + '/bin/SVS/winsvs.exe' )
+        SVSPath = os.path.normpath( os.path.split(ScriptPath)[0] + '/bin/SVS' )
         if( not os.path.exists( SVSPath ) ): print( "This command will fail!: {}".format(SVSPath) )
         if( DEBUG ): print( "StandViz.py: SVSPath = {}".format(SVSPath))
 
@@ -1355,7 +1356,7 @@ class StandViz:
         print( "StandViz.py: visualizing {}".format(FileName))
         (dirname, filename) = os.path.split( FileName )                         # get path and filename for file from command line
         (basename, ext) = os.path.splitext( filename )                      # get filebase and extension
-        D = pd.read_csv( FILE )
+        D = pd.read_csv( FileName )
         print( "StandViz.py: {} lines read".format(len(D.index)))
         OutFilename = "{}/{}.asc".format(dirname,basename)
         SvsFilename = "{}/{}.svs".format(dirname,basename)
@@ -1367,13 +1368,14 @@ class StandViz:
             OUT.write( "{} {} {} {} {} {} {} {} {}\n".format(d.species,d.dbh,d.height,d.cr,d.crad,d.status,d.pc,d.cc,d.tpa))
         OUT.close()
         OUT = open( OptFilename, 'w')
-        if( SOPT.N ): OUT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\SVS\\NRCS.trf {} {}".format(OutFilename,SvsFilename) )
-        else: OUT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\SVS\\FIA.trf {} {}".format(OutFilename,SvsFilename) )
+        #if( SOPT.N ): OUT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\SVS\\NRCS.trf {} {}".format(OutFilename,SvsFilename) )
+        #else: OUT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\SVS\\FIA.trf {} {}".format(OutFilename,SvsFilename) )
+        OUT.write( "-P1 -N 0 -H 0.33 -T..\\inst\\bin\SVS\\FIA.trf {} {}".format(OutFilename,SvsFilename) )
         OUT.close()
         #SVS = StandViz( basename )
-        SVSEXE = "inst\\bin\SVS\winsvs.exe"
-        if( not os.path.exists( SVSEXE ) ): print( "This command will fail!: {}".format(SVSEXE))
-        cmdline = "{} -G -X{} {}".format(SVSEXE,OptFilename,SvsFilename)
+        #SVSEXE = "inst\\bin\SVS\winsvs.exe"
+        if( not os.path.exists( self.SvsExe ) ): print( "This command will fail!: {}".format(self.SvsExe))
+        cmdline = "{} -G -X{} {}".format(self.SvsExe,OptFilename,SvsFilename)
         print( "cmdline={}".format(cmdline) )
         os.system(cmdline)
 

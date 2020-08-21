@@ -226,6 +226,7 @@ svs <- function( data, sheet=FALSE, output='svs', clumped=FALSE, random=TRUE, ro
     # SVS <- import_from_path( "StandViz", path="inst/python" )
 }
 
+
 #' Create SVS example data
 #'
 #' Create different kinds of example data understood by this package.
